@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.kss.main.mapper.CourseMapper">
+	<select id="selectCourseList" resultType="egovframework.kss.main.vo.CourseVO">
+		select c.id, c.title, c.description, u.name as instructor
+		from course c
+		inner join users u on u.id=c.instructor_id
+	</select>
+	
+	<insert id="registerCourse" parameterType="egovframework.kss.main.vo.CourseVO">
+	insert into course(instructor_id, title, description, status) values (#{instructor_id},#{title}, #{description}, #{status})
+	
+	</insert>
+	
+	
+	
+</mapper>

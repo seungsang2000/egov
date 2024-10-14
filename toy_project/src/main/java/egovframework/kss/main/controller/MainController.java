@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MainController {
 
 	@RequestMapping(value = "/main.do")
-	public String mainPage() {
+	public String loginPage() {
 		return "login";
 	}
 
@@ -19,6 +19,11 @@ public class MainController {
 	@RequestMapping(value = "/chkusr.do")
 	public String checkUser() {
 		return "chkusr";
+	}
+
+	@RequestMapping(value = "/egovSampleList.do")
+	public String egovSampleList() {
+		return "home";
 	}
 
 }
