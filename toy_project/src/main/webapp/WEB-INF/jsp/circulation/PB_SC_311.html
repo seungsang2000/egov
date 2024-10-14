@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/x-icon" href="../../images/ico/favicon.ico">
+	<link rel="apple-touch-icon-precomposed" type="image/x-icon" href="images/ico/favicon.ico">
+	<link rel="shortcut icon" type="image/x-icon" href="../../images/ico/favicon.ico">
+	
+	<link rel="stylesheet" type="text/css" href="../../src/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../../src/js/libs/jQuery-ui/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="../../src/css/ngii-mng.css">
+	
+	<title>국토정보포털 통합관리자 - 통계현황</title>
+	
+	<script type="text/javascript" src="../../src/js/libs/jQuery/1.12.3/jquery.min.js"></script>
+	<script type="text/javascript" src="../../src/js/libs/jQuery-ui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../src/js/ngii-mng.js"></script>
+	
+    <!--[if lt IE 9]>
+		<script type="text/javascript" src="../../src/js/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+		<script type="text/javascript" src="../../src/js/libs/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+	<!-- Skip Navigation -->
+	<a href="#content" class="nav-skip">본문바로가기</a>
+	<a href="#gnb" class="nav-skip">주메뉴 바로가기</a>
+	<a href="#lnb" class="nav-skip">서브메뉴 바로가기</a>
+    <!-- /Skip Navigation -->
+	
+	<!-- Header -->
+    <header>
+		<hgroup>
+			<h1 class="logo"><a href="../../login.html"><i></i><span class="blind">국토정보 플랫폼 통합관리자</span></a></h1>
+			<div class="user-info">
+				<span>국토정보 님</span>
+				<button type="button">로그아웃</button>
+			</div>
+		</hgroup>
+		
+        <nav id="gnb">
+			<ul role="menu">
+				<li><a href="../bbs/PB_SC_281.html">게시판 관리</a></li>
+				<li><a href="javascript:alert('준비중입니다');">정보관리</a></li>
+				<li><a href="../api/PB_SC_305.html">OPEN API 관리</a></li>
+				<li><a href="../statistics/PB_SC_308.html">통계 관리</a></li>
+				<li class="current"><a href="PB_SC_311.html">유통 관리</a></li>
+				<li><a href="../data/PB_SC_312.html">데이터 관리</a></li>
+				<li><a href="javascript:alert('준비중입니다');">기관사용자변경</a></li>
+			</ul>
+        </nav>
+    </header>
+    <!-- /Header -->
+	
+	<!-- Container -->
+	<article class="container">
+		<!-- Sub Menu -->
+		<section id="lnb" class="lnb">
+			<h2>유통관리</h2>
+			<ul role="menu">
+				<li><a href="javascript:alert('준비중입니다');">이력관리</a></li>
+				<li class="current"><a href="PB_SC_308.html">통계현황</a></li>
+				<li><a href="javascript:alert('준비중입니다');">오프라인 주문관리</a></li>
+				<li><a href="javascript:alert('준비중입니다');">구매내역 통계</a></li>
+				<li><a href="javascript:alert('준비중입니다');">매칭펀드지급 통계</a></li>
+				<li><a href="javascript:alert('준비중입니다');">설문조사 조회</a></li>
+			</ul>
+		</section>
+		<!-- /Sub Menu -->
+		
+		<!-- Contents -->
+		<section id="content" class="content">
+			<h1 class="title-sub-h1">통계현황</h1>
+
+			<!-- Location -->
+			<ol class="location">
+				<li><i class="fa fa-home"></i><span class="blind">홈</span></li>
+				<li>유통관리</li>
+				<li>통계현황</li>
+			</ol>
+			<!-- /Location -->
+
+			<!-- 통계현황 조회 조건 -->
+			<form action="">
+				<fieldset>
+					<legend>선택 배경지도 통계 조회 조건 선택</legend>
+					<div class="table-vertical type2">
+						<table>
+							<caption class="blind">통계현황 조회 조건</caption>
+							<colgroup>
+								<col style="width:15%;">
+								<col>
+								<col style="width:15%;">
+								<col>
+								<col style="width:15%;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th scope="row"><label for="s-type">사용자 구분</label></th>
+									<td colspan="5">
+										<select id="s-type" name="s-type" title="사용자 구분 선택">
+											<option value="">전체</option>
+											<option value="">사용자ID</option>
+											<option value="">사용자명</option>
+										</select>
+										<label for="w-type" class="blind">사용자 구분</label>
+										<input type="text" id="w-type" name="w-type">
+									</td>
+								</tr>
+								<tr>
+									<th scope="row"><label for="s-map">지도 종류</label></th>
+									<td>
+										<select id="s-map" name="s-map" title="챠트 종류 선택">
+											<option value="">국토영상정보</option>
+										</select>
+									</td>
+									<th scope="row"><label for="s-purpose">구매목적</label></th>
+									<td>
+										<select id="s-purpose" name="s-purpose" title="구매목적 선택">
+											<option value="">전체</option>
+											<option value="">측량 및 지도제작</option>
+										</select>
+									</td>
+									<th scope="row"><label for="s-how">구매방법</label></th>
+									<td>
+										<select id="s-how" name="s-how" title="구매방법 선택">
+											<option value="">전체</option>
+											<option value="">온라인</option>
+											<option value="">방문</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row"><label for="s-agency">제공기관</label></th>
+									<td colspan="5">
+										<select id="s-agency" name="s-agency" title="제공기관 선택">
+											<option value="">전체</option>
+											<option value="">수원시</option>
+											<option value="">인천광역시</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row"><label for="s-date">조회기간 설정</label></th>
+									<td colspan="5">
+										<div class="search-form">
+											<div class="bt-area">
+												<button class="bt white bt table mr-5" style="width:70px;">1개월</button>
+												<button class="bt white bt table mr-5" style="width:70px;">3개월</button>
+												<button class="bt white bt table mr-5" style="width:70px;">6개월</button>
+												<button class="bt white bt table mr-5" style="width:70px;">1년</button>
+												<button class="bt white bt table mr-5" style="width:70px;">2013년</button>
+												<button class="bt white bt table mr-5" style="width:70px;">2014년</button>
+												<button class="bt white bt table mr-5" style="width:70px;">2015년</button>
+												<button class="bt white bt table">2016년</button>
+											</div>
+											<span class="search-date"><input type="text" id="s-date" name="" value="" class="datepicker" title="조회기간 설정 시작일"></span>
+											- 
+											<span class="search-date"><input type="text" id="s-date2" name="" value="" class="datepicker" title="조회기간 설정 종료일"></span>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</fieldset>
+			</form>
+			<!-- /통계현황 조회 조건 -->
+			
+			<div class="bt-area text-right">
+				<button type="button" class="bt dark-gray">조회</button>
+				<button type="button" class="bt dove">대장생성</button>
+			</div>
+
+			<!-- 그래프영역 850*380 -->
+			<div class="area-chart mb-50" style="height:380px;">
+			</div>
+			<!-- /그래프영역 850*380 -->
+
+		</section>
+		<!-- /Contents -->
+	</article>
+	<!-- /Container -->
+
+	<!-- Footer -->
+	<footer>
+		<div class="inner">
+			<p class="f-logo">국토교통부 국토지리정보원</p>
+			<ul>
+				<li><a href="#"><em>개인정보 처리방침</em></a></li>
+				<li><a href="#">저작권정책</a></li>
+				<li><a href="#">이메일무단수집거부</a></li>
+			</ul>
+			<address>경기도 수원시 영통구 월드컵로 92(원천동)</address>
+			<span>전화 : 031-210-2600</span>
+			<span>팩스 : 031-210-2644</span>
+			<small>Copyright (C) 2015 NGII ALL RIGHTS RESERVED.</small>
+
+			<select title="관련기관 바로가기" class="family-site">
+				<option value="">관련기관목록</option>
+			</select>
+		</div>
+	</footer>
+	<!-- /Footer -->
+</body>
+</html>

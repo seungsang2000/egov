@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.kss.main.mapper.QnAMapper">
+
+	<select id="selectQnAList"
+		resultType="egovframework.kss.main.vo.QnAVO">
+		select * from qna;
+	</select>
+
+	<select id="selectQnAById" parameterType="int"
+		resultType="egovframework.kss.main.vo.QnAVO">
+		SELECT
+		q.id,
+		d.name AS division, -- division 테이블에서 name 가져오기
+		q.title,
+		q."testDate",
+		q.view,
+		q.writer,
+		q.email,
+		q.phone,
+		q.content,
+		c.name AS checked, -- checked 테이블에서 name 가져오기
+		q.type,
+		CASE
+		WHEN q.password IS NOT NULL THEN TRUE
+		ELSE FALSE
+		END AS has_password
+		FROM
+		qna q
+		INNER JOIN division d ON q.division_id = d.id -- division 테이블과 INNER JOIN
+		INNER JOIN checked c ON q.checked_id = c.id -- checked 테이블과 INNER JOIN
+		WHERE
+		q.id = #{id};
+	</select>
+
+	<select id="selectQnALists"
+		resultType="egovframework.kss.main.vo.QnAListVO">
+		SELECT
+		id,
+		title,
+		writer,
+		division,
+		checked,
+		"testDate",
+		CASE
+		WHEN password IS NOT NULL THEN TRUE
+		ELSE FALSE
+		END AS has_password
+		FROM
+		qna;
+	</select>
+
+	<update id="addViews" parameterType="int">
+		update qna set view=view+1 where id=#{id}
+	</update>
+
+	<select id="selectPageList" parameterType="map" resultType="map">
+
+		SELECT AAA.*
+		FROM (
+		SELECT
+		COUNT(*) OVER() AS "TOTAL_COUNT",
+		ROW_NUMBER() OVER (ORDER BY RNUM) AS RNUM, -- RNUM 재생성
+		q.ID,
+		q.TITLE,
+		d.name AS division, -- division 테이블에서 name 가져오기
+		q.writer,
+		q."testDate",
+		c.name AS checked, -- checked 테이블에서 name 가져오기
+		CASE WHEN q.password IS NOT NULL AND q.password != '' THEN true ELSE false END AS has_password
+		FROM (
+		SELECT
+		ROW_NUMBER() OVER (ORDER BY ID DESC) RNUM,
+		q.ID,
+		q.TITLE,
+		q.division_id,
+		q.writer,
+		q."testDate",
+		q.checked_id,
+		q.password
+		FROM qna q
+		<where>
+			<!-- division_id 조건 -->
+			<if test="division_id != null and division_id != ''">
+				AND q.division_id = #{division_id}
+			</if>
+
+			<!-- checked_id 조건 -->
+			<if test="checked_id != null and checked_id != ''">
+				AND q.checked_id = #{checked_id}
+			</if>
+
+			<if test="searchKeyword != null and searchKeyword != ''">
+				AND q.title LIKE CONCAT('%', #{searchKeyword}, '%')
+			</if>
+		</where>
+		) q
+		INNER JOIN division d ON q.division_id = d.id
+		INNER JOIN checked c ON q.checked_id = c.id
+		) AAA
+		WHERE
+		RNUM BETWEEN #{START} AND #{END}
+		ORDER BY
+		RNUM;
+	</select>
+
+	<select id="selectCheckedList"
+		resultType="egovframework.kss.main.vo.CheckedVO">
+		select id, name
+		from checked
+	</select>
+
+	<select id="selectDivisionList"
+		resultType="egovframework.kss.main.vo.DivisionVO">
+		select id, name
+		from division
+	</select>
+
+	<insert id="registerQnA"
+		parameterType="egovframework.kss.main.vo.QnAInsertVO">
+		insert into qna
+		(division_id,"testDate",view,writer,email,phone,content,title,password,checked_id)
+		values
+		(#{division_id},#{testDate},#{view},#{writer},#{email},#{phone},#{content},#{title},#{password},#{checked_id})
+	</insert>
+
+	<update id="updateQnA"
+		parameterType="egovframework.kss.main.vo.QnAInsertVO">
+		update qna set title=#{title}, content=#{content},
+		division_id=#{division_id}
+		where id=#{id}
+	</update>
+
+	<delete id="deleteQnA" parameterType="int">
+		DELETE FROM qna WHERE id = #{id}
+	</delete>
+
+	<insert id="registerQnAComment"
+		parameterType="egovframework.kss.main.vo.QnACommentVO">
+		insert into qnacomment (content, post_id) values (#{c_content},#{post_id})
+	</insert>
+
+	<select id="selectQnAComment" parameterType="int"
+		resultType="egovframework.kss.main.vo.QnACommentVO">
+		select id,content as c_content,post_id from qnacomment
+		where post_id=#{id}
+		limit 1
+	</select>
+
+	<delete id="deleteQnAComment" parameterType="int">
+		DELETE FROM qnacomment WHERE id = #{id}
+	</delete>
+
+	<update id="updateQnAChecked" parameterType="map">
+		update qna set checked_id=#{checked_id}
+		where id=#{id}
+	</update>
+	
+	<select id="getPasswordById" parameterType="int" resultType="String">
+		SELECT password 
+    	FROM qna 
+    	WHERE id = #{id}
+	
+	</select>
+
+
+
+
+
+</mapper>
