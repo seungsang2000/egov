@@ -1,5 +1,7 @@
 package egovframework.kss.main.controller;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -44,6 +46,7 @@ public class CourseController {
 	@PostMapping("/courseCreate.do")
 	public String courseCreate(@ModelAttribute CourseVO course) {
 		course.setInstructor_id(1);
+		course.setCreated_at(Timestamp.from(Instant.now()));
 
 		courseService.registerCourse(course);
 
@@ -55,6 +58,18 @@ public class CourseController {
 		System.out.println("course id: " + id);
 
 		return "tests";
+	}
+
+	@RequestMapping("/courseEnroll.do")
+	public String courseEnroll(Model model) {
+
+		// 강좌 목록을 가져온다
+		List<CourseVO> courseList = courseService.selectCourseList();
+
+		// 모델에 강좌 목록 추가
+		model.addAttribute("courseList", courseList);
+		model.addAttribute("pageName", "courseEnroll");
+		return "courseEnrolls";
 	}
 
 }

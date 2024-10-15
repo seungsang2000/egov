@@ -163,7 +163,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
       <img src="/resources/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">TestHub</span>
     </a>
 
     <!-- Sidebar -->
@@ -214,6 +214,35 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <a href="courseRegister.do" class="nav-link <c:if test="${pageName == 'courseRegister'}">active</c:if>">
                   <i class="far fa-circle nav-icon"></i>
                   <p>강좌 생성</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="courseEnroll.do" class="nav-link <c:if test="${pageName == 'courseEnroll'}">active</c:if>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>강좌 등록</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item menu-open">
+            <a href="#" class="nav-link active">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                회원 정보(테스트용)
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="user/register.do" class="nav-link ">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>회원가입</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="user/login.do" class="nav-link ">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>로그인</p>
                 </a>
               </li>
             </ul>

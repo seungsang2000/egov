@@ -1,5 +1,7 @@
 package egovframework.kss.main.vo;
 
+import java.sql.Timestamp;
+
 public class CourseVO {
 	private int id;
 	private String instructor;
@@ -7,6 +9,7 @@ public class CourseVO {
 	private String description;
 	private String status;
 	private int instructor_id;
+	private Timestamp created_at;
 
 	/**
 	 * @id@ getter
@@ -90,6 +93,14 @@ public class CourseVO {
 
 	public void setInstructor_id(int instructor_id) {
 		this.instructor_id = instructor_id;
+	}
+
+	public Timestamp getCreated_at() {
+		return created_at;
+	}
+
+	public void setCreated_at(Timestamp created_at) {
+		this.created_at = created_at;
 	}
 
 }

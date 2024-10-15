@@ -3,13 +3,14 @@
 
 <mapper namespace="egovframework.kss.main.mapper.CourseMapper">
 	<select id="selectCourseList" resultType="egovframework.kss.main.vo.CourseVO">
-		select c.id, c.title, c.description, u.name as instructor
+		select c.id, c.title, c.description, u.name as instructor,  c.created_at as created_at, c.status
 		from course c
 		inner join users u on u.id=c.instructor_id
+		order by c.id
 	</select>
 	
 	<insert id="registerCourse" parameterType="egovframework.kss.main.vo.CourseVO">
-	insert into course(instructor_id, title, description, status) values (#{instructor_id},#{title}, #{description}, #{status})
+	insert into course(instructor_id, title, description, status, created_at) values (#{instructor_id},#{title}, #{description}, #{status}, #{created_at})
 	
 	</insert>
 	
