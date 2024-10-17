@@ -67,6 +67,7 @@
             </div>
           </div>
         </div>
+        <div id="userEmailResult" class="text-danger mb-3"></div>
         <div class="input-group mb-3">
           <select class="form-control" name="role" required>
             <option value="">사용자 역할 선택</option>
@@ -123,17 +124,13 @@ function isValidUserId(userId) {
 
 $(document).ready(function() {
     let isUserIdValid = false;
+    let isEmailValid = false; // 이메일 유효성 검사를 위한 변수
 
+    // 유저 아이디 검사
     $('#userId').on('blur', function() {
         var userId = $(this).val();
-        
-        
-     
-        
-     
-     
         if (userId) {
-         // 유효성 검사
+            // 유효성 검사
             if (!isValidUserId(userId)) {
                 $('#userIdResult').text('유저 아이디는 영어와 숫자만 포함할 수 있습니다.').removeClass('text-success').addClass('text-danger').show();
                 isUserIdValid = false;
@@ -163,39 +160,73 @@ $(document).ready(function() {
         }
     });
 
+    // 이메일 검사
+    $('input[name="email"]').on('blur', function() {
+        var email = $(this).val();
+        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (email) {
+            // 이메일 유효성 검사
+            if (!emailPattern.test(email)) {
+                $('#userEmailResult').text('유효한 이메일 주소를 입력해 주세요.').removeClass('text-success').addClass('text-danger').show();
+                isEmailValid = false;
+                return; // 유효하지 않으면 AJAX 요청을 중단
+            }
+
+            $.ajax({
+                url: '/user/checkEmail.do',
+                method: 'GET',
+                data: { email: email },
+                success: function(response) {
+                    if (response.exists) {
+                        $('#userEmailResult').text('사용할 수 없는 이메일입니다.').removeClass('text-success').addClass('text-danger').show(); // 붉은색
+                        isEmailValid = false; // 중복 이메일
+                    } else {
+                        $('#userEmailResult').text('사용 가능한 이메일입니다.').removeClass('text-danger').addClass('text-success').show(); // 녹색
+                        isEmailValid = true; // 사용 가능한 이메일
+                    }
+                },
+                error: function() {
+                    $('#userEmailResult').text('서버 오류가 발생했습니다.').show();
+                    isEmailValid = false;
+                }
+            });
+        } else {
+            $('#userEmailResult').hide();
+            isEmailValid = false;
+        }
+    });
+
+    // 폼 제출 처리
     $('form').on('submit', function(event) {
+        
+        event.preventDefault();
+        
         var password = $('input[name="password"]').val();
         var confirmPassword = $('input[name="confirmPassword"]').val();
-        var email = $('input[name="email"]').val();
         var agreeTerms = $('#agreeTerms').is(':checked');
-        var userRole = $('input[name="role"]').val();
-
-        // 이메일 유효성 검사
-        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailPattern.test(email)) {
-            alert('유효한 이메일 주소를 입력해 주세요.');
-            event.preventDefault(); // 폼 제출을 막음
-            return false; // 폼 제출 방지
-        }
 
         // 비밀번호 확인 검사
         if (password !== confirmPassword) {
             alert('비밀번호가 일치하지 않습니다.');
-            event.preventDefault(); // 폼 제출을 막음
-            return false; // 폼 제출 방지
+            return false;
         }
 
         // 개인정보 수집 동의 여부 확인
         if (!agreeTerms) {
             alert('개인정보 수집에 동의해야 합니다.');
-            event.preventDefault(); // 폼 제출을 막음
-            return false; // 폼 제출 방지
+            return false;
         }
 
         // 유저 아이디 중복 여부 확인
         if (!isUserIdValid) {
             alert('유저 아이디가 유효하지 않습니다. 중복 확인을 해주세요.');
-            event.preventDefault(); // 폼 제출을 막음
+            return false;
+        }
+
+        // 이메일 중복 여부 확인
+        if (!isEmailValid) {
+            alert('이메일이 유효하지 않습니다. 중복 확인을 해주세요.');
             return false; // 폼 제출 방지
         }
 

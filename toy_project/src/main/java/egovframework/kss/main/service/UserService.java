@@ -1,5 +1,10 @@
 package egovframework.kss.main.service;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import egovframework.kss.main.dto.PasswordKeyDTO;
 import egovframework.kss.main.dto.UserLoginDTO;
 import egovframework.kss.main.dto.UserRegisterDTO;
 import egovframework.kss.main.vo.UserVO;
@@ -14,4 +19,17 @@ public interface UserService {
 
 	UserVO selectUserLogin(UserLoginDTO userLoginDTO);
 
+	void insertPasswordKey(PasswordKeyDTO passwordKeyDTO);
+
+	boolean checkExistUserEmail(String email);
+
+	PasswordKeyDTO getPasswordKeyByKeyAndEmail(Map<String, Object> params);
+
+	UserVO selectUserByEmail(String email);
+
+	Map<String, Object> sendMail(String email);
+
+	String checkPage(HttpServletRequest request);
+
+	void updatePassword(UserVO user, String newPassword);
 }

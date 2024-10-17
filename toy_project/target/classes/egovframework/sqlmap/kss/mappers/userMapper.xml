@@ -7,6 +7,14 @@
 		SELECT EXISTS(SELECT 1 FROM users WHERE user_id = #{userId})
 	</select>
 	
+	<select id="checkExistUserEmail" parameterType="String" resultType="boolean">
+		SELECT EXISTS(SELECT 1 FROM users WHERE email = #{email})
+	</select>
+	
+	<select id="selectUserByEmail" parameterType="String" resultType="egovframework.kss.main.vo.UserVO">
+		SELECT * FROM users WHERE email = #{email}
+	</select>
+	
 	<insert id="userRegister" parameterType="egovframework.kss.main.dto.UserRegisterDTO">
 		insert into users(user_id,password,role,email,name) values(#{user_id},#{password},#{role},#{email},#{username})
 		
@@ -19,6 +27,22 @@
 	<select id="selectUserLogin" parameterType="egovframework.kss.main.dto.UserLoginDTO" resultType="egovframework.kss.main.vo.UserVO">
 		select * from users where user_id=#{user_id}
 	</select>
+	
+	<insert id="insertPasswordKey" parameterType="egovframework.kss.main.dto.PasswordKeyDTO">
+		insert into password_key(key,email,created_at) values(#{key},#{email},#{created_at})
+	</insert>
+	
+	<select id="getPasswordKeyByKeyAndEmail" parameterType="map" resultType="egovframework.kss.main.dto.PasswordKeyDTO">
+    SELECT *
+FROM password_key
+WHERE email = #{email} AND key = #{key}
+ORDER BY created_at DESC
+LIMIT 1;
+</select>
+
+	<update id="updatePassword" parameterType="egovframework.kss.main.vo.UserVO">
+	update users set password = #{password} where id=#{id}
+	</update>
 
 
 

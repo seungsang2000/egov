@@ -1,4 +1,4 @@
-package egovframework.kss.main.vo;
+package egovframework.kss.main.dto;
 
 import java.sql.Timestamp;
 
@@ -9,14 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CourseVO {
+public class CourseEnrollListDTO {
 	private int id;
-	private String instructor;
 	private String title;
 	private String description;
-	private String status;
-	private int instructor_id;
+	private String instructor;
 	private Timestamp created_at;
-	private boolean enrolled = false;
+	private String status;
+	private boolean enrolled;
 	private int studentCount;
 }

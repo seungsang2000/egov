@@ -2,18 +2,103 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="egovframework.kss.main.mapper.CourseMapper">
-	<select id="selectCourseList" resultType="egovframework.kss.main.vo.CourseVO">
-		select c.id, c.title, c.description, u.name as instructor,  c.created_at as created_at, c.status
+	<select id="selectCourseList"
+		resultType="egovframework.kss.main.vo.CourseVO">
+		SELECT
+		c.id,
+		c.title,
+		c.description,
+		u.name AS instructor,
+		c.created_at AS created_at,
+		c.status,
+		COUNT(e.user_id) AS studentCount
+		FROM
+		course c
+		INNER JOIN
+		users u ON u.id = c.instructor_id
+		LEFT JOIN
+		enrollments e ON e.course_id = c.id
+		GROUP BY
+		c.id, u.name, c.title, c.description, c.created_at, c.status
+		ORDER BY
+		c.id;
+	</select>
+
+	<select id="selectMyCourseList"
+		parameterType="java.lang.Integer"
+		resultType="egovframework.kss.main.vo.CourseVO">
+		select c.id, c.title, c.description, u.name as instructor,
+		c.created_at as
+		created_at, c.status
 		from course c
-		inner join users u on u.id=c.instructor_id
+		inner join users u on
+		u.id=c.instructor_id
+		inner join enrollments e ON e.course_id = c.id AND
+		e.user_id = #{currentUserId}
 		order by c.id
 	</select>
-	
-	<insert id="registerCourse" parameterType="egovframework.kss.main.vo.CourseVO">
-	insert into course(instructor_id, title, description, status, created_at) values (#{instructor_id},#{title}, #{description}, #{status}, #{created_at})
-	
+
+	<select id="selectCourseById" parameterType="java.lang.Integer"
+		resultType="egovframework.kss.main.vo.CourseVO">
+		select c.id, c.title, c.description, u.name as instructor,
+		c.created_at as created_at, c.status
+		from course c
+		inner join users u on
+		u.id=c.instructor_id
+		where c.id=#{id}
+	</select>
+
+
+
+	<select id="selectCourseEnrollList"
+        parameterType="java.lang.Integer"
+        resultType="egovframework.kss.main.dto.CourseEnrollListDTO">
+    SELECT
+        c.id,
+        c.title,
+        c.description,
+        u.name AS instructor,
+        c.created_at AS created_at,
+        c.status,
+        CASE 
+            WHEN #{currentUserId} IS NULL THEN false 
+            WHEN COUNT(e.user_id) > 0 THEN true 
+            ELSE false 
+        END AS enrolled,
+        COUNT(e2.user_id) AS studentCount
+    FROM
+        course c
+    INNER JOIN 
+        users u ON u.id = c.instructor_id
+    LEFT JOIN 
+        enrollments e ON e.course_id = c.id AND e.user_id = #{currentUserId}
+    LEFT JOIN 
+        enrollments e2 ON e2.course_id = c.id
+    GROUP BY 
+        c.id, u.name, c.title, c.description, c.created_at, c.status
+    ORDER BY 
+        c.id;
+</select>
+
+
+	<insert id="registerCourse"
+		parameterType="egovframework.kss.main.vo.CourseVO"
+		useGeneratedKeys="true" 
+        keyProperty="id"
+		>
+		insert into course(instructor_id, title, description,
+		status, created_at)
+		values (#{instructor_id},#{title}, #{description},
+		#{status},
+		#{created_at})
+
 	</insert>
-	
-	
-	
+
+	<insert id="enrollUserInCourse"
+		parameterType="egovframework.kss.main.vo.EnrollmentVO">
+		insert into enrollments(user_id, course_id, enrolled_at,
+		status) values
+		(#{user_id}, #{course_id}, #{enrolled_at}, #{status})
+	</insert>
+
 </mapper>

@@ -68,7 +68,7 @@
       <!-- /.social-auth-links -->
 
       <p class="mb-1">
-        <a href="forgot-password.html">비밀번호를 잊었습니다</a>
+        <a href="/user/forgot-password.do">비밀번호를 잊었습니다</a>
       </p>
       <p class="mb-0">
         <a href="/user/register.do" class="text-center">회원 가입</a>

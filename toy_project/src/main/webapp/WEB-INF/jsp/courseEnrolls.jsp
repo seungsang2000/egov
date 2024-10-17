@@ -37,9 +37,6 @@
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-minus"></i>
                     </button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                        <i class="fas fa-times"></i>
-                    </button>
                 </div>
             </div>
             <div class="card-body p-0">
@@ -47,71 +44,73 @@
                     <thead>
                         <tr>
                             <th style="width: 1%">#</th>
-                            <th style="width: 20%">Project Name</th>
-                            <th style="width: 30%">Team Members</th>
+                            <th style="width: 20%">강좌</th>
+                            <th style="width: 15%">강사</th>
+                            <th style="width: 15%">수강 인원</th>
                             <th>Project Progress</th>
-                            <th style="width: 8%" class="text-center">Status</th>
+                            <th style="width: 8%" class="text-center">상태</th>
                             <th style="width: 20%"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach var="course" items="${courseList}">
-                            <tr>
-                                <td>${course.id}</td>
-                                <td>
-                                    <a>${course.title}</a>
-                                    <br/>
-                                    <small>Created <fmt:formatDate value="${course.created_at}" pattern="yyyy-MM-dd" /></small>
-                                </td>
-                                <td>
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item">
-                                            <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar.png">
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar2.png">
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar3.png">
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar4.png">
-                                        </li>
-                                    </ul>
-                                    <small>${course.instructor}</small> <!-- 강사의 이름 추가 -->
-                                </td>
-                                <td class="project_progress">
-                                    <div class="progress progress-sm">
-                                        <div class="progress-bar bg-green" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
-                                        </div>
-                                    </div>
-                                    <small>50% Complete</small>
-                                </td>
-                                <td class="project-state">
-   									 <span class="badge ${course.status == '비공개' ? 'badge-danger' : 'badge-success'}">${course.status}</span>
-								</td>
-                                <td class="project-actions text-right">
-                                    <a class="btn btn-primary btn-sm" href="#">
-                                        <i class="fas fa-folder"></i>
-                                        강좌 정보
-                                    </a>
-                                    <c:choose>
-       									<c:when test="${course.status == '비공개'}">
-            								<a class="btn btn-secondary btn-sm" href="#" disabled>
-                								<i class="fas fa-pencil-alt"></i>
-                								신청 불가
-           				 					</a>
-        								</c:when>
-        								<c:otherwise>
-            								<a class="btn btn-info btn-sm" href="#">
-                								<i class="fas fa-pencil-alt"></i>
-                								등록 신청
-            								</a>
-        								</c:otherwise>
-    								</c:choose>
-                                </td>
-                            </tr>
-                        </c:forEach>
+    <tr>
+        <td>${course.id}</td>
+        <td>
+            <a>${course.title}</a>
+            <br/>
+            <small>Created <fmt:formatDate value="${course.created_at}" pattern="yyyy-MM-dd" /></small>
+        </td>
+        <td>
+            <ul class="list-inline">
+                <li class="list-inline-item">
+                    <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar.png">
+                </li>
+            </ul>
+            <small>${course.instructor}</small>
+        </td>
+        <td><i class="fas fa-user-friends" style="margin-right: 5px; color: #007bff;"></i>
+    <span style="color: #333;">${course.studentCount}명</span></td>
+        <td class="project_progress">
+            <div class="progress progress-sm">
+                <div class="progress-bar bg-green" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+                </div>
+            </div>
+            <small>50% Complete</small>
+        </td>
+        <td class="project-state">
+            <span class="badge ${course.status == '비공개' ? 'badge-danger' : 'badge-success'}">${course.status}</span>
+        </td>
+        <td class="project-actions text-right">
+            <a class="btn btn-primary btn-sm" href="#">
+                <i class="fas fa-folder"></i>
+                강좌 정보
+            </a>
+            <c:choose>
+                <c:when test="${course.status == '비공개'}">
+                    <a class="btn btn-danger btn-sm" href="/" disabled>
+    <i class="fas fa-pencil-alt"></i>
+    신청 불가
+</a>
+                </c:when>
+                <c:otherwise>
+                    <c:if test="${course.enrolled}">
+                        <button class="btn btn-secondary btn-sm" disabled>
+                            <i class="fas fa-check"></i>
+                            이미 등록
+                        </button>
+                    </c:if>
+                    <c:if test="${!course.enrolled}">
+                        <button class="btn btn-info btn-sm enroll-button" data-course-id="${course.id}">
+                            <i class="fas fa-pencil-alt"></i>
+                            등록 신청
+                        </button>
+                    </c:if>
+                </c:otherwise>
+            </c:choose>
+        </td>
+    </tr>
+</c:forEach>
                     </tbody>
                 </table>
             </div>
@@ -123,6 +122,34 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
+  <script src="/resources/plugins/jquery/jquery.min.js"></script>
+  <script>
+$(document).ready(function() {
+    $('.enroll-button').on('click', function() {
+        console.log("...........");
+        var courseId = $(this).data('course-id');
+        
+        $.ajax({
+            url: '/courseEnroll.do',
+            type: 'POST',
+            data: {
+                courseId: courseId
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert('강좌 등록에 실패했습니다: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('서버 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+            }
+        });
+    });
+});
+</script>
 
 
 

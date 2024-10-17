@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <!--
 This is a starter template page. Use this page to start your new project from
@@ -6,9 +7,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 -->
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>온라인 시험 시스템</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>온라인 시험 시스템</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -16,6 +17,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="/resources/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="/resources/dist/css/adminlte.min.css">
+  
+  <!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script src="/resources/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/resources/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/resources/dist/js/adminlte.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -174,7 +184,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <img src="/resources/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Alexander Pierce</a>
+          
+          	<c:choose>
+        		<c:when test="${not empty sessionScope.loggedInUser}">
+            		<a href="#" class="d-block"><p>${sessionScope.loggedInUser.name}</p></a>
+        		</c:when>
+        		<c:otherwise>
+            		<a href="user/login.do" class="d-block"><p>로그인하세요.</p></a>
+        		</c:otherwise>
+    		</c:choose>
+    	
         </div>
       </div>
 
@@ -211,12 +230,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
               <li class="nav-item">
-                <a href="courseRegister.do" class="nav-link <c:if test="${pageName == 'courseRegister'}">active</c:if>">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>강좌 생성</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="courseEnroll.do" class="nav-link <c:if test="${pageName == 'courseEnroll'}">active</c:if>">
                   <i class="far fa-circle nav-icon"></i>
                   <p>강좌 등록</p>
@@ -225,10 +238,27 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </ul>
           </li>
           <li class="nav-item menu-open">
+          <a href="#" class="nav-link active">
+              <i class="nav-icon fas fa-edit"></i>
+              <p>
+                강좌 관리
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="courseRegister.do" class="nav-link <c:if test="${pageName == 'courseRegister'}">active</c:if>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>강좌 생성</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                회원 정보(테스트용)
+                회원 정보 관리(테스트용)
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -243,6 +273,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <a href="user/login.do" class="nav-link ">
                   <i class="far fa-circle nav-icon"></i>
                   <p>로그인</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                 <a href="javascript:void(0);" class="nav-link" onclick="confirmLogout()">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>로그아웃</p>
                 </a>
               </li>
             </ul>
@@ -262,3 +298,50 @@ scratch. This page gets rid of all links and provides the needed markup only.
     </div>
     <!-- /.sidebar -->
   </aside>
+  
+    <!--  로그아웃 모달 -->
+      <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">로그아웃 확인</h5>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    정말 로그아웃 하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="performLogout()">로그아웃</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+  
+  <script>
+    function confirmLogout() {
+        // 모달 띄우기
+        $('#logoutModal').modal('show');
+    }
+
+    function performLogout() {
+        // AJAX 요청 보내기
+        fetch('user/logout.do', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 로그아웃 성공 시 페이지 이동
+                window.location.href = 'mainPage.do'; // 적절한 로그인 페이지로 이동
+            } else {
+                alert("로그아웃 실패. 다시 시도해 주세요.");
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>

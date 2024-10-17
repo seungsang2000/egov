@@ -9,14 +9,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CourseVO {
+public class TestVO {
+
 	private int id;
-	private String instructor;
-	private String title;
+	private int course_id;
+	private String name;
 	private String description;
-	private String status;
-	private int instructor_id;
-	private Timestamp created_at;
-	private boolean enrolled = false;
-	private int studentCount;
+	private Timestamp start_time;
+	private Timestamp end_time;
+	private int duration;
+	private boolean shutdown;
+
 }

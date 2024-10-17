@@ -28,28 +28,35 @@
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-12"> <!-- 변경: 전체 열 사용 -->
+                <div class="col-lg-12"> <!-- 전체 열 사용 -->
                     <div class="container mt-4">
-                        <!-- 첫 번째 항목 -->
-                        <c:forEach var="course" items="${list}">
-                            <!-- 강좌 항목 -->
-                            <div class="card mb-3">
-                             <a href="${pageContext.request.contextPath}/course.do?id=${course.id}" class="text-decoration-none">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="mr-3">
-                                            <img src="path_to_icon/icon.png" alt="Icon" class="img-circle" width="40">
-                                        </div>
-                                        <div>
-                                            <h5 class="mb-1">${course.title}</h5>
-                                            <small class="text-muted">${course.instructor}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                </a>
+                        <c:if test="${not empty message}">
+                            <div class="alert alert-warning" role="alert">
+                                ${message}
                             </div>
-                            <!-- /.card -->
-                        </c:forEach> 
+                        </c:if>
+
+                        <c:if test="${empty message}">
+                            <c:forEach var="course" items="${list}">
+                                <!-- 강좌 항목 -->
+                                <div class="card mb-3">
+                                    <a href="${pageContext.request.contextPath}/course.do?id=${course.id}" class="text-decoration-none">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div class="mr-3">
+                                                    <img src="path_to_icon/icon.png" alt="Icon" class="img-circle" width="40">
+                                                </div>
+                                                <div>
+                                                    <h5 class="mb-1">${course.title}</h5>
+                                                    <small class="text-muted">${course.instructor}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <!-- /.card -->
+                            </c:forEach>
+                        </c:if>
                     </div>
                 </div>
                 <!-- /.col-lg-12 -->
