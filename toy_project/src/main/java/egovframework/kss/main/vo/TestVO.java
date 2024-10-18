@@ -19,5 +19,6 @@ public class TestVO {
 	private Timestamp end_time;
 	private int duration;
 	private boolean shutdown;
+	private String status;
 
 }

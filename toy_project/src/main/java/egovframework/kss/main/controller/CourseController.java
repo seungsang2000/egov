@@ -2,6 +2,8 @@ package egovframework.kss.main.controller;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +14,11 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -96,6 +101,9 @@ public class CourseController {
 		System.out.println("course id: " + id);
 		CourseVO course = courseService.selectCourseById(id);
 		model.addAttribute("course", course);
+
+		List<?> list = courseService.selectTestInCourse(id);
+		model.addAttribute("list", list);
 		return "tests";
 	}
 
@@ -151,16 +159,83 @@ public class CourseController {
 	}
 
 	@RequestMapping(value = "/testCreatePage.do")
-	public String testCreatePage(@RequestParam("courseId") int courseId, Model model) {
+	public String testCreatePage(@RequestParam("courseId") int courseId, Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+
+		if (user == null) {
+			return errorService.redirectErrorPage("로그인 후 다시 시도해주세요");
+		} else {
+			CourseVO courseVO = courseService.selectCourseById(courseId);
+			if (courseVO.getInstructor_id() != user.getId()) {
+				return errorService.redirectErrorPage("해당 강좌에 대한 권한이 없습니다");
+			}
+		}
 
 		model.addAttribute("courseId", courseId);
 		return "testCreatePage";
 	}
 
-	@PostMapping("/testCreatePage.do")
-	public String testCreate(@ModelAttribute TestVO test, HttpServletRequest request) {
+	@PostMapping("/testCreate.do")
+	public String testCreate(HttpServletRequest request) {
+		Logger.debug("---------------");
+
+		HttpSession session = request.getSession();
+		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+
+		String name = request.getParameter("name");
+		String description = request.getParameter("description");
+		int duration = Integer.parseInt(request.getParameter("duration"));
+		String startTimeString = request.getParameter("start_time");
+		String endTimeString = request.getParameter("end_time");
+		int courseId = Integer.parseInt(request.getParameter("course_id"));
+
+		// 날짜/시간 문자열을 LocalDateTime으로 변환
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+		LocalDateTime startDateTime = LocalDateTime.parse(startTimeString, formatter);
+		LocalDateTime endDateTime = LocalDateTime.parse(endTimeString, formatter);
+
+		// LocalDateTime을 Timestamp로 변환
+		Timestamp start_time = Timestamp.valueOf(startDateTime);
+		Timestamp end_time = Timestamp.valueOf(endDateTime);
+
+		if (user == null) {
+			return errorService.redirectErrorPage("로그인 후 다시 시도해주세요");
+		} else {
+			CourseVO courseVO = courseService.selectCourseById(courseId);
+			if (courseVO.getInstructor_id() != user.getId()) {
+				return errorService.redirectErrorPage("해당 강좌에 대한 권한이 없습니다");
+			}
+		}
+
+		// TestVO 객체 생성
+		TestVO test = new TestVO();
+		test.setName(name);
+		test.setDescription(description);
+		test.setDuration(duration);
+		test.setStart_time(start_time);
+		test.setEnd_time(end_time);
+		test.setCourse_id(courseId);
+
+		courseService.registerTest(test);
 
 		return "redirect:/course.do?id=" + test.getCourse_id();
+	}
+
+	@DeleteMapping("/testDelete.do")
+	public ResponseEntity<Void> deleteTest(@RequestParam("id") int testId) { //ResponseEntity도 함 써보자
+		try {
+			courseService.deleteTest(testId);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@RequestMapping(value = "testEdit.do")
+	public String testEditPage(@RequestParam("id") int id) {
+
+		return "testEditPage";
 	}
 
 }

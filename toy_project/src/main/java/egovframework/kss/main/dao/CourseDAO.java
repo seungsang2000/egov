@@ -10,6 +10,7 @@ import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.mapper.CourseMapper;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.EnrollmentVO;
+import egovframework.kss.main.vo.TestVO;
 
 @Repository("CourseDAO")
 public class CourseDAO {
@@ -46,6 +47,22 @@ public class CourseDAO {
 	public CourseVO selectCourseById(Integer id) {
 		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
 		return courseMapper.selectCourseById(id);
+	}
+
+	public void registerTest(TestVO test) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		courseMapper.registerTest(test);
+
+	}
+
+	public List<TestVO> selectTestInCourse(Integer courseId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.selectTestInCourse(courseId);
+	}
+
+	public void deleteTest(int testId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		courseMapper.deleteTest(testId);
 	}
 
 }

@@ -13,6 +13,7 @@ import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.EnrollmentVO;
+import egovframework.kss.main.vo.TestVO;
 import egovframework.kss.main.vo.UserVO;
 
 @Service("CourseService")
@@ -65,6 +66,22 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public CourseVO selectCourseById(Integer id) {
 		return courseDAO.selectCourseById(id);
+	}
+
+	@Override
+	public void registerTest(TestVO test) {
+		test.setStatus("작성중");
+		courseDAO.registerTest(test);
+	}
+
+	@Override
+	public List<TestVO> selectTestInCourse(Integer courseId) {
+		return courseDAO.selectTestInCourse(courseId);
+	}
+
+	@Override
+	public void deleteTest(int testId) {
+		courseDAO.deleteTest(testId);
 	}
 
 }

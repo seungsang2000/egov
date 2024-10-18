@@ -23,7 +23,7 @@
 
     <!-- Main content -->
     <section class="content">
-        <form action="" method="post">
+        <form action="/testCreate.do" method="post">
             <div class="row">
                 <div class="col-md-6">
                     <div class="card card-primary">
@@ -66,13 +66,12 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputStartDateTime">시작일 및 시간</label>
-                                <input type="datetime-local" id="StartDate" class="form-control" name="start_date" required>
+                                <input type="datetime-local" id="StartDate" class="form-control" name="start_time" required>
                             </div>
                             <div class="form-group">
                                 <label for="inputEndDateTime">종료일 및 시간</label>
-                                <input type="datetime-local" id="EndDate" class="form-control" name="end_date" required>
+                                <input type="datetime-local" id="EndDate" class="form-control" name="end_time" required>
                             </div>
-                            <input type="submit" value="제출" class="btn btn-success">
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -105,6 +104,12 @@ function validateDates() {
     
     const now = new Date();
 
+    
+    if (startDate < now) {
+        alert('시작일은 현재 이후여야 합니다.');
+        return false;
+    }
+    
     if (endDate < now) {
         alert('종료일은 현재 이후여야 합니다.');
         return false;

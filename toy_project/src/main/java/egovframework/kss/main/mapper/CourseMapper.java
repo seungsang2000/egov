@@ -5,6 +5,7 @@ import java.util.List;
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.EnrollmentVO;
+import egovframework.kss.main.vo.TestVO;
 
 public interface CourseMapper {
 	List<CourseVO> selectCourseList();
@@ -18,5 +19,11 @@ public interface CourseMapper {
 	List<CourseEnrollListDTO> selectCourseEnrollList(Integer currentUserId);
 
 	CourseVO selectCourseById(Integer id);
+
+	void registerTest(TestVO test);
+
+	List<TestVO> selectTestInCourse(Integer courseId);
+
+	void deleteTest(Integer testId);
 
 }

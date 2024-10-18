@@ -4,6 +4,7 @@ import java.util.List;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.vo.CourseVO;
+import egovframework.kss.main.vo.TestVO;
 import egovframework.kss.main.vo.UserVO;
 
 public interface CourseService {
@@ -19,5 +20,11 @@ public interface CourseService {
 	List<CourseVO> selectMyCourseList(Integer currentUserId);
 
 	CourseVO selectCourseById(Integer id);
+
+	void registerTest(TestVO test);
+
+	List<TestVO> selectTestInCourse(Integer courseId);
+
+	public void deleteTest(int testId);
 
 }

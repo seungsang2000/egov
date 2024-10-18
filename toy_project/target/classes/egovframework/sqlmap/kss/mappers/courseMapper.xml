@@ -41,10 +41,9 @@
 	<select id="selectCourseById" parameterType="java.lang.Integer"
 		resultType="egovframework.kss.main.vo.CourseVO">
 		select c.id, c.title, c.description, u.name as instructor,
-		c.created_at as created_at, c.status
+		c.created_at as created_at, c.status, u.id as instructor_id
 		from course c
-		inner join users u on
-		u.id=c.instructor_id
+		inner join users u on u.id=c.instructor_id
 		where c.id=#{id}
 	</select>
 
@@ -100,5 +99,19 @@
 		status) values
 		(#{user_id}, #{course_id}, #{enrolled_at}, #{status})
 	</insert>
-
+	
+	<insert id="registerTest" parameterType="egovframework.kss.main.vo.TestVO">
+		insert into test(course_id, name, start_time, end_time, duration, description, status) 
+		values (#{course_id}, #{name}, #{start_time}, #{end_time}, #{duration}, #{description}, #{status})
+	</insert>
+	
+	<select id="selectTestInCourse" parameterType="java.lang.Integer"
+		resultType="egovframework.kss.main.vo.TestVO">
+		select * from test where course_id = #{courseId}
+	</select>
+	
+	<delete id="deleteTest" parameterType="java.lang.Integer">
+		delete from test where id=#{testId}
+	</delete>
+	
 </mapper>

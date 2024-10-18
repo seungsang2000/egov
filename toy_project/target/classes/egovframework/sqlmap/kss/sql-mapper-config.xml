@@ -11,5 +11,7 @@
     <mappers>
         <mapper class="egovframework.kss.main.mapper.QnAMapper"/>
         <mapper class="egovframework.kss.main.mapper.CourseMapper"/>
+        <mapper class="egovframework.kss.main.mapper.UserMapper"/>
+        <mapper class="egovframework.kss.main.mapper.QuestionMapper"/>
     </mappers>
 </configuration>
