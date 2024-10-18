@@ -36,7 +36,7 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputStatus">문제 형식</label>
-                                <select id="inputStatus" name="status" class="form-control custom-select" required onchange="toggleFields()">
+                                <select id="inputStatus" name="question_type" class="form-control custom-select" required onchange="toggleFields()">
                                     <option value="객관식">객관식</option>
                                     <option value="주관식">주관식</option>
                                     <option value="서술형">서술형</option>
@@ -107,16 +107,40 @@
 <script>
 function toggleFields() {
     var status = document.getElementById("inputStatus").value;
-    document.getElementById("multipleChoiceFields").style.display = "none";
-    document.getElementById("subjectiveFields").style.display = "none";
-    document.getElementById("descriptiveFields").style.display = "none";
+    var fields = {
+        "객관식": document.getElementById("multipleChoiceFields"),
+        "주관식": document.getElementById("subjectiveFields"),
+        "서술형": document.getElementById("descriptiveFields")
+    };
+    
+    // 모든 필드를 숨기고 required 초기화
+    Object.values(fields).forEach(function(field) {
+        field.style.display = "none";
+    });
 
+    // 모든 입력 필드에서 required 속성 제거
+    document.getElementById("inputQuestion").required = false;
+    document.getElementById("inputSubjectiveQuestion").required = false;
+    document.getElementById("inputDescriptiveQuestion").required = false;
+
+    // 객관식 옵션 필드에서 required 속성 제거
+    ["inputOption1", "inputOption2", "inputOption3", "inputOption4"].forEach(id => {
+        document.getElementById(id).required = false;
+    });
+
+    // 선택된 문제 형식에 따라 필드 보이기 및 required 설정
     if (status === "객관식") {
-        document.getElementById("multipleChoiceFields").style.display = "block";
+        fields["객관식"].style.display = "block";
+        document.getElementById("inputQuestion").required = true;
+        ["inputOption1", "inputOption2", "inputOption3", "inputOption4"].forEach(id => {
+            document.getElementById(id).required = true;
+        });
     } else if (status === "주관식") {
-        document.getElementById("subjectiveFields").style.display = "block";
+        fields["주관식"].style.display = "block";
+        document.getElementById("inputSubjectiveQuestion").required = true;
     } else if (status === "서술형") {
-        document.getElementById("descriptiveFields").style.display = "block";
+        fields["서술형"].style.display = "block";
+        document.getElementById("inputDescriptiveQuestion").required = true;
     }
 }
 </script>
