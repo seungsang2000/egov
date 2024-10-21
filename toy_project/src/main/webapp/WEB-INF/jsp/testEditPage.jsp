@@ -22,6 +22,8 @@
 
     <section class="content">
         <form action="/question/questionCreate.do" method="post">
+        <input type="hidden" name="test_id" value="${testId}">
+        
             <div class="row">
                 <div class="col-md-6">
                     <div class="card card-primary">
@@ -98,6 +100,26 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="col-md-6">
+          <div class="card card-secondary">
+            <div class="card-header">
+              <h3 class="card-title">기타</h3>
+
+              <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                  <i class="fas fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              		
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+                
             </div>
             <button type="submit" class="btn btn-primary">문제 생성</button>
         </form>
@@ -143,6 +165,11 @@ function toggleFields() {
         document.getElementById("inputDescriptiveQuestion").required = true;
     }
 }
+
+
+window.onload = function() {
+    toggleFields();
+};
 </script>
 
 <%@ include file="/WEB-INF/jsp/include/footer.jsp" %>

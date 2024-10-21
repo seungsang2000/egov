@@ -14,4 +14,5 @@ public class QuestionVO {
 	private String question_type;
 	private String correct_answer;
 	private int score;
+	private int question_order;
 }

@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
+import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.service.CourseService;
-import egovframework.kss.main.service.ErrorService;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.TestVO;
@@ -42,9 +42,6 @@ public class CourseController {
 
 	@Resource(name = "UserService")
 	private UserService userService;
-
-	@Resource(name = "ErrorService")
-	ErrorService errorService;
 
 	@RequestMapping(value = "/mainPage.do")
 	public String home(Model model, HttpServletRequest request) {
@@ -85,7 +82,8 @@ public class CourseController {
 		UserVO user = (UserVO) session.getAttribute("loggedInUser");
 
 		if (user == null) {
-			return errorService.redirectErrorPage("로그인 후 다시 시도해주세요");
+			System.out.println("CustomException 발생: 로그인 후 다시 시도해주세요");
+			throw new CustomException("로그인 후 다시 시도해주세요");
 		}
 
 		course.setInstructor_id(user.getId());
@@ -164,11 +162,13 @@ public class CourseController {
 		UserVO user = (UserVO) session.getAttribute("loggedInUser");
 
 		if (user == null) {
-			return errorService.redirectErrorPage("로그인 후 다시 시도해주세요");
+
+			throw new CustomException("로그인 후 다시 시도해주세요");
+
 		} else {
 			CourseVO courseVO = courseService.selectCourseById(courseId);
 			if (courseVO.getInstructor_id() != user.getId()) {
-				return errorService.redirectErrorPage("해당 강좌에 대한 권한이 없습니다");
+				throw new CustomException("해당 강좌에 대한 권한이 없습니다");
 			}
 		}
 
@@ -200,11 +200,11 @@ public class CourseController {
 		Timestamp end_time = Timestamp.valueOf(endDateTime);
 
 		if (user == null) {
-			return errorService.redirectErrorPage("로그인 후 다시 시도해주세요");
+			throw new CustomException("로그인 후 다시 시도해주세요");
 		} else {
 			CourseVO courseVO = courseService.selectCourseById(courseId);
 			if (courseVO.getInstructor_id() != user.getId()) {
-				return errorService.redirectErrorPage("해당 강좌에 대한 권한이 없습니다");
+				throw new CustomException("해당 강좌에 대한 권한이 없습니다");
 			}
 		}
 
@@ -233,7 +233,9 @@ public class CourseController {
 	}
 
 	@RequestMapping(value = "testEdit.do")
-	public String testEditPage(@RequestParam("id") int id) {
+	public String testEditPage(@RequestParam("id") int id, Model model) {
+
+		model.addAttribute("testId", id);
 
 		return "testEditPage";
 	}

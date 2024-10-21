@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import egovframework.kss.main.dto.PasswordKeyDTO;
 import egovframework.kss.main.dto.UserLoginDTO;
 import egovframework.kss.main.dto.UserRegisterDTO;
-import egovframework.kss.main.service.ErrorService;
+import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.UserVO;
 
@@ -33,9 +33,6 @@ public class UserController {
 
 	@Resource(name = "UserService")
 	UserService userService;
-
-	@Resource(name = "ErrorService")
-	ErrorService errorService;
 
 	@RequestMapping(value = "register.do")
 	public String userRegisterPage(Model model) {
@@ -181,9 +178,8 @@ public class UserController {
 		HttpSession session = request.getSession();
 		String sessionKey = (String) session.getAttribute("authKey");
 		String sessionEmail = (String) session.getAttribute("email");
-		String errorMessage = null;
 		if (sessionKey == null || sessionEmail == null) {
-			errorMessage = "접근이 제한된 페이지 입니다.";
+			throw new CustomException("세션에 문제가 발생했습니다. 다시 시도해 주세요");
 		} else {
 			Map<String, Object> params = new HashMap<>();
 			params.put("email", sessionEmail);
@@ -198,20 +194,16 @@ public class UserController {
 				// 인증 키가 생성된 시각과 현재 시각 차이 계산 (1시간 = 3600000ms)
 				if (currentTime - keyCreationTime <= 3600000) {
 					// 키가 유효한 경우
-					errorMessage = null;
+
 				} else {
-					errorMessage = "인증키가 만료되었습니다";
+					throw new CustomException("인증키가 만료되었습니다. 다시 시도해 주세요");
 				}
 			} else {
-				errorMessage = "인증키가 잘못되었습니다. 다시 시도해 주세요";
+				throw new CustomException("인증키가 잘못되었습니다. 다시 시도해 주세요");
 			}
 		}
-		if (errorMessage != null) {
-			return errorService.redirectErrorPage(errorMessage);
-		} else {
-			// 인증 키 세션에서 제거 (필요시)
-			return "resetPassword"; // 비밀번호 변경 완료 페이지
-		}
+		// 인증 키 세션에서 제거 (필요시)
+		return "resetPassword"; // 비밀번호 변경 완료 페이지
 
 	}
 

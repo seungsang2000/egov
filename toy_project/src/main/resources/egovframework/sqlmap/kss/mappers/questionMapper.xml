@@ -2,10 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="egovframework.kss.main.mapper.QuestionMapper">
-	<insert id="insertQuestion" parameterType="egovframework.kss.main.vo.TestVO">
-		insert into questions(test_id, question_text, question_type, correct_answer, score) values()
-	
+
+	<insert id="insertQuestion" parameterType="egovframework.kss.main.model.Question">
+        INSERT INTO public.questions (test_id, question_text, question_type, correct_answer, score, question_order)
+        VALUES (#{testId}, #{questionText}, #{questionType}, #{correctAnswer}, #{score}, #{questionOrder})
+        RETURNING id
 	</insert>
+
+    <insert id="insertOption" parameterType="egovframework.kss.main.model.Option">
+        INSERT INTO public.options (question_id, option_number, option_text)
+        VALUES (#{questionId}, #{optionNumber}, #{optionText})
+    </insert>
 	
 
 
