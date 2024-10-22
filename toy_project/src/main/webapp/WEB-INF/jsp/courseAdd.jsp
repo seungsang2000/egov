@@ -24,7 +24,7 @@
 
     <!-- Main content -->
     <section class="content">
-    <form action="courseCreate.do" method="post">
+    <form action="courseCreate.do" method="post" enctype="multipart/form-data">
       <div class="row">
         <div class="col-md-6">
           <div class="card card-primary">
@@ -54,13 +54,9 @@
                 </select>
               </div>
               <div class="form-group">
-                <label for="inputClientCompany">Client Company</label>
-                <input type="text" id="inputClientCompany" class="form-control">
-              </div>
-              <div class="form-group">
-                <label for="inputProjectLeader">Project Leader</label>
-                <input type="text" id="inputProjectLeader" class="form-control">
-              </div>
+        			<label for="inputImage">이미지 업로드</label>
+        			<input id="inputImage" type="file" name="uploadFile" class="form-control" accept="image/*">
+   			 </div>
             </div>
             <!-- /.card-body -->
           </div>

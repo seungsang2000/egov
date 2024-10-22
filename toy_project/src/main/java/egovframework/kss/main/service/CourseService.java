@@ -27,4 +27,6 @@ public interface CourseService {
 
 	public void deleteTest(int testId);
 
+	void completeTest(int testId);
+
 }

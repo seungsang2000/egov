@@ -84,4 +84,10 @@ public class CourseServiceImpl implements CourseService {
 		courseDAO.deleteTest(testId);
 	}
 
+	@Override
+	public void completeTest(int testId) {
+		courseDAO.completeTest(testId);
+
+	}
+
 }

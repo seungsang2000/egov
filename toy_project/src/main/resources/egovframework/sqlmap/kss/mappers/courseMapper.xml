@@ -29,7 +29,7 @@
 		resultType="egovframework.kss.main.vo.CourseVO">
 		select c.id, c.title, c.description, u.name as instructor,
 		c.created_at as
-		created_at, c.status
+		created_at, c.status, c.image_path
 		from course c
 		inner join users u on
 		u.id=c.instructor_id
@@ -86,10 +86,10 @@
         keyProperty="id"
 		>
 		insert into course(instructor_id, title, description,
-		status, created_at)
+		status, created_at, image_path)
 		values (#{instructor_id},#{title}, #{description},
 		#{status},
-		#{created_at})
+		#{created_at}, #{image_path})
 
 	</insert>
 
@@ -113,5 +113,9 @@
 	<delete id="deleteTest" parameterType="java.lang.Integer">
 		delete from test where id=#{testId}
 	</delete>
+	
+	<update id="completeTest" parameterType="int">
+		update test set status = '완료' where id=#{testId}
+	</update>
 	
 </mapper>

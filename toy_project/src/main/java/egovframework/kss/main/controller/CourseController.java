@@ -1,5 +1,7 @@
 package egovframework.kss.main.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.exception.CustomException;
@@ -77,7 +80,7 @@ public class CourseController {
 	}
 
 	@PostMapping("/courseCreate.do")
-	public String courseCreate(@ModelAttribute CourseVO course, HttpServletRequest request) {
+	public String courseCreate(@ModelAttribute CourseVO course, @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		UserVO user = (UserVO) session.getAttribute("loggedInUser");
 
@@ -88,6 +91,11 @@ public class CourseController {
 
 		course.setInstructor_id(user.getId());
 		course.setCreated_at(Timestamp.from(Instant.now()));
+
+		if (uploadFile != null && !uploadFile.isEmpty()) {
+			String imagePath = saveImage(uploadFile); // 이미지 저장
+			course.setImage_path(imagePath); // CourseVO에 이미지 경로 설정
+		}
 
 		courseService.registerCourse(course);
 
@@ -230,6 +238,32 @@ public class CourseController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+
+	private String saveImage(MultipartFile file) {
+		String uploadDir = "C:\\Users\\admin\\git\\egov\\toy_project\\src\\main\\webapp\\upload\\"; // 실제 경로
+		String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
+		File destinationFile = new File(uploadDir + fileName);
+
+		try {
+			file.transferTo(destinationFile); // 파일 저장
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return "upload/" + fileName; // 저장된 이미지 경로 반환 (웹에서 접근할 수 있도록)
+	}
+
+	@PostMapping("/testComplete.do")
+	@ResponseBody
+	public ResponseEntity<String> completeTest(@RequestParam("testId") int testId) {
+		try {
+			courseService.completeTest(testId);
+			return ResponseEntity.ok("시험 완료 처리 성공");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+
 	}
 
 }

@@ -65,4 +65,9 @@ public class CourseDAO {
 		courseMapper.deleteTest(testId);
 	}
 
+	public void completeTest(int testId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		courseMapper.completeTest(testId);
+	}
+
 }

@@ -87,7 +87,7 @@
 
                          <div class="d-flex justify-content-between mt-3">
                             <a href="#" onclick="confirmDelete(${questionDetail.id})" class="btn btn-danger me-2">문제 삭제</a>
-                            <a href="/question/questionUpdate.do?testId=${testId}&questionId=${questionDetail.id}" class="btn btn-primary">문제 수정</a>
+                            <a href="/question/questionUpdate.do?testId=${testId}&questionId=${questionDetail.id}" class="btn btn-success">문제 수정</a>
                         </div>
                     </div>
                 </div>
@@ -132,7 +132,11 @@
                     <strong>${totalScore}</strong> 점
                 </p>
             </div>
+            
         </div>
+        <div class="text-center mt-3">
+						<button type="button" class="btn btn-primary custom-btn" onclick="completeTest()">시험 완료</button>
+						</div>
     </div>
 </div>
 </section>
@@ -144,6 +148,11 @@
         font-size: 30px; /* 원하는 크기로 설정 */
         font-weight: bold; /* 굵게 설정 */
         color: #007bff; /* 원하는 색상으로 설정 */
+    }
+    
+    .custom-btn{
+    padding: 15px 30px; /* 상하, 좌우 패딩 조정 */
+    font-size: 18px; /* 글자 크기 조정 */
     }
 </style>
 
@@ -169,6 +178,36 @@
                 console.error("Error:", error);
                 alert("삭제 중 오류가 발생했습니다.");
             });
+        }
+    }
+    
+    function completeTest() {
+        // 경고창 표시
+        if (confirm("시험 생성을 완료하시겠습니까? 등록된 유저들에게 시험이 공개되게 되며, 문제 수정이 불가능해집니다.")) {
+           
+            const testId = 'yourTestId';
+
+            // AJAX 요청
+            fetch('/testComplete.do?testId=${testId}', { // 실제 서버 URL로 변경
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("시험이 완료되었습니다.");
+                } else {
+                    alert("시험 완료 요청에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("서버와의 통신 중 오류가 발생했습니다.");
+            });
+        } else {
+            // 취소 시 아무것도 하지 않음
+            console.log("시험 완료가 취소되었습니다.");
         }
     }
 </script>

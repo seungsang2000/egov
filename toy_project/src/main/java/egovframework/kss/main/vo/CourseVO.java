@@ -19,4 +19,5 @@ public class CourseVO {
 	private Timestamp created_at;
 	private boolean enrolled = false;
 	private int studentCount;
+	private String image_path;
 }

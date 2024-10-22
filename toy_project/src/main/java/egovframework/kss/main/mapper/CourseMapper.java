@@ -26,4 +26,6 @@ public interface CourseMapper {
 
 	void deleteTest(Integer testId);
 
+	void completeTest(int testId);
+
 }

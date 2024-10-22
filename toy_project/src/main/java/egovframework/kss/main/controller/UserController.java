@@ -36,9 +36,8 @@ public class UserController {
 
 	@RequestMapping(value = "register.do")
 	public String userRegisterPage(Model model) {
-		System.out.println("user.... register...");
 
-		return "register";
+		return "login/register";
 	}
 
 	@PostMapping("register.do")
@@ -53,7 +52,7 @@ public class UserController {
 	@RequestMapping(value = "login.do")
 	public String userLoginPage(Model model) {
 
-		return "login";
+		return "login/login";
 	}
 
 	@PostMapping("login.do")
@@ -118,9 +117,8 @@ public class UserController {
 
 	@RequestMapping(value = "forgot-password.do")
 	public String forgotPasswordPage() {
-		System.out.println("user.... forgot...");
 
-		return "forgotPassword";
+		return "login/forgotPassword";
 	}
 
 	@PostMapping("emailCheck.do")
@@ -203,7 +201,7 @@ public class UserController {
 			}
 		}
 		// 인증 키 세션에서 제거 (필요시)
-		return "resetPassword"; // 비밀번호 변경 완료 페이지
+		return "login/resetPassword"; // 비밀번호 변경 완료 페이지
 
 	}
 

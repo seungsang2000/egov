@@ -160,9 +160,11 @@
 								<strong>${totalScore}</strong> 점
 							</p>
 						</div>
+						
 					</div>
+					
 				</div>
-
+				
 			</div>
 			
 		</form>

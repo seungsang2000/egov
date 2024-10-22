@@ -44,7 +44,11 @@
                                         <div class="card-body">
                                             <div class="d-flex align-items-center">
                                                 <div class="mr-3">
-                                                    <img src="path_to_icon/icon.png" alt="Icon" class="img-circle" width="40">
+                                                   <img src="${pageContext.request.contextPath}/${course.image_path}" 
+                             alt="이미지 없음" 
+                             class="img-circle" 
+                             width="50" 
+                             onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
                                                 </div>
                                                 <div>
                                                     <h5 class="mb-1">${course.title}</h5>
