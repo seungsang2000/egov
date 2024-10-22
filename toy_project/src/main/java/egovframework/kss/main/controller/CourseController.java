@@ -232,12 +232,4 @@ public class CourseController {
 		}
 	}
 
-	@RequestMapping(value = "testEdit.do")
-	public String testEditPage(@RequestParam("id") int id, Model model) {
-
-		model.addAttribute("testId", id);
-
-		return "testEditPage";
-	}
-
 }

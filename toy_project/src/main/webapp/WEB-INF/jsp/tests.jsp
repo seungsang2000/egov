@@ -104,7 +104,7 @@
                           <span class="badge badge-success"> ${test.status} </span>
                       </td>
                       <td class="project-actions text-right">
-                          <a class="btn btn-info btn-sm" href="testEdit.do?id=${test.id}">
+                          <a class="btn btn-info btn-sm" href="/question/testEdit.do?testId=${test.id}">
     <i class="fas fa-pencil-alt"></i>
     Edit
 </a>

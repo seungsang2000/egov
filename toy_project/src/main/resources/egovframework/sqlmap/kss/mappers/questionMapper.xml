@@ -3,16 +3,56 @@
 
 <mapper namespace="egovframework.kss.main.mapper.QuestionMapper">
 
-	<insert id="insertQuestion" parameterType="egovframework.kss.main.model.Question">
+	<insert id="insertQuestion" parameterType="egovframework.kss.main.model.Question"  useGeneratedKeys="true" keyProperty="id">
         INSERT INTO public.questions (test_id, question_text, question_type, correct_answer, score, question_order)
-        VALUES (#{testId}, #{questionText}, #{questionType}, #{correctAnswer}, #{score}, #{questionOrder})
-        RETURNING id
+VALUES (#{test_id}, #{question_text}, #{question_type}, #{correct_answer}, #{score},
+        (SELECT COALESCE(MAX(question_order), 0) + 1 FROM public.questions WHERE test_id = #{test_id}))
 	</insert>
 
-    <insert id="insertOption" parameterType="egovframework.kss.main.model.Option">
+    <insert id="insertOption" parameterType="egovframework.kss.main.model.Option" >
         INSERT INTO public.options (question_id, option_number, option_text)
-        VALUES (#{questionId}, #{optionNumber}, #{optionText})
+VALUES (#{question_id}, #{option_number}, #{option_text});
     </insert>
+    
+    <select id="selectQuestionListsByTestId" parameterType="int" resultType="egovframework.kss.main.dto.QuestionListDTO">
+    SELECT id, question_order FROM public.questions WHERE test_id = #{testId} ORDER BY question_order;
+	</select>
+	
+	<select id="selectQuestionById" parameterType="int" resultType="egovframework.kss.main.dto.QuestionDetailDTO">
+    SELECT q.id, q.question_text, q.question_type, q.correct_answer, q.score
+    FROM public.questions q
+    WHERE q.id = #{id}
+	</select>
+
+<select id="getOptionsByQuestionId" parameterType="int" resultType="egovframework.kss.main.model.Option">
+    SELECT option_number, option_text
+    FROM public.options
+    WHERE question_id = #{questionId}
+</select>
+
+<select id="getTotalScoreByTestId" parameterType="int" resultType="int">
+    SELECT sum(score)
+    FROM questions
+    WHERE test_id = #{testId}
+</select>
+
+<delete id="deleteQuestion" parameterType="int">
+	delete from questions where id = #{questionId}
+
+</delete>
+
+
+<update id="updateQuestion" parameterType="egovframework.kss.main.model.Question">
+	update questions set question_text=#{question_text}, question_type=#{question_type}, correct_answer=#{correct_answer}, score=#{score} where id = #{id}
+
+</update>
+
+<delete id="deleteOptionByQuestionId" parameterType="int">
+	delete from options where question_id = #{questionId}
+
+</delete>
+
+
 	
 
 
