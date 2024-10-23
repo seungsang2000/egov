@@ -29,4 +29,6 @@ public interface CourseService {
 
 	void completeTest(int testId);
 
+	public TestVO selectTestById(int testId);
+
 }

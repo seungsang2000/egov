@@ -17,7 +17,7 @@ public class TestVO {
 	private String description;
 	private Timestamp start_time;
 	private Timestamp end_time;
-	private int duration;
+	private int time_limit;
 	private boolean shutdown;
 	private String status;
 

@@ -31,7 +31,7 @@ VALUES (#{question_id}, #{option_number}, #{option_text});
 </select>
 
 <select id="getTotalScoreByTestId" parameterType="int" resultType="int">
-    SELECT sum(score)
+    SELECT COALESCE(sum(score),0)
     FROM questions
     WHERE test_id = #{testId}
 </select>

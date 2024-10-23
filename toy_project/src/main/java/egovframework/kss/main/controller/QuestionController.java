@@ -113,6 +113,31 @@ public class QuestionController {
 
 	}
 
+	@RequestMapping(value = "testView.do")
+	public String testViewPage(@RequestParam(value = "testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
+		Logger.debug("문제 보기 ---------------------------");
+
+		model.addAttribute("testId", testId);
+		model.addAttribute("selectedQuestionId", questionId);
+		int totalScore = questionService.getTotalScoreByTestId(testId);
+		model.addAttribute("totalScore", totalScore);
+		List<QuestionListDTO> questions = questionService.selectQuestionListsByTestId(testId);
+		model.addAttribute("questions", questions);
+		Integer id = 0;
+		if (questionId == null) {
+			id = questions.get(0).getId(); // 받은 문제 id가 없으면 첫번째 문제 보기
+		} else {
+			id = questionId;
+		}
+
+		QuestionDetailDTO questionDetail = questionService.selectQuestionById(id);
+		model.addAttribute("questionDetail", questionDetail);
+		model.addAttribute("editable", false);
+
+		return "onlyViewQuestion";
+
+	}
+
 	@DeleteMapping("/questionDelete.do")
 	@ResponseBody
 	public ResponseEntity<String> deleteQuestion(@RequestParam("questionId") int questionId) {

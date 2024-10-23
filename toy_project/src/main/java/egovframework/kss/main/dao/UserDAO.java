@@ -63,4 +63,15 @@ public class UserDAO {
 		userMapper.updatePassword(user);
 	}
 
+	public boolean checkExistUserEmailForUpdate(Map<String, Object> params) {
+		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+		return userMapper.checkExistUserEmailForUpdate(params);
+	}
+
+	public void updateUser(UserVO user) {
+		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+		userMapper.updateUser(user);
+
+	}
+
 }

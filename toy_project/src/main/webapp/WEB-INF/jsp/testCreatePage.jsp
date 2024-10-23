@@ -46,7 +46,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="inputDuration">시험 시간 (분)</label>
-                                <input type="number" id="inputDuration" class="form-control" name="duration" required min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <input type="number" id="inputDuration" class="form-control" name="time_limit" required min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -95,7 +95,7 @@
 function validateDates() {
     const startDateTime = document.getElementById('StartDate').value;
     const endDateTime = document.getElementById('EndDate').value;
-    const duration = parseInt(document.getElementById('inputDuration').value, 10);
+    const time_limit = parseInt(document.getElementById('inputDuration').value, 10);
 
     
     const startDate = new Date(startDateTime);
@@ -116,7 +116,7 @@ function validateDates() {
     }
 
     const examEndDate = new Date(startDate.getTime());
-    examEndDate.setMinutes(examEndDate.getMinutes() + duration);
+    examEndDate.setMinutes(examEndDate.getMinutes() + time_limit);
 
     if (examEndDate > endDate) {
         alert('종료일은 최소한 시작일과 시험 시간을 더한 이후여야 합니다.');

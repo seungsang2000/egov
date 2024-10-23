@@ -70,4 +70,9 @@ public class CourseDAO {
 		courseMapper.completeTest(testId);
 	}
 
+	public TestVO selectTestById(int testId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.selectTestById(testId);
+	}
+
 }

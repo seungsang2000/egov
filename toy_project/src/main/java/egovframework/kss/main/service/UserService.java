@@ -32,4 +32,8 @@ public interface UserService {
 	String checkPage(HttpServletRequest request);
 
 	void updatePassword(UserVO user, String newPassword);
+
+	boolean checkExistUserEmailForUpdate(Map<String, Object> params);
+
+	void updateUser(UserVO user);
 }

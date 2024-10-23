@@ -90,4 +90,10 @@ public class CourseServiceImpl implements CourseService {
 
 	}
 
+	@Override
+	public TestVO selectTestById(int testId) {
+
+		return courseDAO.selectTestById(testId);
+	}
+
 }

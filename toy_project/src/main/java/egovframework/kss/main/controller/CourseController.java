@@ -46,6 +46,20 @@ public class CourseController {
 	@Resource(name = "UserService")
 	private UserService userService;
 
+	private String saveImage(MultipartFile file) {
+		String uploadDir = "C:\\Users\\admin\\git\\egov\\toy_project\\src\\main\\webapp\\upload\\"; // 실제 경로
+		String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
+		File destinationFile = new File(uploadDir + fileName);
+
+		try {
+			file.transferTo(destinationFile); // 파일 저장
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return "upload/" + fileName; // 저장된 이미지 경로 반환 (웹에서 접근할 수 있도록)
+	}
+
 	@RequestMapping(value = "/mainPage.do")
 	public String home(Model model, HttpServletRequest request) {
 
@@ -103,14 +117,26 @@ public class CourseController {
 	}
 
 	@RequestMapping("/course.do")
-	public String selectCourse(@RequestParam("id") int id, Model model) {
-		System.out.println("course id: " + id);
+	public String selectCourse(@RequestParam("id") int id, Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+
+		if (user == null) {
+			throw new CustomException("로그인 후 다시 시도해주세요");
+		}
+
 		CourseVO course = courseService.selectCourseById(id);
 		model.addAttribute("course", course);
 
 		List<?> list = courseService.selectTestInCourse(id);
 		model.addAttribute("list", list);
-		return "tests";
+
+		if (user.getRole().equals("user")) {
+			return "tests_user";
+		} else {
+			return "tests";
+		}
+
 	}
 
 	@RequestMapping("/courseEnroll.do")
@@ -184,6 +210,14 @@ public class CourseController {
 		return "testCreatePage";
 	}
 
+	@RequestMapping(value = "solveTestPage.do")
+	public String solveTestPage(@RequestParam("testId") int testId, Model model) {
+		TestVO test = courseService.selectTestById(testId);
+		model.addAttribute("test", test);
+
+		return "solveTestPage";
+	}
+
 	@PostMapping("/testCreate.do")
 	public String testCreate(HttpServletRequest request) {
 		Logger.debug("---------------");
@@ -193,7 +227,7 @@ public class CourseController {
 
 		String name = request.getParameter("name");
 		String description = request.getParameter("description");
-		int duration = Integer.parseInt(request.getParameter("duration"));
+		int time_limit = Integer.parseInt(request.getParameter("time_limit"));
 		String startTimeString = request.getParameter("start_time");
 		String endTimeString = request.getParameter("end_time");
 		int courseId = Integer.parseInt(request.getParameter("course_id"));
@@ -220,7 +254,7 @@ public class CourseController {
 		TestVO test = new TestVO();
 		test.setName(name);
 		test.setDescription(description);
-		test.setDuration(duration);
+		test.setTime_limit(time_limit);
 		test.setStart_time(start_time);
 		test.setEnd_time(end_time);
 		test.setCourse_id(courseId);
@@ -238,20 +272,6 @@ public class CourseController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
-	}
-
-	private String saveImage(MultipartFile file) {
-		String uploadDir = "C:\\Users\\admin\\git\\egov\\toy_project\\src\\main\\webapp\\upload\\"; // 실제 경로
-		String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
-		File destinationFile = new File(uploadDir + fileName);
-
-		try {
-			file.transferTo(destinationFile); // 파일 저장
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return "upload/" + fileName; // 저장된 이미지 경로 반환 (웹에서 접근할 수 있도록)
 	}
 
 	@PostMapping("/testComplete.do")

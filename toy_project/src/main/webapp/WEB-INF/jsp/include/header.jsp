@@ -187,7 +187,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           
           	<c:choose>
         		<c:when test="${not empty sessionScope.loggedInUser}">
-            		<a href="#" class="d-block"><p>${sessionScope.loggedInUser.name}</p></a>
+            		<a href="/user/myPage.do" class="d-block"><p>${sessionScope.loggedInUser.name}</p></a>
         		</c:when>
         		<c:otherwise>
             		<a href="/user/login.do" class="d-block"><p>로그인하세요.</p></a>
@@ -230,7 +230,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
               <li class="nav-item">
-                <a href="courseEnroll.do" class="nav-link <c:if test="${pageName == 'courseEnroll'}">active</c:if>">
+                <a href="/courseEnroll.do" class="nav-link <c:if test="${pageName == 'courseEnroll'}">active</c:if>">
                   <i class="far fa-circle nav-icon"></i>
                   <p>강좌 등록</p>
                 </a>
@@ -247,7 +247,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
             <li class="nav-item">
-                <a href="courseRegister.do" class="nav-link <c:if test="${pageName == 'courseRegister'}">active</c:if>">
+                <a href="/courseRegister.do" class="nav-link <c:if test="${pageName == 'courseRegister'}">active</c:if>">
                   <i class="far fa-circle nav-icon"></i>
                   <p>강좌 생성</p>
                 </a>

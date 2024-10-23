@@ -11,6 +11,10 @@
 		SELECT EXISTS(SELECT 1 FROM users WHERE email = #{email})
 	</select>
 	
+	<select id="checkExistUserEmailForUpdate" parameterType="map" resultType="boolean">
+	SELECT EXISTS(SELECT 1 FROM users WHERE email = #{email} and id != #{id})
+	</select>
+	
 	<select id="selectUserByEmail" parameterType="String" resultType="egovframework.kss.main.vo.UserVO">
 		SELECT * FROM users WHERE email = #{email}
 	</select>
@@ -42,6 +46,10 @@ LIMIT 1;
 
 	<update id="updatePassword" parameterType="egovframework.kss.main.vo.UserVO">
 	update users set password = #{password} where id=#{id}
+	</update>
+	
+	<update id="updateUser" parameterType="egovframework.kss.main.vo.UserVO">
+	update users set name=#{name}, email=#{email}, image_path = #{image_path} where id=#{id}
 	</update>
 
 

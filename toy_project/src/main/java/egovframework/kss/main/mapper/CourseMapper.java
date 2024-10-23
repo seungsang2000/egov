@@ -28,4 +28,6 @@ public interface CourseMapper {
 
 	void completeTest(int testId);
 
+	TestVO selectTestById(int testId);
+
 }

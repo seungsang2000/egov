@@ -53,9 +53,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="course" items="${courseList}">
+                        <c:forEach var="course" items="${courseList}"  varStatus="status">
     <tr>
-        <td>${course.id}</td>
+        <td>${status.index + 1}</td>
         <td>
             <a>${course.title}</a>
             <br/>
@@ -64,7 +64,10 @@
         <td>
             <ul class="list-inline">
                 <li class="list-inline-item">
-                    <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar.png">
+                <img src="${pageContext.request.contextPath}/${course.instructor_image}" 
+                             alt="이미지 없음" 
+                             class="table-avatar" 
+                             onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
                 </li>
             </ul>
             <small>${course.instructor}</small>

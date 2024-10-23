@@ -1,5 +1,7 @@
 package egovframework.kss.main.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import egovframework.kss.main.dto.PasswordKeyDTO;
 import egovframework.kss.main.dto.UserLoginDTO;
@@ -37,7 +41,7 @@ public class UserController {
 	@RequestMapping(value = "register.do")
 	public String userRegisterPage(Model model) {
 
-		return "login/register";
+		return "user/register";
 	}
 
 	@PostMapping("register.do")
@@ -52,7 +56,7 @@ public class UserController {
 	@RequestMapping(value = "login.do")
 	public String userLoginPage(Model model) {
 
-		return "login/login";
+		return "user/login";
 	}
 
 	@PostMapping("login.do")
@@ -118,7 +122,7 @@ public class UserController {
 	@RequestMapping(value = "forgot-password.do")
 	public String forgotPasswordPage() {
 
-		return "login/forgotPassword";
+		return "user/forgotPassword";
 	}
 
 	@PostMapping("emailCheck.do")
@@ -201,11 +205,11 @@ public class UserController {
 			}
 		}
 		// 인증 키 세션에서 제거 (필요시)
-		return "login/resetPassword"; // 비밀번호 변경 완료 페이지
+		return "user/resetPassword"; // 비밀번호 변경 완료 페이지
 
 	}
 
-	@PostMapping("resetPassword.do")
+	@PostMapping("/resetPassword.do")
 	@ResponseBody
 	public Map<String, Object> resetPassword(@RequestParam String newPassword, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
@@ -241,4 +245,63 @@ public class UserController {
 		return response;
 	}
 
+	@RequestMapping(value = "/myPage.do")
+	public String myPage(HttpServletRequest request, Model model) {
+
+		HttpSession session = request.getSession();
+		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+		model.addAttribute("user", user);
+
+		return "user/profile";
+	}
+
+	@PostMapping("/updateUserProfile.do")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestParam String name, @RequestParam String email, @RequestParam(required = false) MultipartFile uploadFile, HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		HttpSession session = request.getSession();
+
+		UserVO loggedInUser = (UserVO) session.getAttribute("loggedInUser");
+		UserVO user = userService.selectUserByEmail(loggedInUser.getEmail());
+
+		Map<String, Object> param = new HashMap<>();
+		param.put("email", email);
+		param.put("id", user.getId());
+
+		// 이메일 중복 검사
+		if (userService.checkExistUserEmailForUpdate(param)) {
+
+			response.put("success", false);
+			response.put("message", "이미 사용 중인 이메일입니다.");
+			return ResponseEntity.ok(response);
+		}
+
+		user.setName(name);
+		user.setEmail(email);
+		;
+
+		if (uploadFile != null && !uploadFile.isEmpty()) {
+			String imagePath = saveImage(uploadFile); // 이미지 저장
+			user.setImage_path(imagePath); // CourseVO에 이미지 경로 설정
+		}
+
+		userService.updateUser(user);
+
+		response.put("success", true);
+		return ResponseEntity.ok(response);
+	}
+
+	private String saveImage(MultipartFile file) {
+		String uploadDir = "C:\\Users\\admin\\git\\egov\\toy_project\\src\\main\\webapp\\upload\\"; // 실제 경로
+		String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
+		File destinationFile = new File(uploadDir + fileName);
+
+		try {
+			file.transferTo(destinationFile); // 파일 저장
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return "upload/" + fileName; // 저장된 이미지 경로 반환 (웹에서 접근할 수 있도록)
+	}
 }

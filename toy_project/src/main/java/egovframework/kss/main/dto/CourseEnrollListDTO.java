@@ -18,4 +18,5 @@ public class CourseEnrollListDTO {
 	private String status;
 	private boolean enrolled;
 	private int studentCount;
+	private String instructor_image;
 }

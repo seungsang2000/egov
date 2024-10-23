@@ -27,4 +27,8 @@ public interface UserMapper {
 
 	void updatePassword(UserVO user);
 
+	boolean checkExistUserEmailForUpdate(Map<String, Object> params);
+
+	void updateUser(UserVO user);
+
 }

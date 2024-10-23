@@ -57,6 +57,7 @@
         c.title,
         c.description,
         u.name AS instructor,
+        u.image_path as instructor_image,
         c.created_at AS created_at,
         c.status,
         CASE 
@@ -74,7 +75,7 @@
     LEFT JOIN 
         enrollments e2 ON e2.course_id = c.id
     GROUP BY 
-        c.id, u.name, c.title, c.description, c.created_at, c.status
+        c.id, u.name, u.image_path, c.title, c.description, c.created_at, c.status
     ORDER BY 
         c.id;
 </select>
@@ -101,9 +102,14 @@
 	</insert>
 	
 	<insert id="registerTest" parameterType="egovframework.kss.main.vo.TestVO">
-		insert into test(course_id, name, start_time, end_time, duration, description, status) 
-		values (#{course_id}, #{name}, #{start_time}, #{end_time}, #{duration}, #{description}, #{status})
+		insert into test(course_id, name, start_time, end_time, time_limit, description, status) 
+		values (#{course_id}, #{name}, #{start_time}, #{end_time}, #{time_limit}, #{description}, #{status})
 	</insert>
+	
+	<select id="selectTestById" parameterType="int" resultType="egovframework.kss.main.vo.TestVO">
+		select * from test where id=#{testId}
+	
+	</select>
 	
 	<select id="selectTestInCourse" parameterType="java.lang.Integer"
 		resultType="egovframework.kss.main.vo.TestVO">
