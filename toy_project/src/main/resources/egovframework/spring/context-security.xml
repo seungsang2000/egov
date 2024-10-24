@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+	<http auto-config="false" use-expressions="true">
+    <intercept-url pattern="/resources/**" access="permitAll" />
+    <intercept-url pattern="/static/**" access="permitAll" />
+    <intercept-url pattern="/css/**" access="permitAll" />
+    <intercept-url pattern="/js/**" access="permitAll" />
+    <intercept-url pattern="/user/login.do" access="isAnonymous()" />
+    <intercept-url pattern="/user/logout.do" access="permitAll" />
+    <intercept-url pattern="/user/register.do" access="isAnonymous()" />
+    <intercept-url pattern="/user/checkId.do" access="permitAll" />
+    <intercept-url pattern="/user/checkEmail.do" access="permitAll" />
+    <intercept-url pattern="/user/forgotPassword.do" access="permitAll" />
+    <intercept-url pattern="/user/emailCheck.do" access="permitAll" />
+    <intercept-url pattern="/user/verifyAuthKey.do" access="permitAll" />
+    <intercept-url pattern="/user/resetPassword.do" access="permitAll" />
+    <intercept-url pattern="/courseCreate.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/testCreatePage.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/questionCreate.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/testCreate.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/testDelete.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/testView.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/questionUpdate.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/testComplete.do" access="hasAuthority('admin')" />
+    
+    <intercept-url pattern="/**" access="hasAnyAuthority('admin', 'user')" />
+    <form-login login-page="/user/login.do" default-target-url="/home" username-parameter="user_id" password-parameter="password" />
+    <logout logout-url="/user/logout.do" logout-success-url="/user/login.do?logout" />
+    
+    <remember-me key="uniqueAndSecret" token-validity-seconds="86400" />
+</http>
+	
+	<authentication-manager alias="authenticationManager">
+        <authentication-provider user-service-ref="customUserDetailsService">
+            <password-encoder ref="passwordEncoder" />
+        </authentication-provider>
+    </authentication-manager>
+
+    <beans:bean id="customUserDetailsService" class="egovframework.kss.main.service.CustomUserDetailsService" />
+    <beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+</beans:beans>

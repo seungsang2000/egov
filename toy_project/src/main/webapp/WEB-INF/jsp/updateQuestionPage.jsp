@@ -275,11 +275,15 @@ function confirmUpdate() {
     var questionId = document.querySelector('input[name="questionId"]').value;
     var score = document.getElementById("inputScore").value;
     var data = new URLSearchParams();
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
     data.append("test_id", testId);
     data.append("questionId", questionId);
     data.append("score", score);
     data.append("question_type", questionType);
+    
+    data.append('_csrf', csrfToken);
 
     if (questionType === "객관식") {
         var question = document.getElementById("inputQuestion").value;
@@ -309,6 +313,9 @@ function confirmUpdate() {
 
     fetch(form.action, {
         method: 'POST',
+        headers: {
+            [csrfHeader]: csrfToken
+        },
         body: data
     })
     .then(response => {

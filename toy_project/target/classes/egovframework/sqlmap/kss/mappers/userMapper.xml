@@ -51,6 +51,11 @@ LIMIT 1;
 	<update id="updateUser" parameterType="egovframework.kss.main.vo.UserVO">
 	update users set name=#{name}, email=#{email}, image_path = #{image_path} where id=#{id}
 	</update>
+	
+	<select id="selectUserByUserId" parameterType="String" resultType="egovframework.kss.main.vo.UserVO">
+		select * from users where user_id=#{username}
+	
+	</select>
 
 
 

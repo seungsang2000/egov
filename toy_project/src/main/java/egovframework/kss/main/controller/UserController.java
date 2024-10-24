@@ -3,30 +3,38 @@ package egovframework.kss.main.controller;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import egovframework.kss.main.dto.PasswordKeyDTO;
-import egovframework.kss.main.dto.UserLoginDTO;
 import egovframework.kss.main.dto.UserRegisterDTO;
 import egovframework.kss.main.exception.CustomException;
+import egovframework.kss.main.model.CustomUserDetails;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.UserVO;
 
@@ -38,6 +46,27 @@ public class UserController {
 	@Resource(name = "UserService")
 	UserService userService;
 
+	@Autowired
+	@Qualifier("authenticationManager") // 명시적으로 빈 이름을 지정
+	private AuthenticationManager authenticationManager;
+
+	@Autowired
+	private RememberMeServices rememberMeServices;
+
+	private String saveImage(MultipartFile file) {
+		String uploadDir = "C:\\upload\\"; // 실제 경로
+		String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
+		File destinationFile = new File(uploadDir + fileName);
+
+		try {
+			file.transferTo(destinationFile); // 파일 저장
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return "upload/" + fileName; // 저장된 이미지 경로 반환 (웹에서 접근할 수 있도록)
+	}
+
 	@RequestMapping(value = "register.do")
 	public String userRegisterPage(Model model) {
 
@@ -45,12 +74,22 @@ public class UserController {
 	}
 
 	@PostMapping("register.do")
-	public String userRegister(UserRegisterDTO userRegisterDTO) {
-		userRegisterDTO.setCreated_at(Timestamp.from(Instant.now()));
-		userService.userRegister(userRegisterDTO);
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> userRegister(@RequestBody UserRegisterDTO userRegisterDTO) {
+		Map<String, Object> response = new HashMap<>();
 
-		return "redirect:/user/login.do";
+		try {
+			System.out.println("register......");
+			userService.userRegister(userRegisterDTO);
 
+			response.put("success", true); // 성공 플래그
+			response.put("message", "회원가입이 완료되었습니다.");
+		} catch (Exception e) {
+			response.put("success", false); // 실패 플래그
+			response.put("message", "회원가입 실패: " + e.getMessage()); // 실패 메시지
+		}
+
+		return ResponseEntity.ok(response); // JSON 응답 반환
 	}
 
 	@RequestMapping(value = "login.do")
@@ -61,30 +100,37 @@ public class UserController {
 
 	@PostMapping("login.do")
 	@ResponseBody
-	public Map<String, Object> login(@ModelAttribute UserLoginDTO userLoginDTO, HttpServletRequest httpServletRequest) {
+	public ResponseEntity<Map<String, Object>> login(@RequestParam("user_id") String userId, @RequestParam("password") String password, @RequestParam(value = "remember-me", required = false) boolean rememberMe, // Remember Me 파라미터 추가
+			HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
 		Map<String, Object> response = new HashMap<>();
 
-		System.out.println("userId: " + userLoginDTO.getUser_id() + ", password: " + userLoginDTO.getPassword());
+		try {
+			// 사용자 인증 시도
+			Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userId, password));
 
-		// 사용자 인증 로직(현재 사용 X)
-		//boolean isAuthenticated = userService.authenticate(userLoginDTO);
+			// 인증 성공 시
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		UserVO userVO = userService.selectUserLogin(userLoginDTO);
+			// 세션 생성 (Spring Security가 자동으로 관리)
+			HttpSession session = httpServletRequest.getSession(true);
+			CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+			UserVO user = userService.selectUserByUserId(customUserDetails.getUsername());
 
-		if (userVO != null) {
-			response.put("success", true);
-			HttpSession session = httpServletRequest.getSession(false);
-			if (session != null) {
-				session.invalidate(); // 기존 세션 무효화
+			user.setPassword(null); // 비밀번호 세션에 저장안되게
+			session.setAttribute("loggedInUser", user); // 사용자의 세부 정보 저장
+
+			if (rememberMe) {
+				rememberMeServices.loginSuccess(httpServletRequest, httpServletResponse, authentication);
 			}
-			session = httpServletRequest.getSession(true);
-			session.setAttribute("loggedInUser", userVO); // 로그인 성공 시 추가 작업: 임시로 세션 해놓은 것. 후에 스프링 시큐리티로 대체 
-		} else {
+
+			response.put("success", true);
+		} catch (AuthenticationException e) {
+			// 인증 실패
 			response.put("success", false);
 		}
 
-		return response; // JSON 형태로 반환
+		return ResponseEntity.ok(response); // JSON 형태로 반환
 	}
 
 	@RequestMapping(value = "checkId.do")
@@ -105,21 +151,21 @@ public class UserController {
 		return response;
 	}
 
-	@PostMapping("logout.do")
-	@ResponseBody
-	public Map<String, Object> logout(HttpServletRequest httpServletRequest) {
-		Map<String, Object> response = new HashMap<>();
+	/*	@PostMapping("logout.do")
+		@ResponseBody
+		public Map<String, Object> logout(HttpServletRequest httpServletRequest) {
+			Map<String, Object> response = new HashMap<>();
+	
+			HttpSession session = httpServletRequest.getSession(false);
+			if (session != null) {
+				session.invalidate(); // 세션 무효화
+			}
+	
+			response.put("success", true);
+			return response;
+		}*/
 
-		HttpSession session = httpServletRequest.getSession(false);
-		if (session != null) {
-			session.invalidate(); // 세션 무효화
-		}
-
-		response.put("success", true);
-		return response;
-	}
-
-	@RequestMapping(value = "forgot-password.do")
+	@RequestMapping(value = "forgotPassword.do")
 	public String forgotPasswordPage() {
 
 		return "user/forgotPassword";
@@ -248,8 +294,7 @@ public class UserController {
 	@RequestMapping(value = "/myPage.do")
 	public String myPage(HttpServletRequest request, Model model) {
 
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+		UserVO user = userService.getCurrentUser();
 		model.addAttribute("user", user);
 
 		return "user/profile";
@@ -259,10 +304,8 @@ public class UserController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestParam String name, @RequestParam String email, @RequestParam(required = false) MultipartFile uploadFile, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
-		HttpSession session = request.getSession();
 
-		UserVO loggedInUser = (UserVO) session.getAttribute("loggedInUser");
-		UserVO user = userService.selectUserByEmail(loggedInUser.getEmail());
+		UserVO user = userService.getCurrentUser();
 
 		Map<String, Object> param = new HashMap<>();
 		param.put("email", email);
@@ -291,17 +334,4 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}
 
-	private String saveImage(MultipartFile file) {
-		String uploadDir = "C:\\Users\\admin\\git\\egov\\toy_project\\src\\main\\webapp\\upload\\"; // 실제 경로
-		String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
-		File destinationFile = new File(uploadDir + fileName);
-
-		try {
-			file.transferTo(destinationFile); // 파일 저장
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return "upload/" + fileName; // 저장된 이미지 경로 반환 (웹에서 접근할 수 있도록)
-	}
 }

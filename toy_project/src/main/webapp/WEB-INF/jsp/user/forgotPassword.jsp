@@ -5,6 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    	<meta name="_csrf" content="${_csrf.token}"/>
+	<meta name="_csrf_header" content="${_csrf.headerName}"/>
     <title>TESTHub | 비밀번호를 잊었습니다</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -90,6 +92,9 @@
                     data: {
                         email: email
                     },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
+                    },
                     success: function (response) {
                         if (response.success) {
                             // 인증키 입력 필드 표시
@@ -130,6 +135,9 @@
                     data: {
                         inputKey: inputKey,
                         email: inputEmail
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
                     },
                     success: function (response) {
                         if (response.success) {

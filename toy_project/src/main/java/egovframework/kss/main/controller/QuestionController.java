@@ -23,6 +23,7 @@ import egovframework.kss.main.dto.QuestionListDTO;
 import egovframework.kss.main.model.Option;
 import egovframework.kss.main.model.Question;
 import egovframework.kss.main.service.QuestionService;
+import egovframework.kss.main.service.UserService;
 
 @Controller
 @RequestMapping("/question")
@@ -32,6 +33,9 @@ public class QuestionController {
 
 	@Resource(name = "QuestionService")
 	private QuestionService questionService;
+
+	@Resource(name = "UserService")
+	private UserService userService;
 
 	@PostMapping("/questionCreate.do")
 	public String questionCreate(Model model, HttpServletRequest request) { // request.getParameter 방식도 시도해본다
@@ -86,7 +90,7 @@ public class QuestionController {
 			return "testEditPage";
 		}*/
 
-	@RequestMapping(value = "testEdit.do")
+	@RequestMapping(value = "/testEdit.do")
 	public String testEditPage(@RequestParam(value = "testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
 		model.addAttribute("testId", testId);
 		model.addAttribute("selectedQuestionId", questionId);
@@ -94,7 +98,7 @@ public class QuestionController {
 		model.addAttribute("totalScore", totalScore);
 
 		if (questionId != null) {
-
+			// 특정 문제 확인
 			QuestionDetailDTO questionDetail = questionService.selectQuestionById(questionId);
 			model.addAttribute("questionDetail", questionDetail);
 			model.addAttribute("editable", false);
@@ -104,7 +108,7 @@ public class QuestionController {
 
 			return "viewQuestionPage";
 		} else {
-			// 질문 목록도 가져올 수 있음 (선택 사항)
+			// 문제 생성
 			List<QuestionListDTO> questions = questionService.selectQuestionListsByTestId(testId);
 			model.addAttribute("questions", questions);
 
@@ -113,7 +117,7 @@ public class QuestionController {
 
 	}
 
-	@RequestMapping(value = "testView.do")
+	@RequestMapping(value = "/testView.do")
 	public String testViewPage(@RequestParam(value = "testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
 		Logger.debug("문제 보기 ---------------------------");
 

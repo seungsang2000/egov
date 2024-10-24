@@ -33,7 +33,7 @@
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
                 <div class="text-center">
-                <img src="${pageContext.request.contextPath}/${user.image_path}" 
+                <img src="/${user.image_path}" 
                              alt="이미지 없음" 
                              class="profile-user-img img-fluid img-circle" 
                              onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
@@ -200,6 +200,9 @@ function validateForm() {
         url: '/user/updateUserProfile.do',
         type: 'POST',
         data: new FormData($('#userProfileForm')[0]), // FormData 객체로 폼 데이터 전송
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
+        },
         contentType: false,
         processData: false,
         success: function(response) {

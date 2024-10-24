@@ -131,6 +131,9 @@ function confirmDelete(testId) {
         $.ajax({
             url: 'testDelete.do?id=' + testId, // 요청 URL
             type: 'DELETE', // 요청 메서드
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
+            },
             success: function(result) {
                 alert('삭제되었습니다.');
                 window.location.reload(); // 페이지 새로고침

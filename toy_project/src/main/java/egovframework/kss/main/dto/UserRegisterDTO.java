@@ -1,13 +1,10 @@
 package egovframework.kss.main.dto;
 
-import java.sql.Timestamp;
-
 public class UserRegisterDTO {
 	private String password;
 	private String user_id;
 	private String username;
 	private String email;
-	private Timestamp created_at;
 	private String role;
 
 	public String getPassword() {
@@ -40,14 +37,6 @@ public class UserRegisterDTO {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public Timestamp getCreated_at() {
-		return created_at;
-	}
-
-	public void setCreated_at(Timestamp created_at) {
-		this.created_at = created_at;
 	}
 
 	public String getRole() {

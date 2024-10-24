@@ -31,4 +31,6 @@ public interface UserMapper {
 
 	void updateUser(UserVO user);
 
+	UserVO selectUserByUserId(String username);
+
 }

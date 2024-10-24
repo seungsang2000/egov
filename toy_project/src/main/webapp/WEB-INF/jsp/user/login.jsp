@@ -5,6 +5,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" content="${_csrf.token}"/>
+   <meta name="_csrf_header" content="${_csrf.headerName}"/>
   <title>TESTHub | 로그인</title>
 
   <!-- Google Font: Source Sans Pro -->
@@ -46,7 +48,7 @@
         <div class="row">
           <div class="col-8">
             <div class="icheck-primary">
-              <input type="checkbox" id="remember">
+              <input type="checkbox" id="remember" name="remember-me">
               <label for="remember">
                 자동 로그인
               </label>
@@ -68,7 +70,7 @@
       <!-- /.social-auth-links -->
 
       <p class="mb-1">
-        <a href="/user/forgot-password.do">비밀번호를 잊었습니다</a>
+        <a href="/user/forgotPassword.do">비밀번호를 잊었습니다</a>
       </p>
       <p class="mb-0">
         <a href="/user/register.do" class="text-center">회원 가입</a>
@@ -93,6 +95,7 @@ $(document).ready(function() {
 
         var userId = $('input[name="user_id"]').val();
         var password = $('input[name="password"]').val();
+        var rememberMe = $('#remember').is(':checked');
 
         // 유효성 검사
         if (!userId || !password) {
@@ -106,7 +109,11 @@ $(document).ready(function() {
             method: 'POST',
             data: {
                 user_id: userId,
-                password: password
+                password: password,
+                'remember-me': rememberMe // 쉼표 추가
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
             },
             success: function(response) {
                 // 로그인 성공 시 처리

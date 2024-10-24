@@ -36,4 +36,8 @@ public interface UserService {
 	boolean checkExistUserEmailForUpdate(Map<String, Object> params);
 
 	void updateUser(UserVO user);
+
+	public UserVO selectUserByUserId(String username);
+
+	UserVO getCurrentUser();
 }

@@ -12,7 +12,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ public class CourseController {
 	private UserService userService;
 
 	private String saveImage(MultipartFile file) {
-		String uploadDir = "C:\\Users\\admin\\git\\egov\\toy_project\\src\\main\\webapp\\upload\\"; // 실제 경로
+		String uploadDir = "C:\\upload\\"; // 실제 경로
 		String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
 		File destinationFile = new File(uploadDir + fileName);
 
@@ -61,47 +60,34 @@ public class CourseController {
 	}
 
 	@RequestMapping(value = "/mainPage.do")
-	public String home(Model model, HttpServletRequest request) {
-
+	public String home(Model model) {
 		Logger.debug("CourseList.......");
+
+		// 강좌 목록을 가져온다
 		List<?> list = courseService.selectCourseList();
 		model.addAttribute("list", list);
 
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser");
-
-		if (user == null) {
-			model.addAttribute("message", "로그인해 주세요.");
-		} else {
-			UserVO CurrentUser = userService.selectUserByEmail(user.getEmail());
-
-			// 강좌 목록을 가져온다
-			List<CourseVO> courseList = courseService.selectMyCourseList(CurrentUser.getId());
-			// 모델에 강좌 목록 추가
-			model.addAttribute("list", courseList);
-		}
+		// 강좌 목록 가져오기
+		UserVO user = userService.getCurrentUser();
+		List<CourseVO> courseList = courseService.selectMyCourseList(user.getId());
+		// 모델에 강좌 목록 추가
+		model.addAttribute("list", courseList);
 
 		model.addAttribute("pageName", "myCourses");
 
 		return "home";
 	}
 
-	@RequestMapping(value = "/courseRegister.do")
+	@RequestMapping(value = "/courseCreate.do")
 	public String courseRegister(Model model) {
-		model.addAttribute("pageName", "courseRegister");
+		model.addAttribute("pageName", "courseCreate");
 
 		return "courseAdd";
 	}
 
 	@PostMapping("/courseCreate.do")
 	public String courseCreate(@ModelAttribute CourseVO course, @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser");
-
-		if (user == null) {
-			System.out.println("CustomException 발생: 로그인 후 다시 시도해주세요");
-			throw new CustomException("로그인 후 다시 시도해주세요");
-		}
+		UserVO user = userService.getCurrentUser();
 
 		course.setInstructor_id(user.getId());
 		course.setCreated_at(Timestamp.from(Instant.now()));
@@ -118,12 +104,7 @@ public class CourseController {
 
 	@RequestMapping("/course.do")
 	public String selectCourse(@RequestParam("id") int id, Model model, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser");
-
-		if (user == null) {
-			throw new CustomException("로그인 후 다시 시도해주세요");
-		}
+		UserVO user = userService.getCurrentUser();
 
 		CourseVO course = courseService.selectCourseById(id);
 		model.addAttribute("course", course);
@@ -141,20 +122,12 @@ public class CourseController {
 
 	@RequestMapping("/courseEnroll.do")
 	public String courseEnrollPage(Model model, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+		UserVO user = userService.getCurrentUser();
 
-		if (user == null) {
-			List<?> courseList = courseService.selectCourseList();
-			model.addAttribute("courseList", courseList);
-		} else {
-			UserVO CurrentUser = userService.selectUserByEmail(user.getEmail());
-
-			// 강좌 목록을 가져온다
-			List<CourseEnrollListDTO> courseList = courseService.selectCourseEnrollList(CurrentUser.getId());
-			// 모델에 강좌 목록 추가
-			model.addAttribute("courseList", courseList);
-		}
+		// 강좌 목록을 가져온다
+		List<CourseEnrollListDTO> courseList = courseService.selectCourseEnrollList(user.getId());
+		// 모델에 강좌 목록 추가
+		model.addAttribute("courseList", courseList);
 
 		model.addAttribute("pageName", "courseEnroll");
 		return "courseEnrolls";
@@ -165,20 +138,11 @@ public class CourseController {
 	public Map<String, Object> enrollCourse(@RequestParam("courseId") int courseId, HttpServletRequest request) {
 		Logger.debug("enroll----------------------");
 		Map<String, Object> response = new HashMap<>();
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser"); // 예시로 세션에서 사용자 이메일을 가져옴
-
-		if (user == null) {
-			response.put("success", false);
-			response.put("message", "로그인 후 신청해 주세요.");
-			return response;
-		}
-
-		UserVO CurrentUser = userService.selectUserByEmail(user.getEmail());
+		UserVO user = userService.getCurrentUser();
 
 		try {
 			// 강좌 등록 로직
-			courseService.enrollUserInCourse(courseId, CurrentUser);
+			courseService.enrollUserInCourse(courseId, user);
 			response.put("success", true);
 			response.put("message", "강좌가 등록되었습니다");
 		} catch (Exception e) {
@@ -192,18 +156,11 @@ public class CourseController {
 
 	@RequestMapping(value = "/testCreatePage.do")
 	public String testCreatePage(@RequestParam("courseId") int courseId, Model model, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+		UserVO user = userService.getCurrentUser();
 
-		if (user == null) {
-
-			throw new CustomException("로그인 후 다시 시도해주세요");
-
-		} else {
-			CourseVO courseVO = courseService.selectCourseById(courseId);
-			if (courseVO.getInstructor_id() != user.getId()) {
-				throw new CustomException("해당 강좌에 대한 권한이 없습니다");
-			}
+		CourseVO courseVO = courseService.selectCourseById(courseId);
+		if (courseVO.getInstructor_id() != user.getId()) {
+			throw new CustomException("해당 강좌에 대한 권한이 없습니다");
 		}
 
 		model.addAttribute("courseId", courseId);
@@ -222,8 +179,7 @@ public class CourseController {
 	public String testCreate(HttpServletRequest request) {
 		Logger.debug("---------------");
 
-		HttpSession session = request.getSession();
-		UserVO user = (UserVO) session.getAttribute("loggedInUser");
+		UserVO user = userService.getCurrentUser();
 
 		String name = request.getParameter("name");
 		String description = request.getParameter("description");
@@ -241,13 +197,9 @@ public class CourseController {
 		Timestamp start_time = Timestamp.valueOf(startDateTime);
 		Timestamp end_time = Timestamp.valueOf(endDateTime);
 
-		if (user == null) {
-			throw new CustomException("로그인 후 다시 시도해주세요");
-		} else {
-			CourseVO courseVO = courseService.selectCourseById(courseId);
-			if (courseVO.getInstructor_id() != user.getId()) {
-				throw new CustomException("해당 강좌에 대한 권한이 없습니다");
-			}
+		CourseVO courseVO = courseService.selectCourseById(courseId);
+		if (courseVO.getInstructor_id() != user.getId()) {
+			throw new CustomException("해당 강좌에 대한 권한이 없습니다");
 		}
 
 		// TestVO 객체 생성

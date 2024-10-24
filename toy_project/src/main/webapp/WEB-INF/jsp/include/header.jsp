@@ -9,6 +9,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" content="${_csrf.token}"/>
+	<meta name="_csrf_header" content="${_csrf.headerName}"/>
 	<title>온라인 시험 시스템</title>
 
   <!-- Google Font: Source Sans Pro -->
@@ -181,7 +183,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="/resources/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+        <img src="/${sessionScope.loggedInUser.image_path}" 
+                             alt="이미지 없음" 
+                             class="img-circle elevation-2" 
+                             onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
         </div>
         <div class="info">
           
@@ -247,7 +252,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
             <li class="nav-item">
-                <a href="/courseRegister.do" class="nav-link <c:if test="${pageName == 'courseRegister'}">active</c:if>">
+                <a href="/courseCreate.do" class="nav-link <c:if test="${pageName == 'courseCreate'}">active</c:if>">
                   <i class="far fa-circle nav-icon"></i>
                   <p>강좌 생성</p>
                 </a>
@@ -275,12 +280,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>로그인</p>
                 </a>
               </li>
-              <li class="nav-item">
-                 <a href="javascript:void(0);" class="nav-link" onclick="confirmLogout()">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>로그아웃</p>
-                </a>
-              </li>
+              <form id="logoutForm" action="/user/logout.do" method="post" style="display: none;">
+    <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+</form>
+
+<li class="nav-item">
+    <a href="javascript:void(0);" class="nav-link" onclick="document.getElementById('logoutForm').submit();">
+        <i class="far fa-circle nav-icon"></i>
+        <p>로그아웃</p>
+    </a>
+</li>
             </ul>
           </li>
           <li class="nav-item">
@@ -300,48 +309,58 @@ scratch. This page gets rid of all links and provides the needed markup only.
   </aside>
   
     <!--  로그아웃 모달 -->
-      <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">로그아웃 확인</h5>
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    정말 로그아웃 하시겠습니까?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" onclick="performLogout()">로그아웃</button>
-                </div>
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">로그아웃 확인</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                정말 로그아웃하시겠습니까?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="performLogout()">로그아웃</button>
             </div>
         </div>
     </div>
-  
-  
-  <script>
+</div>
+
+<script>
     function confirmLogout() {
         // 모달 띄우기
         $('#logoutModal').modal('show');
     }
 
     function performLogout() {
+        // CSRF 토큰 가져오기
+        const csrfToken = document.querySelector("input[name='_csrf']").value; // CSRF 토큰을 가져옵니다.
+
         // AJAX 요청 보내기
         fetch('user/logout.do', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken // CSRF 토큰 추가
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // 로그아웃 성공 시 페이지 이동
-                window.location.href = 'mainPage.do'; // 적절한 로그인 페이지로 이동
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // JSON 응답 파싱
             } else {
-                alert("로그아웃 실패. 다시 시도해 주세요.");
+                throw new Error('로그아웃 요청 실패');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .then(data => {
+            // 로그아웃 성공 시 페이지 이동
+            window.location.href = 'mainPage.do'; // 적절한 페이지로 이동
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("로그아웃 실패. 다시 시도해 주세요."); // 오류 발생 시 알림
+        });
     }
-    </script>
+</script>

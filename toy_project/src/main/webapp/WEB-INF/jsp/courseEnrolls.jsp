@@ -64,7 +64,7 @@
         <td>
             <ul class="list-inline">
                 <li class="list-inline-item">
-                <img src="${pageContext.request.contextPath}/${course.instructor_image}" 
+                <img src="/${course.instructor_image}" 
                              alt="이미지 없음" 
                              class="table-avatar" 
                              onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
@@ -131,12 +131,16 @@ $(document).ready(function() {
     $('.enroll-button').on('click', function() {
         console.log("...........");
         var courseId = $(this).data('course-id');
+        var csrfToken = $('meta[name="_csrf"]').attr('content');
         
         $.ajax({
             url: '/courseEnroll.do',
             type: 'POST',
             data: {
                 courseId: courseId
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // CSRF 토큰 추가
             },
             success: function(response) {
                 if (response.success) {

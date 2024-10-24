@@ -5,6 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    	<meta name="_csrf" content="${_csrf.token}"/>
+	<meta name="_csrf_header" content="${_csrf.headerName}"/>
     <title>비밀번호 재설정</title>
     <link rel="stylesheet" href="/resources/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="/resources/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
@@ -57,6 +59,9 @@
                 type: 'POST',
                 data: {
                     newPassword: newPassword
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
                 },
                 success: function(response) {
                     if (response.success) {

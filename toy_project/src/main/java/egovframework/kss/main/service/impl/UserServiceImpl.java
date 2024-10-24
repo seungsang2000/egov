@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,9 @@ import egovframework.kss.main.dao.UserDAO;
 import egovframework.kss.main.dto.PasswordKeyDTO;
 import egovframework.kss.main.dto.UserLoginDTO;
 import egovframework.kss.main.dto.UserRegisterDTO;
+import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.mail.TempKey;
+import egovframework.kss.main.model.CustomUserDetails;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.UserVO;
 
@@ -156,6 +160,29 @@ public class UserServiceImpl implements UserService {
 	public void updateUser(UserVO user) {
 		userDAO.updateUser(user);
 
+	}
+
+	@Override
+	public UserVO selectUserByUserId(String username) {
+		return userDAO.selectUserByUserId(username);
+	}
+
+	@Override
+	public UserVO getCurrentUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Object principal = authentication.getPrincipal();
+
+		try {
+			CustomUserDetails currentUser = (CustomUserDetails) principal;
+			UserVO user = selectUserByUserId(currentUser.getUsername());
+			if (user == null) {
+				throw new CustomException("로그인 후 다시 시도해주세요");
+			}
+			user.setPassword(null);
+			return user;
+		} catch (Exception e) {
+			throw new CustomException("유저 정보에 이상이 생겼습니다");
+		}
 	}
 
 }

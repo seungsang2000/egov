@@ -44,7 +44,7 @@
                                         <div class="card-body">
                                             <div class="d-flex align-items-center">
                                                 <div class="mr-3">
-                                                   <img src="${pageContext.request.contextPath}/${course.image_path}" 
+                                                   <img src="/${course.image_path}" 
                              alt="이미지 없음" 
                              class="img-circle" 
                              width="50" 

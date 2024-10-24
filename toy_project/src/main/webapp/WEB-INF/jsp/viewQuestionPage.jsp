@@ -157,18 +157,23 @@
 </style>
 
 <script>
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
     function confirmDelete(questionId) {
         if (confirm("문제를 삭제하시겠습니까?")) {
-            // 삭제 요청을 위한 URL
+            
             var url = "/question/questionDelete.do?questionId=" + questionId;
-            // AJAX 요청을 통해 삭제 처리
+            
             fetch(url, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    [csrfHeader]: csrfToken 
+                }
             })
             .then(response => {
                 if (response.ok) {
                     alert("삭제 완료되었습니다.");
-                    // 문제 생성 페이지로 이동
+                    
                     window.location.href = "/question/testEdit.do?testId=${testId}";
                 } else {
                     alert("삭제에 실패했습니다.");
@@ -182,16 +187,17 @@
     }
     
     function completeTest() {
-        // 경고창 표시
+        
         if (confirm("시험 생성을 완료하시겠습니까? 등록된 유저들에게 시험이 공개되게 되며, 문제 수정이 불가능해집니다.")) {
            
             const testId = 'yourTestId';
 
-            // AJAX 요청
-            fetch('/testComplete.do?testId=${testId}', { // 실제 서버 URL로 변경
+            
+            fetch('/testComplete.do?testId=${testId}', { 
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken 
                 },
             })
             .then(response => {
@@ -206,7 +212,7 @@
                 alert("서버와의 통신 중 오류가 발생했습니다.");
             });
         } else {
-            // 취소 시 아무것도 하지 않음
+            
             console.log("시험 완료가 취소되었습니다.");
         }
     }

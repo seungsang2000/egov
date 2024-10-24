@@ -74,4 +74,9 @@ public class UserDAO {
 
 	}
 
+	public UserVO selectUserByUserId(String username) {
+		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+		return userMapper.selectUserByUserId(username);
+	}
+
 }

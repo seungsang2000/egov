@@ -26,6 +26,7 @@
       <p class="login-box-msg">회원 정보를 입력해주세요</p>
 
       <form action="/user/register.do" method="post">
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <div class="input-group mb-3">
           <input type="text" class="form-control" name="username" placeholder="유저 이름" required>
           <div class="input-group-append">
@@ -125,6 +126,8 @@ function isValidUserId(userId) {
 $(document).ready(function() {
     let isUserIdValid = false;
     let isEmailValid = false; // 이메일 유효성 검사를 위한 변수
+    var csrfToken = $("input[name='_csrf']").val();
+    var csrfHeader = "X-CSRF-TOKEN"; // 기본 CSRF 헤더 이름
 
     // 유저 아이디 검사
     $('#userId').on('blur', function() {
@@ -177,6 +180,7 @@ $(document).ready(function() {
                 url: '/user/checkEmail.do',
                 method: 'GET',
                 data: { email: email },
+                
                 success: function(response) {
                     if (response.exists) {
                         $('#userEmailResult').text('사용할 수 없는 이메일입니다.').removeClass('text-success').addClass('text-danger').show(); // 붉은색
@@ -230,7 +234,39 @@ $(document).ready(function() {
             return false; // 폼 제출 방지
         }
 
-        return true; // 모든 조건이 통과하면 폼 제출 허용
+        $('form').on('submit', function(event) {
+            event.preventDefault();
+
+            var formData = $(this).serializeArray();
+            var jsonData = {};
+
+            // 배열을 객체로 변환
+            $.map(formData, function(n) {
+                jsonData[n.name] = n.value;
+            });
+
+            $.ajax({
+                url: '/user/register.do',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(jsonData), // JSON 형식으로 변환
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('회원가입 성공! ');
+                        window.location.href = '/user/login.do'; // 로그인 페이지로 리다이렉트
+                    } else {
+                        alert('회원가입 실패: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("서버 오류:", status, error);
+                    alert('서버와의 연결에 문제가 발생했습니다.');
+                }
+            });
+        });
     });
 });
 </script>

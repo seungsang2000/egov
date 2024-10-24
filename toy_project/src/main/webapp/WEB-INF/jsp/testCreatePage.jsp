@@ -24,6 +24,7 @@
     <!-- Main content -->
     <section class="content">
         <form action="/testCreate.do" method="post">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card card-primary">
