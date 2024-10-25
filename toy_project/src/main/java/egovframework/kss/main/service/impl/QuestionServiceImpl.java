@@ -1,6 +1,7 @@
 package egovframework.kss.main.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -8,11 +9,13 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import egovframework.kss.main.dao.QuestionDAO;
+import egovframework.kss.main.dto.AnswerDTO;
 import egovframework.kss.main.dto.QuestionDetailDTO;
 import egovframework.kss.main.dto.QuestionListDTO;
 import egovframework.kss.main.model.Option;
 import egovframework.kss.main.model.Question;
 import egovframework.kss.main.service.QuestionService;
+import egovframework.kss.main.vo.ExamParticipationVO;
 
 @Service("QuestionService")
 public class QuestionServiceImpl implements QuestionService {
@@ -93,6 +96,48 @@ public class QuestionServiceImpl implements QuestionService {
 	public void deleteOptionByQuestionId(int questionId) {
 		questionDAO.deleteOptionByQuestionId(questionId);
 
+	}
+
+	@Override
+	public QuestionDetailDTO selectNextQuestionById(int currentQuestionId) {
+		return questionDAO.selectNextQuestionById(currentQuestionId);
+	}
+
+	@Override
+	public void insertUserAnswer(AnswerDTO answer) {
+		questionDAO.insertUserAnswer(answer);
+
+	}
+
+	@Override
+	public boolean checkUserAnswerExists(AnswerDTO answer) {
+		return questionDAO.checkUserAnswerExists(answer);
+	}
+
+	@Override
+	public String selectUserAnswer(Map<String, Object> params) {
+		return questionDAO.selectUserAnswer(params);
+	}
+
+	@Override
+	public void updateUserAnswer(AnswerDTO answer) {
+		questionDAO.updateUserAnswer(answer);
+
+	}
+
+	@Override
+	public boolean checkExamParticipationExists(Map<String, Object> params) {
+		return questionDAO.checkExamParticipationExists(params);
+	}
+
+	@Override
+	public void insertExamParticipation(Map<String, Object> params) {
+		questionDAO.insertExamParticipation(params);
+	}
+
+	@Override
+	public ExamParticipationVO selectExamParticipation(Map<String, Object> params) {
+		return questionDAO.selectExamParticipation(params);
 	}
 
 }

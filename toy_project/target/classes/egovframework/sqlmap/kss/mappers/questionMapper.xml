@@ -52,9 +52,61 @@ VALUES (#{question_id}, #{option_number}, #{option_text});
 
 </delete>
 
+<select id="selectNextQuestionById" parameterType="int" resultType="egovframework.kss.main.dto.QuestionDetailDTO">
+    SELECT q.id, q.question_text, q.question_type, q.correct_answer, q.score
+    FROM public.questions q
+    WHERE q.test_id = (SELECT test_id FROM public.questions WHERE id = #{id}) 
+      AND q.question_order > (SELECT question_order FROM public.questions WHERE id = #{id})
+    ORDER BY q.question_order
+    LIMIT 1
+</select>
 
-	
+<insert id="insertUserAnswer" parameterType="egovframework.kss.main.dto.AnswerDTO">
+	insert into answers (user_id, test_id, question_id, answer) values (#{user_id}, #{test_id}, #{question_id}, #{answer})
+</insert>
 
+<update id="updateUserAnswer" parameterType="egovframework.kss.main.dto.AnswerDTO">
+	update answers set answer = #{answer} where user_id=#{user_id} and test_id=#{test_id} and question_id=#{question_id}
+
+</update>
+
+
+<select id="checkUserAnswerExists" parameterType="egovframework.kss.main.dto.AnswerDTO" resultType="boolean">
+    SELECT EXISTS (
+        SELECT 1 
+        FROM answers 
+        WHERE user_id = #{user_id} 
+          AND test_id = #{test_id} 
+          AND question_id = #{question_id}
+    )
+</select>
+
+
+<select id="selectUserAnswer" parameterType="map" resultType="String">
+    SELECT a.answer 
+    FROM public.answers a 
+    WHERE a.question_id = #{questionId} 
+      AND a.user_id = #{userId} 
+      AND a.test_id = #{testId}
+</select>
+
+<select id="checkExamParticipationExists" parameterType="map" resultType="boolean">
+	select exists(
+		select 1
+		from exam_participation
+		where user_id=#{userId} and test_id=#{testId}
+	)
+
+</select>
+
+<insert id="insertExamParticipation" parameterType="map">
+	insert into exam_participation(user_id, test_id, start_time, end_time, status) values (#{userId}, #{testId}, #{startTime}, #{endTime}, #{status})
+
+</insert>
+
+<select id="selectExamParticipation" parameterType="map" resultType="egovframework.kss.main.vo.ExamParticipationVO">
+	select * from exam_participation where user_id=#{userId} and test_id=#{testId}
+</select>
 
 
 

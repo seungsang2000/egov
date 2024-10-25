@@ -1,16 +1,19 @@
 package egovframework.kss.main.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import egovframework.kss.main.dto.AnswerDTO;
 import egovframework.kss.main.dto.QuestionDetailDTO;
 import egovframework.kss.main.dto.QuestionListDTO;
 import egovframework.kss.main.mapper.QuestionMapper;
 import egovframework.kss.main.model.Option;
 import egovframework.kss.main.model.Question;
+import egovframework.kss.main.vo.ExamParticipationVO;
 
 @Repository("QuestionDAO")
 public class QuestionDAO {
@@ -97,6 +100,48 @@ public class QuestionDAO {
 			questionMapper.insertOption(option);
 		}
 
+	}
+
+	public QuestionDetailDTO selectNextQuestionById(int currentQuestionId) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.selectNextQuestionById(currentQuestionId);
+	}
+
+	public void insertUserAnswer(AnswerDTO answer) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		questionMapper.insertUserAnswer(answer);
+
+	}
+
+	public void updateUserAnswer(AnswerDTO answer) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		questionMapper.updateUserAnswer(answer);
+
+	}
+
+	public boolean checkUserAnswerExists(AnswerDTO answer) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.checkUserAnswerExists(answer);
+	}
+
+	public String selectUserAnswer(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.selectUserAnswer(params);
+	}
+
+	public boolean checkExamParticipationExists(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.checkExamParticipationExists(params);
+	}
+
+	public void insertExamParticipation(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		questionMapper.insertExamParticipation(params);
+	}
+
+	public ExamParticipationVO selectExamParticipation(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.selectExamParticipation(params);
 	}
 
 }

@@ -167,12 +167,12 @@ public class CourseController {
 		return "testCreatePage";
 	}
 
-	@RequestMapping(value = "solveTestPage.do")
+	@RequestMapping(value = "startTestPage.do")
 	public String solveTestPage(@RequestParam("testId") int testId, Model model) {
 		TestVO test = courseService.selectTestById(testId);
 		model.addAttribute("test", test);
 
-		return "solveTestPage";
+		return "startTestPage";
 	}
 
 	@PostMapping("/testCreate.do")

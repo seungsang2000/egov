@@ -87,7 +87,7 @@
                                     <td class="project-actions text-right">
                                     <c:set var="currentTime" value="${currentTime}" />
                                         <c:if test="${currentTime.time >= test.start_time.time && currentTime.time <= test.end_time.time}">
-                                            <a class="btn btn-primary btn-sm" href="/solveTestPage.do?testId=${test.id}"> 
+                                            <a class="btn btn-primary btn-sm" href="/startTestPage.do?testId=${test.id}"> 
                                             <i class="fas fa-eye"></i> 문제 풀기 
                                         </a>
                                         </c:if>
