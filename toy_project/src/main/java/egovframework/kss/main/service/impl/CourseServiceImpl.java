@@ -102,4 +102,9 @@ public class CourseServiceImpl implements CourseService {
 		return courseDAO.selectTestInCourseWithUser(params);
 	}
 
+	@Override
+	public int selectTotalStudentsByCourseId(int courseId) {
+		return courseDAO.selectTotalStudentsByCourseId(courseId);
+	}
+
 }

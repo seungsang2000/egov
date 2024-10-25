@@ -68,8 +68,7 @@
 								</small></td>
 								<td>
 									<ul class="list-inline">
-										<li class="list-inline-item"><img alt="Avatar"
-											class="table-avatar" src="../../dist/img/avatar.png"></li>
+										<li class="list-inline-item">${test.user_count }</li>
 										<li class="list-inline-item"><img alt="Avatar"
 											class="table-avatar" src="../../dist/img/avatar2.png">
 										</li>

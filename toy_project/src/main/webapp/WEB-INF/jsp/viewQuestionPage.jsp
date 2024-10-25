@@ -203,6 +203,7 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
             .then(response => {
                 if (response.ok) {
                     alert("시험이 완료되었습니다.");
+                    window.location.href = '/question/testView.do?testId=${testId}';
                 } else {
                     alert("시험 완료 요청에 실패했습니다.");
                 }

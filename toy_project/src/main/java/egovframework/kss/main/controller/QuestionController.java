@@ -253,6 +253,14 @@ public class QuestionController {
 		params.put("questionId", questionId);
 		params.put("userId", userId);
 		params.put("testId", testId);
+		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
+
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		if (userParticipation != null) {
+			if (userParticipation.getEnd_time().before(now) || userParticipation.getStatus().equals("완료")) {
+				throw new CustomException("이미 완료된 시험입니다");
+			}
+		}
 
 		if (!questionService.checkExamParticipationExists(params)) {
 			System.out.println("시험 응시 시작~~~~~~~~"); //유저 시험 참여
@@ -275,8 +283,6 @@ public class QuestionController {
 		} else {
 			System.out.println("시험 중복 응시~~~~~~~~");
 		}
-
-		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
 
 		model.addAttribute("endTime", userParticipation.getEndTimeAsISO());
 
@@ -314,6 +320,17 @@ public class QuestionController {
 		int currentQuestionId = Integer.parseInt(request.getParameter("currentQuestionId"));
 		UserVO user = userService.getCurrentUser();
 		int userId = user.getId();
+		Map<String, Object> params = new HashMap<>();
+		params.put("userId", userId);
+		params.put("testId", testId);
+		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
+
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		if (userParticipation != null) {
+			if (userParticipation.getEnd_time().before(now) || userParticipation.getStatus().equals("완료")) {
+				throw new CustomException("이미 완료된 시험입니다");
+			}
+		}
 
 		AnswerDTO answer = new AnswerDTO();
 		answer.setQuestion_id(currentQuestionId);
@@ -355,12 +372,8 @@ public class QuestionController {
 		}
 
 		QuestionDetailDTO questionDetail = questionService.selectQuestionById(currentQuestionId);
-		Map<String, Object> params = new HashMap<>();
-		params.put("questionId", currentQuestionId);
-		params.put("userId", userId);
-		params.put("testId", testId);
 
-		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
+		params.put("questionId", currentQuestionId);
 
 		model.addAttribute("endTime", userParticipation.getEndTimeAsISO());
 

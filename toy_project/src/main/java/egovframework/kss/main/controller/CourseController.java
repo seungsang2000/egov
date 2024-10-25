@@ -116,6 +116,10 @@ public class CourseController {
 
 			List<?> list = courseService.selectTestInCourseWithUser(params);
 			model.addAttribute("list", list);
+
+			int totalStudent = courseService.selectTotalStudentsByCourseId(id);
+			model.addAttribute("totalStudent", totalStudent);
+
 			return "tests_user";
 		} else { // 강사
 			List<?> list = courseService.selectTestInCourse(id);

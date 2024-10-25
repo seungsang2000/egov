@@ -21,5 +21,6 @@ public class TestVO {
 	private boolean shutdown;
 	private String status;
 	private String user_status;
+	private int user_count;
 
 }

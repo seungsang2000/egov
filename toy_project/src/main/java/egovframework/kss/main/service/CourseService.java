@@ -34,4 +34,6 @@ public interface CourseService {
 
 	public TestVO selectTestById(int testId);
 
+	int selectTotalStudentsByCourseId(int courseId);
+
 }

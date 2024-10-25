@@ -81,4 +81,9 @@ public class CourseDAO {
 		return courseMapper.selectTestInCourseWithUser(params);
 	}
 
+	public int selectTotalStudentsByCourseId(int courseId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.selectTotalStudentsByCourseId(courseId);
+	}
+
 }

@@ -110,7 +110,7 @@
 								<div class="col-2 mb-4">
 									<button type="button"
 										class="btn ${question.id == selectedQuestionId ? 'btn-primary' : 'btn-outline-primary'} btn-block"
-										onclick="submitAndNavigate(${question.id})">문제
+										onclick="submitAndNavigate(${question.id})">
 										${question.question_order}</button>
 								</div>
 							</c:forEach>
@@ -196,7 +196,7 @@
             document.getElementById('timer').textContent = "시간 초과";
             submitTestForm(); // 자동 제출
         } else {
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const minutes = Math.floor(distance / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
             
             const formattedSeconds = String(seconds).padStart(2, '0');

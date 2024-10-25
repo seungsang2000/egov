@@ -33,4 +33,6 @@ public interface CourseMapper {
 
 	TestVO selectTestById(int testId);
 
+	int selectTotalStudentsByCourseId(int courseId);
+
 }

@@ -127,11 +127,13 @@
         t.shutdown, 
         t.description, 
         t.status, 
-        e.status AS user_status 
+        e.status AS user_status,
+        (SELECT COUNT(e2.user_id) FROM exam_participation e2 WHERE e2.test_id = t.id) AS user_count
     FROM 
         (SELECT * FROM test WHERE course_id = #{courseId}) t
     LEFT JOIN 
         exam_participation e ON t.id = e.test_id AND e.user_id = #{userId}
+  	order by t.id
 	</select>
 	
 	<delete id="deleteTest" parameterType="java.lang.Integer">
@@ -141,5 +143,9 @@
 	<update id="completeTest" parameterType="int">
 		update test set status = '완료' where id=#{testId}
 	</update>
+	
+	<select id="selectTotalStudentsByCourseId" parameterType="int" resultType="int">
+		select count(*) from enrollments where course_id = #{courseId} and status = 'user'
+	</select>
 	
 </mapper>

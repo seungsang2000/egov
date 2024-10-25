@@ -45,10 +45,10 @@
                         <tr>
                             <th style="width: 1%">#</th>
                             <th style="width: 20%">시험 이름</th>
-                            <th style="width: 30%">응시 인원</th>
+                            <th style="width: 25%">응시 인원</th>
                             <th>점수</th>
-                            <th style="width: 8%" class="text-center">상태</th>
-                            <th style="width: 20%"></th>
+                            <th style="width: 15%" class="text-center">상태</th>
+                            <th style="width: 18%"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -63,16 +63,19 @@
                                             <fmt:formatDate value="${test.end_time}" pattern="yyyy-MM-dd HH:mm" />
                                         </small>
                                     </td>
-                                    <td>
-                                        <ul class="list-inline">
-                                            <li class="list-inline-item">
-                                                <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar.png">
-                                            </li>
-                                            <li class="list-inline-item">
-                                                <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar2.png">
-                                            </li>
-                                        </ul>
-                                    </td>
+<td>
+    <div class="user-count-container">
+        <span class="badge badge-info">${test.user_count}</span> <!-- 시험 본 유저 수 -->
+        <span class="separator">/</span>
+        <span class="badge badge-light">${totalStudent}</span> <!-- 전체 유저 수 -->
+        <span class="user-icon">
+            <i class="fas fa-users" aria-hidden="true"></i> <!-- 사용자 아이콘 -->
+        </span>
+        <span class="check-icon">
+            <i class="fas fa-check-circle" aria-hidden="true"></i> <!-- 체크 아이콘 -->
+        </span>
+    </div>
+</td>
                                     <td class="project_progress">
                                         <div class="progress progress-sm">
                                             <div class="progress-bar bg-green" role="progressbar" aria-valuenow="47" aria-valuemin="0" aria-valuemax="100" style="width: 47%"></div>
@@ -121,5 +124,39 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+<style>
+.user-count-container {
+    display: flex;
+    align-items: center; /* 아이템 수직 중앙 정렬 */
+    font-size: 1.2rem; /* 기본 폰트 크기 */
+    padding: 5px; /* 패딩 추가 */
+    
+}
+
+.badge {
+    font-size: 1rem; /* 배지 크기 조정 */
+    margin-right: 5px; /* 배지 간격 조정 */
+}
+
+.separator {
+    margin: 0 5px; /* 구분자 간격 조정 */
+    font-weight: bold; /* 구분자 강조 */
+}
+
+.user-icon {
+    margin-left: 10px; /* 사용자 아이콘 여백 */
+    color: #007bff; /* 아이콘 색상 */
+    font-size: 1.5rem; /* 아이콘 크기 조정 */
+}
+
+.check-icon {
+    margin-left: 5px; /* 체크 아이콘 여백 */
+    color: #28a745; /* 체크 아이콘 색상 */
+    font-size: 1.5rem; /* 체크 아이콘 크기 조정 */
+}
+
+</style>
+
 
 <%@ include file="/WEB-INF/jsp/include/footer.jsp"%>
