@@ -40,4 +40,6 @@ public interface UserService {
 	public UserVO selectUserByUserId(String username);
 
 	UserVO getCurrentUser();
+
+	void updateAuthentication(UserVO updatedUser);
 }

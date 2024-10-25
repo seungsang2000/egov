@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -160,6 +161,7 @@ public class UserServiceImpl implements UserService {
 	public void updateUser(UserVO user) {
 		userDAO.updateUser(user);
 
+		updateAuthentication(user);
 	}
 
 	@Override
@@ -183,6 +185,21 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception e) {
 			throw new CustomException("유저 정보에 이상이 생겼습니다");
 		}
+	}
+
+	@Override
+	public void updateAuthentication(UserVO updatedUser) {
+		// 현재의 Authentication 객체를 가져옴
+		Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+
+		// 새로운 UserDetails 생성 (CustomUserDetails 또는 현재 사용 중인 인증 객체의 UserDetails)
+		CustomUserDetails updatedUserDetails = new CustomUserDetails(updatedUser.getUser_id(), updatedUser.getPassword(), updatedUser.getRole(), updatedUser.getName(), updatedUser.getImage_path());
+
+		// 새로운 Authentication 객체 생성
+		Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUserDetails, currentAuth.getCredentials(), updatedUserDetails.getAuthorities());
+
+		// SecurityContext에 새로운 인증 정보 설정
+		SecurityContextHolder.getContext().setAuthentication(newAuth);
 	}
 
 }

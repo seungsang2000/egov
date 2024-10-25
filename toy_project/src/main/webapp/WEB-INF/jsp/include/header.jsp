@@ -239,6 +239,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>강좌 등록</p>
                 </a>
               </li>
+              
             </ul>
           </li>
           <li class="nav-item menu-open">
@@ -267,6 +268,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </p>
             </a>
             <ul class="nav nav-treeview">
+            <sec:authorize access="!isAuthenticated()">
               <li class="nav-item">
                 <a href="user/register.do" class="nav-link ">
                   <i class="far fa-circle nav-icon"></i>
@@ -279,16 +281,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>로그인</p>
                 </a>
               </li>
+              </ul>
+              </sec:authorize>
               <form id="logoutForm" action="/user/logout.do" method="post" style="display: none;">
     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
 </form>
-
+<sec:authorize access="isAuthenticated()">
+<li class="nav-item">
+    <a href="/user/myPage.do" class="nav-link <c:if test="${pageName == 'myPage'}">active</c:if>">
+        <i class="far fa-circle nav-icon"></i>
+        <p>회원정보 수정</p>
+    </a>
+</li>
 <li class="nav-item">
     <a href="javascript:void(0);" class="nav-link" onclick="document.getElementById('logoutForm').submit();">
         <i class="far fa-circle nav-icon"></i>
         <p>로그아웃</p>
     </a>
 </li>
+</sec:authorize>
             </ul>
           </li>
           <li class="nav-item">

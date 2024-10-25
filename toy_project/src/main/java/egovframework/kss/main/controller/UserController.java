@@ -295,6 +295,7 @@ public class UserController {
 
 		UserVO user = userService.getCurrentUser();
 		model.addAttribute("user", user);
+		model.addAttribute("pageName", "myPage");
 
 		return "user/profile";
 	}
