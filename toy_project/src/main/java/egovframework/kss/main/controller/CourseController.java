@@ -109,12 +109,17 @@ public class CourseController {
 		CourseVO course = courseService.selectCourseById(id);
 		model.addAttribute("course", course);
 
-		List<?> list = courseService.selectTestInCourse(id);
-		model.addAttribute("list", list);
+		if (user.getRole().equals("user")) { // 학생
+			Map<String, Object> params = new HashMap<>();
+			params.put("courseId", id);
+			params.put("userId", user.getId());
 
-		if (user.getRole().equals("user")) {
+			List<?> list = courseService.selectTestInCourseWithUser(params);
+			model.addAttribute("list", list);
 			return "tests_user";
-		} else {
+		} else { // 강사
+			List<?> list = courseService.selectTestInCourse(id);
+			model.addAttribute("list", list);
 			return "tests";
 		}
 
@@ -165,14 +170,6 @@ public class CourseController {
 
 		model.addAttribute("courseId", courseId);
 		return "testCreatePage";
-	}
-
-	@RequestMapping(value = "startTestPage.do")
-	public String solveTestPage(@RequestParam("testId") int testId, Model model) {
-		TestVO test = courseService.selectTestById(testId);
-		model.addAttribute("test", test);
-
-		return "startTestPage";
 	}
 
 	@PostMapping("/testCreate.do")

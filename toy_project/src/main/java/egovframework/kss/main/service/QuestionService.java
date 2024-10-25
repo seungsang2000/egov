@@ -49,4 +49,6 @@ public interface QuestionService {
 	public void insertExamParticipation(Map<String, Object> params);
 
 	public ExamParticipationVO selectExamParticipation(Map<String, Object> params);
+
+	public void updateExamParticipation(ExamParticipationVO examParticipation);
 }

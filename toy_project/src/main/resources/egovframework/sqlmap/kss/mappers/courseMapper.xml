@@ -113,7 +113,25 @@
 	
 	<select id="selectTestInCourse" parameterType="java.lang.Integer"
 		resultType="egovframework.kss.main.vo.TestVO">
-		select * from test where course_id = #{courseId}
+		select t.id, t.course_id, t.name, t.start_time, t.end_time, t.time_limit, t.shutdown, t.description, t.status from test t where course_id = #{courseId}
+	</select>
+	
+	<select id="selectTestInCourseWithUser" parameterType="map" resultType="egovframework.kss.main.vo.TestVO">
+		SELECT 
+        t.id, 
+        t.course_id, 
+        t.name, 
+        t.start_time, 
+        t.end_time, 
+        t.time_limit, 
+        t.shutdown, 
+        t.description, 
+        t.status, 
+        e.status AS user_status 
+    FROM 
+        (SELECT * FROM test WHERE course_id = #{courseId}) t
+    LEFT JOIN 
+        exam_participation e ON t.id = e.test_id AND e.user_id = #{userId}
 	</select>
 	
 	<delete id="deleteTest" parameterType="java.lang.Integer">

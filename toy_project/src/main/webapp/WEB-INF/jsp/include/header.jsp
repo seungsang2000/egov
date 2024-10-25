@@ -184,21 +184,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-        <img src="/${sessionScope.loggedInUser.image_path}" 
+        <img src="/<sec:authentication property='principal.image_path' />" 
                              alt="이미지 없음" 
                              class="img-circle elevation-2" 
                              onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
         </div>
         <div class="info">
           
-          	<c:choose>
-        		<c:when test="${not empty sessionScope.loggedInUser}">
-            		<a href="/user/myPage.do" class="d-block"><p>${sessionScope.loggedInUser.name}</p></a>
-        		</c:when>
-        		<c:otherwise>
-            		<a href="/user/login.do" class="d-block"><p>로그인하세요.</p></a>
-        		</c:otherwise>
-    		</c:choose>
+          	<sec:authorize access="isAuthenticated()">
+    <a href="/user/myPage.do" class="d-block"><p><sec:authentication property="principal.name" /></p></a>
+</sec:authorize>
+<sec:authorize access="!isAuthenticated()">
+    <a href="/user/login.do" class="d-block"><p>로그인하세요.</p></a>
+</sec:authorize>
     	
         </div>
       </div>

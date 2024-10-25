@@ -11,12 +11,16 @@ public class CustomUserDetails implements UserDetails {
 	private String username;
 	private String password;
 	private String role;
+	private String name;
+	private String image_path;
 
 	// Constructor
-	public CustomUserDetails(String username, String password, String role) {
+	public CustomUserDetails(String username, String password, String role, String name, String image_path) {
 		this.username = username;
 		this.password = password;
 		this.role = role;
+		this.name = name;
+		this.setImage_path(image_path);
 	}
 
 	@Override
@@ -52,5 +56,21 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getImage_path() {
+		return image_path;
+	}
+
+	public void setImage_path(String image_path) {
+		this.image_path = image_path;
 	}
 }

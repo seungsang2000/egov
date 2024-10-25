@@ -34,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import egovframework.kss.main.dto.PasswordKeyDTO;
 import egovframework.kss.main.dto.UserRegisterDTO;
 import egovframework.kss.main.exception.CustomException;
-import egovframework.kss.main.model.CustomUserDetails;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.UserVO;
 
@@ -112,13 +111,13 @@ public class UserController {
 			// 인증 성공 시
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-			// 세션 생성 (Spring Security가 자동으로 관리)
-			HttpSession session = httpServletRequest.getSession(true);
-			CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-			UserVO user = userService.selectUserByUserId(customUserDetails.getUsername());
-
-			user.setPassword(null); // 비밀번호 세션에 저장안되게
-			session.setAttribute("loggedInUser", user); // 사용자의 세부 정보 저장
+			/*			HttpSession session = httpServletRequest.getSession(true);
+						CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+						UserVO user = userService.selectUserByUserId(customUserDetails.getUsername());
+			
+						user.setPassword(null); // 비밀번호 세션에 저장안되게
+						session.setAttribute("loggedInUser", user); // 사용자의 세부 정보 저장
+			*/
 
 			if (rememberMe) {
 				rememberMeServices.loginSuccess(httpServletRequest, httpServletResponse, authentication);

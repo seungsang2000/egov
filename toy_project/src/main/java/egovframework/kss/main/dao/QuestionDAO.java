@@ -144,4 +144,10 @@ public class QuestionDAO {
 		return questionMapper.selectExamParticipation(params);
 	}
 
+	public void updateExamParticipation(ExamParticipationVO examParticipation) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		questionMapper.updateExamParticipation(examParticipation);
+
+	}
+
 }

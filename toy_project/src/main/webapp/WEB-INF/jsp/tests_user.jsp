@@ -2,14 +2,14 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Date"%>
 
 <%@ include file="/WEB-INF/jsp/include/header.jsp"%>
 
-<% 
+<%
     // 현재 시간 가져오기
-    Date currentTime = new Date(); 
-    request.setAttribute("currentTime", currentTime); 
+    Date currentTime = new Date();
+    request.setAttribute("currentTime", currentTime);
 %>
 
 <!-- Content Wrapper. Contains page content -->
@@ -59,14 +59,18 @@
                                     <td>
                                         <a>${test.name}</a><br />
                                         <small>
-                                            <fmt:formatDate value="${test.start_time}" pattern="yyyy-MM-dd HH:mm" /> ~ 
+                                            <fmt:formatDate value="${test.start_time}" pattern="yyyy-MM-dd HH:mm" /> ~
                                             <fmt:formatDate value="${test.end_time}" pattern="yyyy-MM-dd HH:mm" />
                                         </small>
                                     </td>
                                     <td>
                                         <ul class="list-inline">
-                                            <li class="list-inline-item"><img alt="Avatar" class="table-avatar" src="../../dist/img/avatar.png"></li>
-                                            <li class="list-inline-item"><img alt="Avatar" class="table-avatar" src="../../dist/img/avatar2.png"></li>
+                                            <li class="list-inline-item">
+                                                <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar.png">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <img alt="Avatar" class="table-avatar" src="../../dist/img/avatar2.png">
+                                            </li>
                                         </ul>
                                     </td>
                                     <td class="project_progress">
@@ -76,27 +80,33 @@
                                         <small>47% Complete</small>
                                     </td>
                                     <td class="project-state">
-                                        <c:set var="currentTime" value="${currentTime}" />
-                                        <c:if test="${currentTime.time >= test.start_time.time && currentTime.time <= test.end_time.time}">
-                                            <span class="badge badge-success">응시 가능</span>
+                                        <c:if test="${not empty test.user_status}">
+                                            <span class="badge badge-info">${test.user_status}</span>
                                         </c:if>
-                                        <c:if test="${currentTime.time < test.start_time.time || currentTime.time > test.end_time.time}">
-                                            <span class="badge badge-danger">응시 불가</span>
+                                        <c:if test="${empty test.user_status}">
+                                            <c:set var="currentTime" value="${currentTime}" />
+                                            <c:if test="${currentTime.time >= test.start_time.time && currentTime.time <= test.end_time.time}">
+                                                <span class="badge badge-success">응시 가능</span>
+                                            </c:if>
+                                            <c:if test="${currentTime.time < test.start_time.time || currentTime.time > test.end_time.time}">
+                                                <span class="badge badge-danger">응시 불가</span>
+                                            </c:if>
                                         </c:if>
                                     </td>
                                     <td class="project-actions text-right">
-                                    <c:set var="currentTime" value="${currentTime}" />
-                                        <c:if test="${currentTime.time >= test.start_time.time && currentTime.time <= test.end_time.time}">
-                                            <a class="btn btn-primary btn-sm" href="/startTestPage.do?testId=${test.id}"> 
-                                            <i class="fas fa-eye"></i> 문제 풀기 
-                                        </a>
-                                        </c:if>
-                                        <c:if test="${currentTime.time < test.start_time.time || currentTime.time > test.end_time.time}">
-                                            <button class="btn btn-secondary btn-sm" disabled>
-                								<i class="fas fa-eye-slash"></i> 문제 풀기
-            								</button>
-                                        </c:if>
-                                        
+                                        <c:set var="currentTime" value="${currentTime}" />
+                                        <c:choose>
+                                            <c:when test="${currentTime.time >= test.start_time.time && currentTime.time <= test.end_time.time && test.user_status != '완료'}">
+                                                <a class="btn btn-primary btn-sm" href="/question/startTestPage.do?testId=${test.id}">
+                                                    <i class="fas fa-eye"></i> 문제 풀기
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <button class="btn btn-secondary btn-sm" disabled>
+                                                    <i class="fas fa-eye-slash"></i> 문제 풀기
+                                                </button>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
                             </c:if>
@@ -107,7 +117,6 @@
             <!-- /.card-body -->
         </div>
         <!-- /.card -->
-
     </section>
     <!-- /.content -->
 </div>

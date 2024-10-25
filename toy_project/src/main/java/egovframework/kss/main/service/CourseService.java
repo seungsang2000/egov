@@ -1,6 +1,7 @@
 package egovframework.kss.main.service;
 
 import java.util.List;
+import java.util.Map;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.vo.CourseVO;
@@ -24,6 +25,8 @@ public interface CourseService {
 	void registerTest(TestVO test);
 
 	List<TestVO> selectTestInCourse(Integer courseId);
+
+	List<TestVO> selectTestInCourseWithUser(Map<String, Object> params);
 
 	public void deleteTest(int testId);
 

@@ -26,6 +26,7 @@ import egovframework.kss.main.dto.AnswerDTO;
 import egovframework.kss.main.dto.QuestionDetailDTO;
 import egovframework.kss.main.dto.QuestionDetailWithUserAnswerDTO;
 import egovframework.kss.main.dto.QuestionListDTO;
+import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.model.Option;
 import egovframework.kss.main.model.Question;
 import egovframework.kss.main.service.CourseService;
@@ -358,6 +359,11 @@ public class QuestionController {
 		params.put("questionId", currentQuestionId);
 		params.put("userId", userId);
 		params.put("testId", testId);
+
+		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
+
+		model.addAttribute("endTime", userParticipation.getEndTimeAsISO());
+
 		String userAnswer = questionService.selectUserAnswer(params);
 
 		QuestionDetailWithUserAnswerDTO detailWithAnswer = new QuestionDetailWithUserAnswerDTO(); // 변환
@@ -376,6 +382,86 @@ public class QuestionController {
 		}
 
 		return "solveQuestion";
+	}
+
+	@PostMapping("/userFinishTest.do")
+	@ResponseBody
+	public ResponseEntity<Integer> completeTest(HttpServletRequest request) {
+		try {
+			String questionType = request.getParameter("questionType");
+			int testId = Integer.parseInt(request.getParameter("testId"));
+			int currentQuestionId = Integer.parseInt(request.getParameter("currentQuestionId"));
+			UserVO user = userService.getCurrentUser();
+			int userId = user.getId();
+
+			AnswerDTO answer = new AnswerDTO();
+			answer.setQuestion_id(currentQuestionId);
+			answer.setTest_id(testId);
+			answer.setUser_id(user.getId());
+
+			if (questionType.equals("주관식")) {
+				String user_answer = request.getParameter("subjectiveAnswer");
+				answer.setAnswer(user_answer);
+			} else if (questionType.equals("서술형")) {
+
+			} else if (questionType.equals("객관식")) {
+				String user_answer = request.getParameter("answer");
+				answer.setAnswer(user_answer);
+			}
+
+			if (!questionService.checkUserAnswerExists(answer)) {
+				System.out.println("답변 저장");
+				questionService.insertUserAnswer(answer);
+			} else {
+				System.out.println("답변 업데이트");
+				questionService.updateUserAnswer(answer);
+			}
+
+			TestVO test = courseService.selectTestById(testId);
+			int courseId = test.getCourse_id();
+
+			Map<String, Object> params = new HashMap<>();
+			params.put("testId", testId);
+			params.put("userId", userId);
+			ExamParticipationVO examParticipation = questionService.selectExamParticipation(params);
+			examParticipation.setStatus("완료");
+			questionService.updateExamParticipation(examParticipation);
+			return ResponseEntity.ok(courseId);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+
+	}
+
+	@RequestMapping(value = "startTestPage.do")
+	public String solveTestPage(@RequestParam("testId") int testId, Model model) {
+		TestVO test = courseService.selectTestById(testId);
+		model.addAttribute("test", test);
+
+		UserVO user = userService.getCurrentUser();
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("testId", test.getId());
+		params.put("userId", user.getId());
+
+		ExamParticipationVO examParticipation = questionService.selectExamParticipation(params);
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+
+		if (test.getEnd_time().before(now)) {
+			throw new CustomException("이미 완료된 시험입니다");
+		}
+
+		if (examParticipation != null) {
+			if (examParticipation.getEnd_time().before(now) || examParticipation.getStatus().equals("완료")) {
+				throw new CustomException("이미 완료된 시험입니다");
+			} else {
+				//참여한 적은 있는데, 시험 종료가 아직 안된경우. 즉 뒤로 가거나 튕겼다가 돌아온 경우
+				model.addAttribute("examParticipation", examParticipation);
+			}
+
+		}
+
+		return "startTestPage";
 	}
 
 }

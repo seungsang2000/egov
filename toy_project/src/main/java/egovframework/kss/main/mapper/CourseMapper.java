@@ -1,6 +1,7 @@
 package egovframework.kss.main.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.vo.CourseVO;
@@ -23,6 +24,8 @@ public interface CourseMapper {
 	void registerTest(TestVO test);
 
 	List<TestVO> selectTestInCourse(Integer courseId);
+
+	List<TestVO> selectTestInCourseWithUser(Map<String, Object> params);
 
 	void deleteTest(Integer testId);
 

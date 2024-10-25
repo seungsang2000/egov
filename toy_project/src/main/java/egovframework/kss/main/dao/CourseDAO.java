@@ -1,6 +1,7 @@
 package egovframework.kss.main.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,11 @@ public class CourseDAO {
 	public TestVO selectTestById(int testId) {
 		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
 		return courseMapper.selectTestById(testId);
+	}
+
+	public List<TestVO> selectTestInCourseWithUser(Map<String, Object> params) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.selectTestInCourseWithUser(params);
 	}
 
 }

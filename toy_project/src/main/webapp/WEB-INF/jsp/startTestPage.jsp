@@ -48,7 +48,15 @@
                     <p>${test.time_limit} 분</p>
                 </div>
                 <div class="form-group">
-                    <button id="startTest" class="btn btn-success">시험 시작</button>
+                	<c:choose>
+                	<c:when test="${not empty examParticipation}">
+                	<a href="/question/solveTest.do?testId=${test.id}" id="continueTest" class="btn btn-primary">시험 재개</a>
+                    
+                    </c:when>
+                    <c:otherwise>
+                    	<button id="startTest" class="btn btn-success">시험 시작</button>
+                    </c:otherwise>
+                    </c:choose>
                 </div>
             </div>
         </div>
@@ -57,13 +65,40 @@
 </div>
 <!-- /.content-wrapper -->
 
+
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog"
+	aria-labelledby="confirmModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="confirmModalLabel">시험 시작 확인</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">시험 기회는 1번이며, 한번 시험이 시작되면 되돌릴 수 없습니다. 시험을 시작하시겠습니까?</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+				<button type="button" class="btn btn-primary" id="confirmStartTest">확인</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
 <script>
+    // 시험 시작 버튼 클릭 시 모달 표시
     document.getElementById('startTest').addEventListener('click', function() {
-        // 시험 시작 버튼 클릭 시 확인 메시지 표시
-        if (confirm('시험 기회는 1번이며, 한번 시험이 시작되면 되돌릴 수 없습니다. 시험을 시작하시겠습니까?')) {
-            // 확인 버튼 클릭 시 문제 풀이 페이지로 이동
-            window.location.href = '/question/solveTest.do?testId=${test.id}';
-        }
+        // Bootstrap의 모달을 표시
+        $('#confirmModal').modal('show');
+    });
+
+    // 모달에서 '확인' 버튼 클릭 시 페이지 이동
+    document.getElementById('confirmStartTest').addEventListener('click', function() {
+        // 문제 풀이 페이지로 이동
+        window.location.href = '/question/solveTest.do?testId=${test.id}';
     });
 </script>
 

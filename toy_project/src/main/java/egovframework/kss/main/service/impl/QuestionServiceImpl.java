@@ -140,4 +140,10 @@ public class QuestionServiceImpl implements QuestionService {
 		return questionDAO.selectExamParticipation(params);
 	}
 
+	@Override
+	public void updateExamParticipation(ExamParticipationVO examParticipation) {
+		questionDAO.updateExamParticipation(examParticipation);
+
+	}
+
 }

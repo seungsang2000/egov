@@ -82,8 +82,8 @@
 										제출</button>
 								</c:when>
 								<c:otherwise>
-									<button type="submit" id="endTest" class="btn btn-primary">시험
-										완료</button>
+									<button type="submit" id="endTest" class="btn btn-primary"
+										onclick="submitEndTestForm(event)">시험 완료</button>
 								</c:otherwise>
 							</c:choose>
 						</form>
@@ -137,6 +137,28 @@
 	</section>
 </div>
 
+
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog"
+	aria-labelledby="confirmModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="confirmModalLabel">시험 완료 확인</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">정말로 시험을 완료하시겠습니까?</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+				<button type="button" class="btn btn-primary" id="confirmEndTest">확인</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 <style>
 .score-text {
 	font-size: 30px; /* 원하는 크기로 설정 */
@@ -159,6 +181,7 @@
 <script>
  // 서버에서 전달받은 endTime (예: "2024-10-25T02:27:02.034Z[UTC]")
     const serverEndTime = "${endTime}";
+    
 
     // [UTC] 부분 제거
     const formattedEndTime = serverEndTime.replace(/\[UTC\]/, '');
@@ -171,7 +194,7 @@
         if (distance < 0) {
             clearInterval(interval);
             document.getElementById('timer').textContent = "시간 초과";
-            //document.getElementById('submitAnswer').click(); // 자동 제출
+            submitTestForm(); // 자동 제출
         } else {
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -212,6 +235,52 @@
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+    
+    function submitEndTestForm(event) {
+        event.preventDefault();   
+        const form = event.target.closest('form');
+        var csrfToken = $('meta[name="_csrf"]').attr('content');
+
+        
+        $('#confirmModal').modal('show');
+
+        
+        document.getElementById('confirmEndTest').onclick = function() {
+            $('#confirmModal').modal('hide');
+            
+            // AJAX 요청
+            $.ajax({
+                type: 'POST',
+                url: '/question/userFinishTest.do',
+                data: $(form).serialize(),
+                success: function(courseId) {
+                    
+                    window.location.href = '/course.do?id=' + courseId;
+                },
+                error: function() {
+                    
+                    alert("시험 완료 처리 중 오류가 발생했습니다.");
+                }
+            });
+        };
+    }
+    
+    function submitTestForm() {
+        const form = document.querySelector('form[action="/question/solveTest.do"]');
+        
+        // AJAX 요청
+        $.ajax({
+            type: 'POST',
+            url: '/question/userFinishTest.do',
+            data: $(form).serialize(),
+            success: function(courseId) {
+                window.location.href = '/course.do?id=' + courseId;
+            },
+            error: function() {
+                alert("시험 완료 처리 중 오류가 발생했습니다.");
+            }
         });
     }
 </script>

@@ -47,4 +47,6 @@ public interface QuestionMapper {
 
 	ExamParticipationVO selectExamParticipation(Map<String, Object> params);
 
+	void updateExamParticipation(ExamParticipationVO examParticipation);
+
 }

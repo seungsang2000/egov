@@ -3,6 +3,7 @@ package egovframework.kss.main.service.impl;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -94,6 +95,11 @@ public class CourseServiceImpl implements CourseService {
 	public TestVO selectTestById(int testId) {
 
 		return courseDAO.selectTestById(testId);
+	}
+
+	@Override
+	public List<TestVO> selectTestInCourseWithUser(Map<String, Object> params) {
+		return courseDAO.selectTestInCourseWithUser(params);
 	}
 
 }

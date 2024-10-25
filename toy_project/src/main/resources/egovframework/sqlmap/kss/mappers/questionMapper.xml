@@ -108,6 +108,10 @@ VALUES (#{question_id}, #{option_number}, #{option_text});
 	select * from exam_participation where user_id=#{userId} and test_id=#{testId}
 </select>
 
+<update id="updateExamParticipation" parameterType="egovframework.kss.main.vo.ExamParticipationVO">
+	update exam_participation set start_time = #{start_time}, end_time = #{end_time}, score = #{score}, status = #{status} where user_id = #{user_id} and test_id = #{test_id}
+</update>
+
 
 
 

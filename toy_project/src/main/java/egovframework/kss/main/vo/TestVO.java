@@ -20,5 +20,6 @@ public class TestVO {
 	private int time_limit;
 	private boolean shutdown;
 	private String status;
+	private String user_status;
 
 }
