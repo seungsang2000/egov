@@ -49,4 +49,10 @@ public interface QuestionMapper {
 
 	void updateExamParticipation(ExamParticipationVO examParticipation);
 
+	void testGrading(int testId);
+
+	void assignZeroScoreToNonParticipants(int testId); //testGrading과 한 세트
+
+	void updateIsScoredComplete(int testId); //testGrading과 한 세트
+
 }

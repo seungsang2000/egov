@@ -150,4 +150,11 @@ public class QuestionDAO {
 
 	}
 
+	public void testGrading(int testId) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		questionMapper.testGrading(testId); // 시험에 참여한 유저들 점수 계산
+		questionMapper.assignZeroScoreToNonParticipants(testId); // 시험에 참여안한 유저들 0점 처리
+		questionMapper.updateIsScoredComplete(testId); // 시험을 채점 완료로 바꿈
+	}
+
 }

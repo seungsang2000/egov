@@ -301,6 +301,7 @@ public class QuestionController {
 		detailWithAnswer.setQuestion_type(questionDetail.getQuestion_type());
 		detailWithAnswer.setOptions(questionDetail.getOptions());
 		detailWithAnswer.setUserAnswer(userAnswer);
+		detailWithAnswer.setScore(questionDetail.getScore());
 
 		model.addAttribute("currentQuestion", detailWithAnswer);
 		model.addAttribute("editable", false);
@@ -385,6 +386,7 @@ public class QuestionController {
 		detailWithAnswer.setQuestion_type(questionDetail.getQuestion_type());
 		detailWithAnswer.setOptions(questionDetail.getOptions());
 		detailWithAnswer.setUserAnswer(userAnswer);
+		detailWithAnswer.setScore(questionDetail.getScore());
 		model.addAttribute("currentQuestion", detailWithAnswer);
 		model.addAttribute("selectedQuestionId", questionDetail.getId());
 		model.addAttribute("editable", false);
@@ -475,6 +477,16 @@ public class QuestionController {
 		}
 
 		return "startTestPage";
+	}
+
+	@PostMapping("testGrading.do")
+	public ResponseEntity<Void> testGrading(@RequestParam("id") int testId) { //ResponseEntity도 함 써보자
+		try {
+			questionService.testGrading(testId);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
 }

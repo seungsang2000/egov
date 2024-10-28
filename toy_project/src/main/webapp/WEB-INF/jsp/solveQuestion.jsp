@@ -40,10 +40,11 @@
 								value="${nextQuestionId}" />
 							<sec:csrfInput />
 
-							<div class="form-group">
-								<label>문제</label>
-								<h4>${currentQuestion.question_text}</h4>
-							</div>
+							<div class="form-group d-flex justify-content-between align-items-center">
+    <label class="mb-0">문제</label>
+    <span class="badge badge-info">배점: ${currentQuestion.score}</span>
+</div>
+<h4>${currentQuestion.question_text}</h4>
 
 							<c:if test="${currentQuestion.question_type == '객관식'}">
 								<div class="form-group">

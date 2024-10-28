@@ -77,11 +77,32 @@
     </div>
 </td>
                                     <td class="project_progress">
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-green" role="progressbar" aria-valuenow="47" aria-valuemin="0" aria-valuemax="100" style="width: 47%"></div>
-                                        </div>
-                                        <small>47% Complete</small>
-                                    </td>
+                                   <c:choose>
+                                   <c:when test = "${test.is_scored}">
+    <div class="progress progress-sm">
+        <div class="progress-bar bg-green" role="progressbar"
+             aria-valuenow="${(test.user_score / test.score) * 100}" 
+             aria-valuemin="0" 
+             aria-valuemax="100"
+             style="width: ${(test.user_score / test.score) * 100}%">
+        </div>
+    </div>
+    <small>${test.user_score} 점 / ${test.score} 점(${Math.round((test.user_score / test.score) * 100)}%)</small>
+    </c:when>
+    <c:otherwise>
+    <div class="progress progress-sm">
+        <div class="progress-bar bg-green" role="progressbar"
+             aria-valuenow="0" 
+             aria-valuemin="0" 
+             aria-valuemax="100"
+             style="width: 0">
+        </div>
+    </div>
+    <small>미채점</small>
+    </c:otherwise>
+   
+    </c:choose>
+</td>
                                     <td class="project-state">
                                         <c:if test="${not empty test.user_status}">
                                             <span class="badge badge-info">${test.user_status}</span>

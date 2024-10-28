@@ -113,7 +113,9 @@
 	
 	<select id="selectTestInCourse" parameterType="java.lang.Integer"
 		resultType="egovframework.kss.main.vo.TestVO">
-		select t.id, t.course_id, t.name, t.start_time, t.end_time, t.time_limit, t.shutdown, t.description, t.status from test t where course_id = #{courseId}
+		select t.id, t.course_id, t.name, t.start_time, t.end_time, t.time_limit, t.shutdown, t.description, t.status, t.is_scored, (SELECT COUNT(e2.user_id) FROM exam_participation e2 WHERE e2.test_id = t.id and e2.end_time is not null) AS user_count 
+		 FROM (SELECT * FROM test WHERE course_id = #{courseId}) t
+		 order by t.id
 	</select>
 	
 	<select id="selectTestInCourseWithUser" parameterType="map" resultType="egovframework.kss.main.vo.TestVO">
@@ -128,7 +130,10 @@
         t.description, 
         t.status, 
         e.status AS user_status,
-        (SELECT COUNT(e2.user_id) FROM exam_participation e2 WHERE e2.test_id = t.id) AS user_count
+        t.score,
+        t.is_scored,
+        (SELECT COUNT(e2.user_id) FROM exam_participation e2 WHERE e2.test_id = t.id and e2.end_time is not null) AS user_count,
+        e.score as user_score
     FROM 
         (SELECT * FROM test WHERE course_id = #{courseId}) t
     LEFT JOIN 
@@ -141,7 +146,9 @@
 	</delete>
 	
 	<update id="completeTest" parameterType="int">
-		update test set status = '완료' where id=#{testId}
+		update test 
+		set status = '완료', score = (SELECT SUM(score) FROM questions WHERE test_id = #{testId}) 
+		where id=#{testId}
 	</update>
 	
 	<select id="selectTotalStudentsByCourseId" parameterType="int" resultType="int">

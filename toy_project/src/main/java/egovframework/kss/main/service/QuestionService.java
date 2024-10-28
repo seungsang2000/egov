@@ -51,4 +51,6 @@ public interface QuestionService {
 	public ExamParticipationVO selectExamParticipation(Map<String, Object> params);
 
 	public void updateExamParticipation(ExamParticipationVO examParticipation);
+
+	public void testGrading(int testId);
 }

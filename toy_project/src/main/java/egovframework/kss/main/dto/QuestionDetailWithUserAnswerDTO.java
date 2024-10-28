@@ -16,5 +16,6 @@ public class QuestionDetailWithUserAnswerDTO {
 	private String question_type;
 	private List<Option> options;
 	private String userAnswer;
+	private int score;
 
 }

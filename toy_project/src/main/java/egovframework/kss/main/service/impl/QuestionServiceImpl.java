@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import egovframework.kss.main.dao.QuestionDAO;
 import egovframework.kss.main.dto.AnswerDTO;
@@ -144,6 +144,12 @@ public class QuestionServiceImpl implements QuestionService {
 	public void updateExamParticipation(ExamParticipationVO examParticipation) {
 		questionDAO.updateExamParticipation(examParticipation);
 
+	}
+
+	@Override
+	@Transactional
+	public void testGrading(int testId) {
+		questionDAO.testGrading(testId);
 	}
 
 }

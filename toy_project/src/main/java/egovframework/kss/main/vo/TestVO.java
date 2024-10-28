@@ -22,5 +22,12 @@ public class TestVO {
 	private String status;
 	private String user_status;
 	private int user_count;
+	private int score;
+	private boolean is_scored;
+	private int user_score;
+
+	public boolean isIs_scored() {
+		return is_scored;
+	}
 
 }
