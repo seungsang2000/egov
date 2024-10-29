@@ -9,6 +9,7 @@
 
 
 	<http auto-config="false" use-expressions="true">
+	<!-- <csrf disabled="true" /> -->
     <intercept-url pattern="/resources/**" access="permitAll" />
     <intercept-url pattern="/static/**" access="permitAll" />
     <intercept-url pattern="/css/**" access="permitAll" />
@@ -31,12 +32,17 @@
     <intercept-url pattern="/question/questionUpdate.do" access="hasAuthority('admin')" />
     <intercept-url pattern="/question/testComplete.do" access="hasAuthority('admin')" />
     
+    <intercept-url pattern="/ws/**" access="permitAll" />
+    
+    
     <intercept-url pattern="/**" access="hasAnyAuthority('admin', 'user')" />
     
     <form-login login-page="/user/login.do" default-target-url="/home" username-parameter="user_id" password-parameter="password" />
     <logout logout-url="/user/logout.do" logout-success-url="/user/login.do?logout" />
     
     <remember-me key="uniqueAndSecret" token-validity-seconds="86400" />
+    
+    
 </http>
 	
 	<authentication-manager alias="authenticationManager">

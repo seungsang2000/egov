@@ -29,6 +29,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="/resources/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="/resources/dist/js/adminlte.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/resources/dist/js/adminlte.min.js"></script>
+<!-- ChartJS -->
+<script src="/resources/plugins/chart.js/Chart.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -132,31 +138,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </li> -->
       <!-- Notifications Dropdown Menu -->
       <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-header">15 Notifications</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
-      </li>
+    <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class="far fa-bell"></i>
+        <span class="badge badge-warning navbar-badge" id="notification-count">0</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notification-dropdown">
+        <span class="dropdown-header">Notifications</span>
+        <div class="dropdown-divider"></div>
+        <div id="notification-items"></div> <!-- 알림 항목을 추가할 곳 -->
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+    </div>
+</li>
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
           <i class="fas fa-expand-arrows-alt"></i>
@@ -263,7 +256,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                회원 정보 관리(테스트용)
+                회원 정보
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -294,7 +287,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
     </a>
 </li>
 <li class="nav-item">
-    <a href="javascript:void(0);" class="nav-link" onclick="document.getElementById('logoutForm').submit();">
+    <a href="/chart.do" class="nav-link <c:if test="${pageName == 'userChart'}">active</c:if>">
+        <i class="far fa-circle nav-icon"></i>
+        <p>유저별 강좌 차트</p>
+    </a>
+</li>
+<li class="nav-item">
+    <a href="javascript:void(0);" class="nav-link" onclick="confirmLogout();">
         <i class="far fa-circle nav-icon"></i>
         <p>로그아웃</p>
     </a>
@@ -318,7 +317,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- /.sidebar -->
   </aside>
   
-    <!--  로그아웃 모달 -->
+<!-- 로그아웃 모달 -->
 <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -333,7 +332,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-primary" onclick="performLogout()">로그아웃</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('logoutForm').submit();">로그아웃</button>
             </div>
         </div>
     </div>
@@ -344,33 +343,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
         // 모달 띄우기
         $('#logoutModal').modal('show');
     }
+    
 
-    function performLogout() {
-        // CSRF 토큰 가져오기
-        const csrfToken = document.querySelector("input[name='_csrf']").value; // CSRF 토큰을 가져옵니다.
-
-        // AJAX 요청 보내기
-        fetch('user/logout.do', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken // CSRF 토큰 추가
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json(); // JSON 응답 파싱
-            } else {
-                throw new Error('로그아웃 요청 실패');
-            }
-        })
-        .then(data => {
-            // 로그아웃 성공 시 페이지 이동
-            window.location.href = 'mainPage.do'; // 적절한 페이지로 이동
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("로그아웃 실패. 다시 시도해 주세요."); // 오류 발생 시 알림
-        });
-    }
 </script>

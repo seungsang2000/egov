@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -238,6 +239,7 @@ public class QuestionController {
 	}
 
 	@RequestMapping(value = "/solveTest.do")
+	@Transactional
 	public String solveTest(@RequestParam(value = "testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
 
 		List<QuestionListDTO> questions = questionService.selectQuestionListsByTestId(testId);
@@ -280,6 +282,7 @@ public class QuestionController {
 			params.put("status", status);
 
 			questionService.insertExamParticipation(params);
+			userParticipation = questionService.selectExamParticipation(params);
 		} else {
 			System.out.println("시험 중복 응시~~~~~~~~");
 		}

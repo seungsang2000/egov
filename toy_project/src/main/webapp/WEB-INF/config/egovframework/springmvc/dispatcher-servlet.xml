@@ -46,6 +46,8 @@
 			</list>
 		</property>
 	</bean>
+	
+	<bean class="egovframework.kss.main.config.WebSocketConfig"/>
 
 	<bean id="localeResolver"
 		class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />

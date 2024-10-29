@@ -21,7 +21,6 @@
 		<spring.maven.artifact.version>4.3.25.RELEASE</spring.maven.artifact.version>
 		<egovframework.rte.version>3.10.0</egovframework.rte.version>
 		<security.version>4.2.3.RELEASE</security.version>
-		<spring.security.oauth2.version>2.5.0.RELEASE</spring.security.oauth2.version>
 	</properties>
 
 	<repositories>
@@ -208,14 +207,34 @@
 			<artifactId>spring-security-test</artifactId>
 			<version>${security.version}</version>
 		</dependency>
-
-		<!-- 스프링 시큐리티(구글 로그인) -->
-		<!-- 구글 OAuth2 인증 추가 -->
-    <dependency>
-        <groupId>org.springframework.security.oauth</groupId>
-        <artifactId>spring-security-oauth2</artifactId>
-        <version>${spring.security.oauth2.version}</version>
+		
+		<!-- 웹소켓 -->
+		<dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-websocket</artifactId>
+        <version>${spring.maven.artifact.version}</version> <!-- 4.3.25.RELEASE 사용 -->
     </dependency>
+    
+    <!-- Spring Messaging -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-messaging</artifactId>
+        <version>${spring.maven.artifact.version}</version> <!-- 4.3.25.RELEASE 사용 -->
+    </dependency>
+    
+    <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-expression</artifactId>
+    <version>${spring.maven.artifact.version}</version> <!-- 4.3.25.RELEASE 사용 -->
+</dependency>
+    
+		
+		
+		
+		
+		
+		
+		<!-- 스프링 시큐리티(구글 로그인) -->
 
 
 		<!-- 메일 라이브러리 -->

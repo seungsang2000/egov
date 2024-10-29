@@ -15,8 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.exception.CustomException;
+import egovframework.kss.main.model.Notification;
 import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.CourseVO;
@@ -44,6 +47,13 @@ public class CourseController {
 
 	@Resource(name = "UserService")
 	private UserService userService;
+
+	private final SimpMessagingTemplate messagingTemplate;
+
+	@Autowired
+	public CourseController(SimpMessagingTemplate messagingTemplate) {
+		this.messagingTemplate = messagingTemplate;
+	}
 
 	private String saveImage(MultipartFile file) {
 		String uploadDir = "C:\\upload\\"; // 실제 경로
@@ -74,6 +84,12 @@ public class CourseController {
 		model.addAttribute("list", courseList);
 
 		model.addAttribute("pageName", "myCourses");
+
+		Notification notification = new Notification();
+		notification.setMessage("유저가 입장하셨습니당: " + user.getName());
+
+		// 클라이언트에 메시지 전송
+		messagingTemplate.convertAndSend("/topic/notifications", notification);
 
 		return "home";
 	}

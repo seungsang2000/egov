@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
+import egovframework.kss.main.dto.CourseScoreDTO;
+import egovframework.kss.main.dto.CourseUserCountDTO;
 import egovframework.kss.main.mapper.CourseMapper;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.EnrollmentVO;
@@ -84,6 +86,16 @@ public class CourseDAO {
 	public int selectTotalStudentsByCourseId(int courseId) {
 		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
 		return courseMapper.selectTotalStudentsByCourseId(courseId);
+	}
+
+	public List<CourseScoreDTO> selectCourseScores(int currentUserId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.selectCourseScores(currentUserId);
+	}
+
+	public List<CourseUserCountDTO> selectCourseUserCounts(int currentUserId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.selectCourseUserCounts(currentUserId);
 	}
 
 }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import egovframework.kss.main.dto.CourseEnrollListDTO;
+import egovframework.kss.main.dto.CourseScoreDTO;
+import egovframework.kss.main.dto.CourseUserCountDTO;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.TestVO;
 import egovframework.kss.main.vo.UserVO;
@@ -35,5 +37,9 @@ public interface CourseService {
 	public TestVO selectTestById(int testId);
 
 	int selectTotalStudentsByCourseId(int courseId);
+
+	List<CourseScoreDTO> selectCourseScores(int currentUserId);
+
+	List<CourseUserCountDTO> selectCourseUserCounts(int currentUserId);
 
 }

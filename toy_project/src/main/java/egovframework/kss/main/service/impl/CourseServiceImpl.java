@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import egovframework.kss.main.dao.CourseDAO;
 import egovframework.kss.main.dto.CourseEnrollListDTO;
+import egovframework.kss.main.dto.CourseScoreDTO;
+import egovframework.kss.main.dto.CourseUserCountDTO;
 import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.EnrollmentVO;
@@ -105,6 +107,16 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public int selectTotalStudentsByCourseId(int courseId) {
 		return courseDAO.selectTotalStudentsByCourseId(courseId);
+	}
+
+	@Override
+	public List<CourseScoreDTO> selectCourseScores(int currentUserId) {
+		return courseDAO.selectCourseScores(currentUserId);
+	}
+
+	@Override
+	public List<CourseUserCountDTO> selectCourseUserCounts(int currentUserId) {
+		return courseDAO.selectCourseUserCounts(currentUserId);
 	}
 
 }
