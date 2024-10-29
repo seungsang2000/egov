@@ -13,6 +13,8 @@ import egovframework.kss.main.vo.TestVO;
 public interface CourseMapper {
 	List<CourseVO> selectCourseList();
 
+	List<CourseVO> selectEditCourseList(Integer currentUserId);
+
 	List<CourseVO> selectMyCourseList(Integer currentUserId);
 
 	void registerCourse(CourseVO courseVO);
@@ -40,5 +42,7 @@ public interface CourseMapper {
 	List<CourseScoreDTO> selectCourseScores(int currentUserId);
 
 	List<CourseUserCountDTO> selectCourseUserCounts(int currentUserId);
+
+	void updateCourse(CourseVO courseVO);
 
 }

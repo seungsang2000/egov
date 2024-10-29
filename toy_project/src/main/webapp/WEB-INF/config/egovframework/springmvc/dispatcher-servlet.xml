@@ -99,6 +99,9 @@
         <property name="maxInMemorySize" value="1000000000" />
     </bean>
     <!--  파일 업로드 -->
+    
+    <!-- stomp -->
+    <bean class="egovframework.kss.main.config.WebSocketConfig"/>
 
 	<mvc:view-controller path="/cmmn/validator.do"
 		view-name="cmmn/validator" />

@@ -30,13 +30,7 @@
             <div class="row">
                 <div class="col-lg-12"> <!-- 전체 열 사용 -->
                     <div class="container mt-4">
-                        <c:if test="${not empty message}">
-                            <div class="alert alert-warning" role="alert">
-                                ${message}
-                            </div>
-                        </c:if>
-
-                        <c:if test="${empty message}">
+                        
                             <c:forEach var="course" items="${list}">
                                 <!-- 강좌 항목 -->
                                 <div class="card mb-3">
@@ -60,7 +54,6 @@
                                 </div>
                                 <!-- /.card -->
                             </c:forEach>
-                        </c:if>
                     </div>
                 </div>
                 <!-- /.col-lg-12 -->

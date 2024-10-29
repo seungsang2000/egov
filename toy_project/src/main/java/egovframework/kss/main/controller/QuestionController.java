@@ -113,7 +113,6 @@ public class QuestionController {
 		model.addAttribute("totalScore", totalScore);
 
 		if (questionId != null) {
-			// 특정 문제 확인
 			QuestionDetailDTO questionDetail = questionService.selectQuestionById(questionId);
 			model.addAttribute("questionDetail", questionDetail);
 			model.addAttribute("editable", false);
@@ -144,7 +143,7 @@ public class QuestionController {
 		model.addAttribute("questions", questions);
 		Integer id = 0;
 		if (questionId == null) {
-			id = questions.get(0).getId(); // 받은 문제 id가 없으면 첫번째 문제 보기
+			id = questions.get(0).getId();
 		} else {
 			id = questionId;
 		}
@@ -231,10 +230,10 @@ public class QuestionController {
 				questionService.updateMultipleChoiceQuestion(question, options);
 			}
 
-			return ResponseEntity.ok("문제가 수정되었습니다."); // 성공 메시지 반환
+			return ResponseEntity.ok("문제가 수정되었습니다.");
 		} catch (Exception e) {
 			Logger.error("문제 수정 중 오류 발생: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정에 실패했습니다."); // 실패 메시지 반환
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정에 실패했습니다.");
 		}
 	}
 
@@ -365,13 +364,8 @@ public class QuestionController {
 		model.addAttribute("testId", testId);
 
 		if (questionId != null) {
-			// questionId가 있을 때의 처리
-			// 예: 해당 질문에 대한 로직 수행
-			// 예: 문제를 해결하거나 답변 제출
 			currentQuestionId = questionId;
 		} else {
-			// questionId가 없을 때의 처리
-			// 예: 기본 질문 또는 오류 처리
 			currentQuestionId = nextQuestionId;
 		}
 
@@ -383,7 +377,7 @@ public class QuestionController {
 
 		String userAnswer = questionService.selectUserAnswer(params);
 
-		QuestionDetailWithUserAnswerDTO detailWithAnswer = new QuestionDetailWithUserAnswerDTO(); // 변환
+		QuestionDetailWithUserAnswerDTO detailWithAnswer = new QuestionDetailWithUserAnswerDTO();
 		detailWithAnswer.setId(questionDetail.getId());
 		detailWithAnswer.setQuestion_text(questionDetail.getQuestion_text());
 		detailWithAnswer.setQuestion_type(questionDetail.getQuestion_type());

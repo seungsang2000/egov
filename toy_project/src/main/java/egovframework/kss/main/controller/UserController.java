@@ -81,14 +81,14 @@ public class UserController {
 			System.out.println("register......");
 			userService.userRegister(userRegisterDTO);
 
-			response.put("success", true); // 성공 플래그
+			response.put("success", true);
 			response.put("message", "회원가입이 완료되었습니다.");
 		} catch (Exception e) {
-			response.put("success", false); // 실패 플래그
-			response.put("message", "회원가입 실패: " + e.getMessage()); // 실패 메시지
+			response.put("success", false);
+			response.put("message", "회원가입 실패: " + e.getMessage());
 		}
 
-		return ResponseEntity.ok(response); // JSON 응답 반환
+		return ResponseEntity.ok(response);
 	}
 
 	@RequestMapping(value = "login.do")
@@ -129,7 +129,7 @@ public class UserController {
 			response.put("success", false);
 		}
 
-		return ResponseEntity.ok(response); // JSON 형태로 반환
+		return ResponseEntity.ok(response);
 	}
 
 	@RequestMapping(value = "checkId.do")
@@ -189,7 +189,6 @@ public class UserController {
 		params.put("email", email);
 		params.put("key", inputKey);
 
-		// 데이터베이스에서 인증 키 정보 조회
 		PasswordKeyDTO passwordKeyDTO = userService.getPasswordKeyByKeyAndEmail(params);
 
 		if (passwordKeyDTO != null) {
@@ -198,7 +197,6 @@ public class UserController {
 			long currentTime = System.currentTimeMillis();
 			long keyCreationTime = createdAt.getTime();
 
-			// 인증 키가 생성된 시각과 현재 시각 차이 계산 (1시간 = 3600000ms)
 			if (currentTime - keyCreationTime <= 3600000) {
 				// 키가 유효한 경우
 				response.put("success", true);
@@ -216,7 +214,7 @@ public class UserController {
 			response.put("message", "인증키가 잘못되었습니다.");
 		}
 
-		return response; // JSON 형태로 반환
+		return response;
 	}
 
 	@RequestMapping(value = "resetPassword.do")

@@ -142,6 +142,11 @@ public class CourseController {
 			model.addAttribute("list", list);
 			int totalStudent = courseService.selectTotalStudentsByCourseId(id);
 			model.addAttribute("totalStudent", totalStudent);
+			if (course.getInstructor_id() == user.getId()) {
+				model.addAttribute("is_instructor", true);
+			} else {
+				model.addAttribute("is_instructor", false);
+			}
 			return "tests";
 		}
 
@@ -162,7 +167,7 @@ public class CourseController {
 
 	@PostMapping("/courseEnroll.do")
 	@ResponseBody
-	public Map<String, Object> enrollCourse(@RequestParam("courseId") int courseId, HttpServletRequest request) {
+	public Map<String, Object> enrollCourse(@RequestParam("courseId") int courseId) {
 		Logger.debug("enroll----------------------");
 		Map<String, Object> response = new HashMap<>();
 		UserVO user = userService.getCurrentUser();
@@ -179,6 +184,47 @@ public class CourseController {
 		}
 
 		return response;
+	}
+
+	@RequestMapping("/courseEditList.do")
+	public String courseEditList(Model model) {
+		UserVO user = userService.getCurrentUser();
+
+		// 강좌 목록을 가져온다
+		List<CourseVO> courseList = courseService.selectEditCourseList(user.getId());
+		// 모델에 강좌 목록 추가
+		model.addAttribute("courseList", courseList);
+
+		model.addAttribute("pageName", "courseEdit");
+		return "courseEditList";
+	}
+
+	@RequestMapping("/couresEdit.do")
+	public String courseEdit(Model model, @RequestParam("courseId") int courseId) {
+
+		CourseVO courseVO = courseService.selectCourseById(courseId);
+
+		model.addAttribute("course", courseVO);
+		model.addAttribute("pageName", "courseEdit");
+		return "courseEditPage";
+	}
+
+	@PostMapping("/courseUpdate.do")
+	public String courseUpdate(@ModelAttribute CourseVO newCourse, @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile, HttpServletRequest request) {
+
+		CourseVO course = courseService.selectCourseById(newCourse.getId());
+		course.setDescription(newCourse.getDescription());
+		course.setStatus(newCourse.getStatus());
+		course.setTitle(newCourse.getTitle());
+
+		if (uploadFile != null && !uploadFile.isEmpty()) {
+			String imagePath = saveImage(uploadFile); // 이미지 저장
+			course.setImage_path(imagePath); // CourseVO에 이미지 경로 설정
+		}
+
+		courseService.updateCourse(course);
+
+		return "redirect:/courseEditList.do";
 	}
 
 	@RequestMapping(value = "/testCreatePage.do")

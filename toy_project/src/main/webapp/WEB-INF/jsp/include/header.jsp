@@ -31,8 +31,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="/resources/dist/js/adminlte.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-<!-- AdminLTE App -->
-<script src="/resources/dist/js/adminlte.min.js"></script>
 <!-- ChartJS -->
 <script src="/resources/plugins/chart.js/Chart.min.js"></script>
 </head>
@@ -226,15 +224,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>나의 강좌</p>
                 </a>
               </li>
+              <sec:authorize access="hasAuthority('user')">
               <li class="nav-item">
                 <a href="/courseEnroll.do" class="nav-link <c:if test="${pageName == 'courseEnroll'}">active</c:if>">
                   <i class="far fa-circle nav-icon"></i>
                   <p>강좌 등록</p>
                 </a>
               </li>
-              
+              </sec:authorize>
             </ul>
           </li>
+          <sec:authorize access="hasAuthority('admin')">
           <li class="nav-item menu-open">
           <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-edit"></i>
@@ -250,8 +250,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <p>강좌 생성</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="/courseEditList.do" class="nav-link <c:if test="${pageName == 'courseEdit'}">active</c:if>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>강좌 수정</p>
+                </a>
+              </li>
             </ul>
           </li>
+          </sec:authorize>
           <li class="nav-item menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>

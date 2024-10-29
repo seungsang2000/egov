@@ -139,7 +139,10 @@
 
     <div class="d-flex justify-content-end mt-3">
         <!-- Flexbox를 사용하여 오른쪽 정렬 -->
+        
+        <c:if test="${is_instructor}">
         <button type="button" class="btn btn-success" onclick="location.href='testCreatePage.do?courseId='+${course.id}">시험 생성</button>
+        </c:if>
     </div>
 
 </section>

@@ -14,6 +14,8 @@ public interface CourseService {
 
 	public List<CourseVO> selectCourseList();
 
+	public List<CourseVO> selectEditCourseList(Integer currentUserId);
+
 	public void registerCourse(CourseVO courseVO);
 
 	public void enrollUserInCourse(int courseId, UserVO user);
@@ -41,5 +43,7 @@ public interface CourseService {
 	List<CourseScoreDTO> selectCourseScores(int currentUserId);
 
 	List<CourseUserCountDTO> selectCourseUserCounts(int currentUserId);
+
+	void updateCourse(CourseVO courseVO);
 
 }

@@ -119,4 +119,15 @@ public class CourseServiceImpl implements CourseService {
 		return courseDAO.selectCourseUserCounts(currentUserId);
 	}
 
+	@Override
+	public List<CourseVO> selectEditCourseList(Integer currentUserId) {
+		return courseDAO.selectEditCourseList(currentUserId);
+	}
+
+	@Override
+	public void updateCourse(CourseVO courseVO) {
+		courseDAO.updateCourse(courseVO);
+
+	}
+
 }

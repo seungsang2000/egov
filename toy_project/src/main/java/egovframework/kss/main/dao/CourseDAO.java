@@ -98,4 +98,14 @@ public class CourseDAO {
 		return courseMapper.selectCourseUserCounts(currentUserId);
 	}
 
+	public List<CourseVO> selectEditCourseList(Integer currentUserId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.selectEditCourseList(currentUserId);
+	}
+
+	public void updateCourse(CourseVO courseVO) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		courseMapper.updateCourse(courseVO);
+	}
+
 }

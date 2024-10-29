@@ -23,6 +23,29 @@
 		ORDER BY
 		c.id;
 	</select>
+	
+	<select id="selectEditCourseList" parameterType="java.lang.Integer"
+		resultType="egovframework.kss.main.vo.CourseVO">
+		SELECT
+		c.id,
+		c.title,
+		c.description,
+		u.name AS instructor,
+		u.image_path as image_path,
+		c.created_at AS created_at,
+		c.status,
+		COUNT(e.user_id) AS studentCount
+		FROM
+		course c
+		INNER JOIN
+		users u ON u.id = c.instructor_id and c.instructor_id = #{id}
+		LEFT JOIN
+		enrollments e ON e.course_id = c.id
+		GROUP BY
+		c.id, u.name, c.title, c.description, c.created_at, c.status, u.image_path
+		ORDER BY
+		c.id;
+	</select>
 
 	<select id="selectMyCourseList"
 		parameterType="java.lang.Integer"
@@ -41,7 +64,7 @@
 	<select id="selectCourseById" parameterType="java.lang.Integer"
 		resultType="egovframework.kss.main.vo.CourseVO">
 		select c.id, c.title, c.description, u.name as instructor,
-		c.created_at as created_at, c.status, u.id as instructor_id
+		c.created_at as created_at, c.status, u.id as instructor_id, c.image_path
 		from course c
 		inner join users u on u.id=c.instructor_id
 		where c.id=#{id}
@@ -149,6 +172,10 @@
 		update test 
 		set status = '완료', score = (SELECT SUM(score) FROM questions WHERE test_id = #{testId}) 
 		where id=#{testId}
+	</update>
+	
+	<update id="updateCourse" parameterType="egovframework.kss.main.vo.CourseVO">
+		update course set title=#{title}, description=#{description}, status = #{status}, image_path = #{image_path} where id=#{id}
 	</update>
 	
 	<select id="selectTotalStudentsByCourseId" parameterType="int" resultType="int">
