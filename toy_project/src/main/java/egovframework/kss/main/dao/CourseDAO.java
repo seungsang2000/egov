@@ -108,4 +108,8 @@ public class CourseDAO {
 		courseMapper.updateCourse(courseVO);
 	}
 
+	public List<Integer> getUsersByCourseId(int courseId) {
+		CourseMapper courseMapper = sqlSession.getMapper(CourseMapper.class);
+		return courseMapper.getUsersByCourseId(courseId);
+	}
 }

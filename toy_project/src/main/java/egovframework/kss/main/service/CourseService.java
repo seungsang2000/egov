@@ -46,4 +46,6 @@ public interface CourseService {
 
 	void updateCourse(CourseVO courseVO);
 
+	List<Integer> getUsersByCourseId(int courseId);
+
 }

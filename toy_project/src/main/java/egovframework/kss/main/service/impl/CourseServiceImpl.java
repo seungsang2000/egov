@@ -130,4 +130,9 @@ public class CourseServiceImpl implements CourseService {
 
 	}
 
+	@Override
+	public List<Integer> getUsersByCourseId(int courseId) {
+		return courseDAO.getUsersByCourseId(courseId);
+	}
+
 }

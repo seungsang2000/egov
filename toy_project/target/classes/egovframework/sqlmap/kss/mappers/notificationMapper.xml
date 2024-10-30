@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.kss.main.mapper.NotificationMapper">
+
+	<insert id="insertNotification" parameterType="egovframework.kss.main.vo.NotificationVO" useGeneratedKeys="true"  keyProperty="id">
+    	insert into notifications(user_id, course_id, message) values(#{user_id}, #{course_id}, #{message})
+    </insert>
+    
+	<delete id="deleteNotification" parameterType="map">
+		delete from notifications where course_id = #{courseId} and user_id = #{userId} and message = #{message}
+	</delete>
+	
+	<select id="selectNotificationByUserId" parameterType="int" resultType="egovframework.kss.main.vo.NotificationVO">
+		select * from notifications where user_id = #{userId}
+		ORDER BY created_at ASC; 
+	
+	
+	</select>
+
+
+
+</mapper>

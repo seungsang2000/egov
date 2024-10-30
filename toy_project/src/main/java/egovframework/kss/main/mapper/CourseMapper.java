@@ -45,4 +45,6 @@ public interface CourseMapper {
 
 	void updateCourse(CourseVO courseVO);
 
+	List<Integer> getUsersByCourseId(int courseId);
+
 }

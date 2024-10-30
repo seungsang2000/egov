@@ -55,8 +55,6 @@ public class QuestionController {
 	@PostMapping("/questionCreate.do")
 	public String questionCreate(Model model, HttpServletRequest request) { // request.getParameter 방식도 시도해본다
 
-		Logger.debug("문제 생성 ---------------------------");
-
 		String questionType = request.getParameter("question_type");
 		int testId = Integer.parseInt(request.getParameter("test_id"));
 
@@ -133,7 +131,6 @@ public class QuestionController {
 
 	@RequestMapping(value = "/testView.do")
 	public String testViewPage(@RequestParam(value = "testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
-		Logger.debug("문제 보기 ---------------------------");
 
 		model.addAttribute("testId", testId);
 
@@ -189,8 +186,6 @@ public class QuestionController {
 	@PostMapping("/questionUpdate.do")
 	@ResponseBody
 	public ResponseEntity<String> questionUpdate(HttpServletRequest request) {
-		Logger.debug("문제 수정 ---------------------------");
-
 		try {
 			String questionType = request.getParameter("question_type");
 			int testId = Integer.parseInt(request.getParameter("test_id"));

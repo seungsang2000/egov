@@ -45,7 +45,7 @@
                         <tr>
                             <th style="width: 1%">#</th>
                             <th style="width: 20%">강좌</th>
-                            <th style="width: 15%">강사</th>
+                            <th style="width: 15%">이미지</th>
                             <th style="width: 15%">수강 인원</th>
                             <th>Project Progress</th>
                             <th style="width: 8%" class="text-center">상태</th>
@@ -70,7 +70,6 @@
                              onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
                 </li>
             </ul>
-            <small>${course.instructor}</small>
         </td>
         <td><i class="fas fa-user-friends" style="margin-right: 5px; color: #007bff;"></i>
     <span style="color: #333;">${course.studentCount}명</span></td>
@@ -102,7 +101,7 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <script src="/resources/plugins/jquery/jquery.min.js"></script>
+
   <script>
 $(document).ready(function() {
     $('.enroll-button').on('click', function() {

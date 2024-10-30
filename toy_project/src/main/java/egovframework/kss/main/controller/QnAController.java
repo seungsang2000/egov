@@ -37,7 +37,6 @@ public class QnAController {
 
 	@RequestMapping(value = "qnalist.do")
 	public String selectQnAlist(Model model) {
-		Logger.debug("qnalist.......................");
 
 		List<?> list = qnAService.selectQnAlists();
 		model.addAttribute("list", list);
@@ -149,8 +148,6 @@ public class QnAController {
 	@PostMapping(value = "QnARegister.do")
 	public String registerNotice(QnAInsertVO qnAVO, Model model) throws Exception {
 
-		Logger.debug("register....................................................................");
-
 		qnAVO.setTestDate(Timestamp.from(Instant.now()));
 		qnAVO.setView(0);
 
@@ -173,7 +170,6 @@ public class QnAController {
 
 	@PostMapping(value = "updateQnA.do")
 	public String updateNotice(QnAInsertVO qnAVO, Model model) throws Exception {
-		Logger.debug("update....................................................................");
 		qnAService.updateQnA(qnAVO);
 		return "redirect:/QnA/qnaPageList.do";
 	}

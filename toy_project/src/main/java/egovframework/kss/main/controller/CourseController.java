@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,8 +37,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.service.CourseService;
+import egovframework.kss.main.service.NotificationService;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.CourseVO;
+import egovframework.kss.main.vo.NotificationVO;
 import egovframework.kss.main.vo.TestVO;
 import egovframework.kss.main.vo.UserVO;
 
@@ -50,6 +53,9 @@ public class CourseController {
 
 	@Resource(name = "UserService")
 	private UserService userService;
+
+	@Resource(name = "NotificationService")
+	private NotificationService notificationService;
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
@@ -75,7 +81,6 @@ public class CourseController {
 
 	@RequestMapping(value = "/mainPage.do")
 	public String home(Model model, HttpServletRequest request) {
-		Logger.debug("CourseList.......");
 		HttpSession session = request.getSession();
 		// 강좌 목록 가져오기
 		UserVO user = userService.getCurrentUser();
@@ -165,7 +170,6 @@ public class CourseController {
 	@PostMapping("/courseEnroll.do")
 	@ResponseBody
 	public Map<String, Object> enrollCourse(@RequestParam("courseId") int courseId) {
-		Logger.debug("enroll----------------------");
 		Map<String, Object> response = new HashMap<>();
 		UserVO user = userService.getCurrentUser();
 
@@ -239,7 +243,6 @@ public class CourseController {
 
 	@PostMapping("/testCreate.do")
 	public String testCreate(HttpServletRequest request) {
-		Logger.debug("---------------");
 
 		UserVO user = userService.getCurrentUser();
 
@@ -290,21 +293,58 @@ public class CourseController {
 
 	@PostMapping("/testComplete.do")
 	@ResponseBody
+	@Transactional
 	public ResponseEntity<String> completeTest(@RequestParam("testId") int testId) {
 		try {
-			courseService.completeTest(testId);
+			Logger.debug("-----------------시험 완료 로직-------------------");
+
 			TestVO test = courseService.selectTestById(testId);
+			CourseVO course = courseService.selectCourseById(test.getCourse_id());
+			String messageText = course.getTitle() + " 강좌에서 새로운 시험이 공개되었습니다: " + test.getName();
+
+			List<Integer> receiverIds = courseService.getUsersByCourseId(test.getCourse_id());
+
+			//db에 메세지 저장
+			for (int receiverId : receiverIds) {
+				NotificationVO notification = new NotificationVO();
+				notification.setCourse_id(test.getCourse_id());
+				notification.setMessage(messageText);
+				notification.setUser_id(receiverId); // 수신자 ID 설정
+				notificationService.insertNotification(notification);
+			}
 
 			// STOMP를 통해 해당 강좌에 구독 중인 사용자에게 메시지 전송
-			Map<String, String> message = new HashMap<>();
-			message.put("text", "새로운 시험이 공개되었습니다: " + test.getName());
+			Map<String, Object> message = new HashMap<>();
+			message.put("message", messageText);
+			message.put("course_id", test.getCourse_id());
 			messagingTemplate.convertAndSend("/topic/course/" + test.getCourse_id() + "/notifications", new ObjectMapper().writeValueAsString(message));
 
+			courseService.completeTest(testId);
 			return ResponseEntity.ok("시험 완료 처리 성공");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 
+	}
+
+	@DeleteMapping("/notifications")
+	public ResponseEntity<Void> deleteNotification(@RequestParam int id, @RequestParam String message) {
+		UserVO user = userService.getCurrentUser();
+		Map<String, Object> params = new HashMap<>();
+		params.put("courseId", id);
+		params.put("userId", user.getId());
+		params.put("message", message);
+
+		notificationService.deleteNotification(params);
+		return ResponseEntity.noContent().build();
+	}
+
+	@RequestMapping(value = "/notifications")
+	public ResponseEntity<List<NotificationVO>> notificationList() {
+		UserVO user = userService.getCurrentUser();
+
+		List<NotificationVO> notifications = notificationService.selectNotificationByUserId(user.getId());
+		return ResponseEntity.ok(notifications);
 	}
 
 }

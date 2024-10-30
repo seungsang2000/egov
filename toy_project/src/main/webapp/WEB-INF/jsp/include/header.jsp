@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <!--
 This is a starter template page. Use this page to start your new project from
@@ -16,8 +17,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	
 	<style>
 #notification-dropdown {
-    max-height: 500px; /* 최대 높이 설정 */
-    overflow-y: auto; /* 스크롤 추가 */
+    max-height: 500px; 
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: auto; 
+}
+#notification-items .dropdown-item {
+    white-space: normal !important; 
+    overflow-wrap: break-word !important; 
+    word-wrap: break-word !important; 
+    display: block !important; 
+    padding: 10px; 
+    box-sizing: border-box; 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
 }
 </style>
 
@@ -83,76 +95,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
       </li>
 
-<!--       Messages Dropdown Menu
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-comments"></i>
-          <span class="badge badge-danger navbar-badge">3</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="#" class="dropdown-item">
-            Message Start
-            <div class="media">
-              <img src="dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Brad Diesel
-                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">Call me whenever you can...</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            Message End
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            Message Start
-            <div class="media">
-              <img src="dist/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  John Pierce
-                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">I got your message bro</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            Message End
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            Message Start
-            <div class="media">
-              <img src="dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Nora Silvester
-                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">The subject goes here</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            Message End
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-        </div>
-      </li> -->
-      <!-- Notifications Dropdown Menu -->
       <li class="nav-item dropdown">
     <a class="nav-link" data-toggle="dropdown" href="#">
         <i class="far fa-bell"></i>
         <span class="badge badge-warning navbar-badge" id="notification-count">0</span>
     </a>
     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notification-dropdown">
-        <span class="dropdown-header">Notifications</span>
+        <span class="dropdown-header">알림</span>
         <div class="dropdown-divider"></div>
         <div id="notification-items"></div> <!-- 알림 항목을 추가할 곳 -->
         <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+        <a href="#" class="dropdown-item dropdown-footer">알림 모두 삭제</a>
     </div>
 </li>
       <li class="nav-item">
@@ -303,7 +256,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <li class="nav-item">
     <a href="/chart.do" class="nav-link <c:if test="${pageName == 'userChart'}">active</c:if>">
         <i class="far fa-circle nav-icon"></i>
-        <p>유저별 강좌 차트</p>
+        <p>통계</p>
     </a>
 </li>
 <li class="nav-item">
@@ -362,58 +315,93 @@ scratch. This page gets rid of all links and provides the needed markup only.
 let stompClient = null;
 
 function connect() {
-    const socket = new SockJS('/stomp'); // STOMP 엔드포인트
+    const socket = new SockJS('/stomp'); 
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
 
         const courseIds = JSON.parse('${sessionScope.courseIds}'); 
-        console.log(courseIds); // 배열 내용 확인
+        console.log(courseIds); 
 
-        // 각 강좌 ID에 대해 구독 설정
+        
         courseIds.forEach(courseId => {
             if (courseId) {
                 stompClient.subscribe('/topic/course/'+courseId+'/notifications', function (message) {
-                    // message.body를 JSON 파싱
+                    
                     const data = JSON.parse(message.body);
-                    showNotification(data.text); // JSON에서 text 필드 사용
+                    showNotification(data);
                 });
             }
         });
 
-        // 일반 메시지 구독
+       
         stompClient.subscribe('/topic/messages', function (message) {
-            // message.body를 JSON 파싱
+            
             const data = JSON.parse(message.body);
-            showNotification(data.text); // JSON에서 text 필드 사용
+            showNotification(data);
         });
     });
 }
 
-function showNotification(message) {
+function showNotification(data) {
     const notificationItems = document.getElementById('notification-items');
     const newNotification = document.createElement('a');
     newNotification.classList.add('dropdown-item');
-    newNotification.innerText = message; // 메시지 내용
-    notificationItems.appendChild(newNotification);
+    newNotification.innerText = data.message; 
 
-    // 알림 개수 증가
+    
+    newNotification.onclick = function() {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content
+        
+        fetch('/notifications?id='+data.course_id+"&message="+encodeURIComponent(data.message), {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken 
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                
+                window.location.href = '/course.do?id=' + data.course_id;
+            } else {
+                console.error('알림 삭제 실패');
+            }
+        })
+        .catch(error => console.error('Error deleting notification:', error));
+    };
+
+    notificationItems.insertBefore(newNotification, notificationItems.firstChild);
+
+    
     const notificationCount = document.getElementById('notification-count');
     notificationCount.innerText = parseInt(notificationCount.innerText) + 1;
 }
 
-// 페이지가 로드될 때 연결
+function loadNotifications() {
+    fetch('/notifications')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(notification => {
+                showNotification(notification);
+            });
+        })
+        .catch(error => console.error('Error loading notifications:', error));
+}
+
+
 window.onload = function() {
+    loadNotifications();
     connect();
 };
 
 function sendMessage() {
-    const message = { text: "테스트 메시지입니다!" };
+    const message = { message: "테스트 메시지입니다!" };
     stompClient.send("/app/sendMessage", {}, JSON.stringify(message));
 }
     function confirmLogout() {
-        // 모달 띄우기
+        
         $('#logoutModal').modal('show');
     }
     

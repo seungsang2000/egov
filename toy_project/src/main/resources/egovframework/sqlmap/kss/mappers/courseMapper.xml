@@ -31,7 +31,7 @@
 		c.title,
 		c.description,
 		u.name AS instructor,
-		u.image_path as image_path,
+		c.image_path as image_path,
 		c.created_at AS created_at,
 		c.status,
 		COUNT(e.user_id) AS studentCount
@@ -225,5 +225,14 @@ WHERE
 GROUP BY 
     c.id, c.title;
     </select>
+    
+    <select id="getUsersByCourseId" parameterType="int" resultType="java.lang.Integer">
+    select user_id
+    from enrollments
+    where course_id = #{courseId}
+    
+    </select>
+    
+    
 	
 </mapper>

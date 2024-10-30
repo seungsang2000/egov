@@ -125,7 +125,7 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <script src="/resources/plugins/jquery/jquery.min.js"></script>
+
   <script>
 $(document).ready(function() {
     $('.enroll-button').on('click', function() {
