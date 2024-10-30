@@ -9,9 +9,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +31,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.exception.CustomException;
-import egovframework.kss.main.model.Notification;
 import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.CourseVO;
@@ -48,7 +51,8 @@ public class CourseController {
 	@Resource(name = "UserService")
 	private UserService userService;
 
-	private final SimpMessagingTemplate messagingTemplate;
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
 
 	@Autowired
 	public CourseController(SimpMessagingTemplate messagingTemplate) {
@@ -70,13 +74,9 @@ public class CourseController {
 	}
 
 	@RequestMapping(value = "/mainPage.do")
-	public String home(Model model) {
+	public String home(Model model, HttpServletRequest request) {
 		Logger.debug("CourseList.......");
-
-		// 강좌 목록을 가져온다
-		List<?> list = courseService.selectCourseList();
-		model.addAttribute("list", list);
-
+		HttpSession session = request.getSession();
 		// 강좌 목록 가져오기
 		UserVO user = userService.getCurrentUser();
 		List<CourseVO> courseList = courseService.selectMyCourseList(user.getId());
@@ -85,11 +85,8 @@ public class CourseController {
 
 		model.addAttribute("pageName", "myCourses");
 
-		Notification notification = new Notification();
-		notification.setMessage("유저가 입장하셨습니당: " + user.getName());
-
-		// 클라이언트에 메시지 전송
-		messagingTemplate.convertAndSend("/topic/notifications", notification);
+		List<Integer> courseIds = courseList.stream().map(CourseVO::getId).collect(Collectors.toList());
+		session.setAttribute("courseIds", courseIds);
 
 		return "home";
 	}
@@ -296,6 +293,13 @@ public class CourseController {
 	public ResponseEntity<String> completeTest(@RequestParam("testId") int testId) {
 		try {
 			courseService.completeTest(testId);
+			TestVO test = courseService.selectTestById(testId);
+
+			// STOMP를 통해 해당 강좌에 구독 중인 사용자에게 메시지 전송
+			Map<String, String> message = new HashMap<>();
+			message.put("text", "새로운 시험이 공개되었습니다: " + test.getName());
+			messagingTemplate.convertAndSend("/topic/course/" + test.getCourse_id() + "/notifications", new ObjectMapper().writeValueAsString(message));
+
 			return ResponseEntity.ok("시험 완료 처리 성공");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

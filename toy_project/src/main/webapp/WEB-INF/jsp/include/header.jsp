@@ -13,6 +13,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	<meta name="_csrf" content="${_csrf.token}"/>
 	<meta name="_csrf_header" content="${_csrf.headerName}"/>
 	<title>온라인 시험 시스템</title>
+	
+	<style>
+#notification-dropdown {
+    max-height: 500px; /* 최대 높이 설정 */
+    overflow-y: auto; /* 스크롤 추가 */
+}
+</style>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -305,6 +312,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <p>로그아웃</p>
     </a>
 </li>
+<li class="nav-item">
+    <a href="javascript:void(0);" class="nav-link" onclick="sendMessage();">
+        <i class="far fa-circle nav-icon"></i>
+        <p>예시 데이터 보내기</p>
+    </a>
+</li>
 </sec:authorize>
             </ul>
           </li>
@@ -346,6 +359,59 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 
 <script>
+let stompClient = null;
+
+function connect() {
+    const socket = new SockJS('/stomp'); // STOMP 엔드포인트
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+
+        const courseIds = JSON.parse('${sessionScope.courseIds}'); 
+        console.log(courseIds); // 배열 내용 확인
+
+        // 각 강좌 ID에 대해 구독 설정
+        courseIds.forEach(courseId => {
+            if (courseId) {
+                stompClient.subscribe('/topic/course/'+courseId+'/notifications', function (message) {
+                    // message.body를 JSON 파싱
+                    const data = JSON.parse(message.body);
+                    showNotification(data.text); // JSON에서 text 필드 사용
+                });
+            }
+        });
+
+        // 일반 메시지 구독
+        stompClient.subscribe('/topic/messages', function (message) {
+            // message.body를 JSON 파싱
+            const data = JSON.parse(message.body);
+            showNotification(data.text); // JSON에서 text 필드 사용
+        });
+    });
+}
+
+function showNotification(message) {
+    const notificationItems = document.getElementById('notification-items');
+    const newNotification = document.createElement('a');
+    newNotification.classList.add('dropdown-item');
+    newNotification.innerText = message; // 메시지 내용
+    notificationItems.appendChild(newNotification);
+
+    // 알림 개수 증가
+    const notificationCount = document.getElementById('notification-count');
+    notificationCount.innerText = parseInt(notificationCount.innerText) + 1;
+}
+
+// 페이지가 로드될 때 연결
+window.onload = function() {
+    connect();
+};
+
+function sendMessage() {
+    const message = { text: "테스트 메시지입니다!" };
+    stompClient.send("/app/sendMessage", {}, JSON.stringify(message));
+}
     function confirmLogout() {
         // 모달 띄우기
         $('#logoutModal').modal('show');
@@ -353,3 +419,5 @@ scratch. This page gets rid of all links and provides the needed markup only.
     
 
 </script>
+
+

@@ -12,7 +12,7 @@
     <button onclick="sendMessage()">Send Message</button>
 
     <script>
-        var socket = new SockJS('http://localhost:8080/stomp'); // STOMP 엔드포인트에 연결
+        var socket = new SockJS('/stomp'); // STOMP 엔드포인트에 연결
         var stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function (frame) {
@@ -20,6 +20,8 @@
             stompClient.subscribe('/topic/messages', function (message) {
                 console.log('Received: ' + message.body);
             });
+        }, function (error) {
+            console.error('Error connecting to STOMP:', error); // 에러 핸들링 추가
         });
 
         // 메시지를 전송하는 함수
