@@ -13,7 +13,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/">메인 화면</a></li>
+                        <li class="breadcrumb-item"><a href="/course.do?id=${course.id}">${course.title}</a></li>
                         <li class="breadcrumb-item active">문제 상세 보기</li>
                     </ol>
                 </div>
@@ -145,14 +145,14 @@
 
 <style>
     .score-text {
-        font-size: 30px; /* 원하는 크기로 설정 */
-        font-weight: bold; /* 굵게 설정 */
-        color: #007bff; /* 원하는 색상으로 설정 */
+        font-size: 30px; 
+        font-weight: bold; 
+        color: #007bff; 
     }
     
     .custom-btn{
-    padding: 15px 30px; /* 상하, 좌우 패딩 조정 */
-    font-size: 18px; /* 글자 크기 조정 */
+    padding: 15px 30px; 
+    font-size: 18px; 
     }
 </style>
 

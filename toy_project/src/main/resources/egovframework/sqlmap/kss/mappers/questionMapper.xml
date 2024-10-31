@@ -15,8 +15,26 @@ VALUES (#{question_id}, #{option_number}, #{option_text});
     </insert>
     
     <select id="selectQuestionListsByTestId" parameterType="int" resultType="egovframework.kss.main.dto.QuestionListDTO">
-    SELECT id, question_order FROM public.questions WHERE test_id = #{testId} ORDER BY question_order;
+    SELECT id, ROW_NUMBER() OVER (ORDER BY question_order) AS question_order FROM public.questions WHERE test_id = #{testId} ORDER BY question_order;
 	</select>
+	
+<select id="selectSloveQuestionListsByTestId" parameterType="map" resultType="egovframework.kss.main.dto.QuestionListDTO">
+    SELECT 
+        q.id, 
+        ROW_NUMBER() OVER (ORDER BY q.question_order) AS question_order,
+        CASE 
+            WHEN a.answer IS NOT NULL AND a.answer != '' THEN TRUE 
+            ELSE FALSE 
+        END AS is_answered
+    FROM 
+        public.questions q
+    LEFT JOIN 
+        public.answers a ON q.id = a.question_id AND a.user_id = #{userId} AND a.test_id = #{testId}
+    WHERE 
+        q.test_id = #{testId}
+    ORDER BY 
+        q.question_order;
+</select>
 	
 	<select id="selectQuestionById" parameterType="int" resultType="egovframework.kss.main.dto.QuestionDetailDTO">
     SELECT q.id, q.question_text, q.question_type, q.correct_answer, q.score

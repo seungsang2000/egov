@@ -13,7 +13,7 @@
 				</div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
-						<li class="breadcrumb-item"><a href="/">메인 화면</a></li>
+						<li class="breadcrumb-item"><a href="/course.do?id=${course.id}">${course.title}</a></li>
 						<li class="breadcrumb-item active">문제 풀기</li>
 					</ol>
 				</div>
@@ -54,10 +54,11 @@
 											<input type="radio" name="answer"
 												value="${option.option_number}"
 												id="option${option.option_number}"
-												<c:if test="${currentQuestion.userAnswer == option.option_number}"> checked</c:if>>
+												<c:if test="${currentQuestion.userAnswer == option.option_number}"> checked</c:if> onclick="check('${option.option_number}')">
 											<label for="option${option.option_number}">${option.option_text}</label>
 										</div>
 									</c:forEach>
+									<input type="radio" name="answer" value="" id="optionEmpty" style="display:none;">
 								</div>
 							</c:if>
 
@@ -108,13 +109,16 @@
 					<div class="card-body">
 						<div class="row">
 							<c:forEach var="question" items="${questions}">
-								<div class="col-2 mb-4">
-									<button type="button"
-										class="btn ${question.id == selectedQuestionId ? 'btn-primary' : 'btn-outline-primary'} btn-block"
-										onclick="submitAndNavigate(${question.id})">
-										${question.question_order}</button>
-								</div>
-							</c:forEach>
+    <div class="col-2 mb-4">
+        <button type="button"
+            class="btn 
+                ${question.id == selectedQuestionId ? 'btn-primary' : (question.is_answered ? 'btn-warning btn-outline-primary' : 'btn-outline-primary')} 
+                btn-block"
+            onclick="submitAndNavigate(${question.id})">
+            ${question.question_order}
+        </button>
+    </div>
+</c:forEach>
 						</div>
 					</div>
 				</div>
@@ -180,11 +184,11 @@
 </style>
 
 <script>
- // 서버에서 전달받은 endTime (예: "2024-10-25T02:27:02.034Z[UTC]")
+
     const serverEndTime = "${endTime}";
     
 
-    // [UTC] 부분 제거
+    
     const formattedEndTime = serverEndTime.replace(/\[UTC\]/, '');
     const endTime = new Date(formattedEndTime).getTime();
 
@@ -214,7 +218,7 @@
         const form = document.querySelector('form[action="/question/solveTest.do"]');
         const formData = new FormData(form);
 
-        // 선택된 문제에 대한 questionId 추가
+        
         formData.append("questionId", questionId);
 
         
@@ -229,7 +233,7 @@
             throw new Error('Network response was not ok.');
         })
         .then(data => {
-            // 서버에서 반환된 JSP를 현재 문서에 작성
+            
             document.open();
             document.write(data);
             document.close();
@@ -251,7 +255,7 @@
         document.getElementById('confirmEndTest').onclick = function() {
             $('#confirmModal').modal('hide');
             
-            // AJAX 요청
+            
             $.ajax({
                 type: 'POST',
                 url: '/question/userFinishTest.do',
@@ -271,7 +275,7 @@
     function submitTestForm() {
         const form = document.querySelector('form[action="/question/solveTest.do"]');
         
-        // AJAX 요청
+        
         $.ajax({
             type: 'POST',
             url: '/question/userFinishTest.do',
@@ -284,6 +288,30 @@
             }
         });
     }
+    
+    var checkNum =null;
+    function check(num) {
+        var obj = $('input:radio[name="answer"]'); 
+
+        
+        if (checkNum == num) {
+            
+            obj.each(function() {
+                if ($(this).val() == num) {
+                    $(this).prop('checked', false); 
+                }
+            });
+            checkNum = null; 
+        } else {
+            
+            checkNum = num; 
+        }
+        
+        if (!obj.is(':checked')) {
+            document.getElementById('optionEmpty').checked = true;
+        }
+    }
+    
 </script>
 
 <%@ include file="/WEB-INF/jsp/include/footer.jsp"%>

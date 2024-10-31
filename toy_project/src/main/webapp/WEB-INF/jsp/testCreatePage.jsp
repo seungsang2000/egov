@@ -12,7 +12,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/">메인 화면</a></li>
+                        <li class="breadcrumb-item"><a href="/course.do?id=${course.id}">${course.title}</a></li>
                         <li class="breadcrumb-item active">시험 생성</li>
                     </ol>
                 </div>
@@ -81,7 +81,7 @@
             <div class="row">
                 <div class="col-12">
                     <a href="#" class="btn btn-secondary">취소</a>
-                    <input type="hidden" name="course_id" value="${courseId}"/>
+                    <input type="hidden" name="course_id" value="${course.id}"/>
                     <input type="submit" value="시험 생성" class="btn btn-success float-right" onclick="return validateDates()">
                 </div>
             </div>

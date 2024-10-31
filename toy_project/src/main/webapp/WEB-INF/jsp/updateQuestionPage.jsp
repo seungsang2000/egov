@@ -13,7 +13,7 @@
 				</div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
-						<li class="breadcrumb-item"><a href="/">메인 화면</a></li>
+						<li class="breadcrumb-item"><a href="/course.do?id=${course.id}">${course.title}</a></li>
 						<li class="breadcrumb-item active">문제 수정</li>
 					</ol>
 				</div>
@@ -344,7 +344,7 @@ window.onload = function() {
 
 <style>
 .score-text {
-	font-size: 30px; /* 원하는 크기로 설정 */
+	font-size: 30px; 
 	font-weight: bold; /* 굵게 설정 */
 	color: #007bff; /* 원하는 색상으로 설정 */
 }

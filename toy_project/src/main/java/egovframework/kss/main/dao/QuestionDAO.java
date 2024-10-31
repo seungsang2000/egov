@@ -157,4 +157,9 @@ public class QuestionDAO {
 		questionMapper.updateIsScoredComplete(testId); // 시험을 채점 완료로 바꿈
 	}
 
+	public List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.selectSloveQuestionListsByTestId(params);
+	}
+
 }

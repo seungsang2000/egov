@@ -237,7 +237,7 @@ public class CourseController {
 			throw new CustomException("해당 강좌에 대한 권한이 없습니다");
 		}
 
-		model.addAttribute("courseId", courseId);
+		model.addAttribute("course", courseVO);
 		return "testCreatePage";
 	}
 

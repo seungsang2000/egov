@@ -33,6 +33,7 @@ import egovframework.kss.main.model.Question;
 import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.service.QuestionService;
 import egovframework.kss.main.service.UserService;
+import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.ExamParticipationVO;
 import egovframework.kss.main.vo.TestVO;
 import egovframework.kss.main.vo.UserVO;
@@ -110,6 +111,11 @@ public class QuestionController {
 		int totalScore = questionService.getTotalScoreByTestId(testId);
 		model.addAttribute("totalScore", totalScore);
 
+		TestVO test = courseService.selectTestById(testId);
+		CourseVO course = courseService.selectCourseById(test.getCourse_id());
+
+		model.addAttribute("course", course);
+
 		if (questionId != null) {
 			QuestionDetailDTO questionDetail = questionService.selectQuestionById(questionId);
 			model.addAttribute("questionDetail", questionDetail);
@@ -150,6 +156,11 @@ public class QuestionController {
 		model.addAttribute("questionDetail", questionDetail);
 		model.addAttribute("editable", false);
 
+		TestVO test = courseService.selectTestById(testId);
+		CourseVO course = courseService.selectCourseById(test.getCourse_id());
+
+		model.addAttribute("course", course);
+
 		return "onlyViewQuestion";
 
 	}
@@ -178,6 +189,11 @@ public class QuestionController {
 
 		List<QuestionListDTO> questions = questionService.selectQuestionListsByTestId(testId);
 		model.addAttribute("questions", questions);
+
+		TestVO test = courseService.selectTestById(testId);
+		CourseVO course = courseService.selectCourseById(test.getCourse_id());
+
+		model.addAttribute("course", course);
 
 		return "updateQuestionPage";
 
@@ -236,19 +252,21 @@ public class QuestionController {
 	@Transactional
 	public String solveTest(@RequestParam(value = "testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
 
-		List<QuestionListDTO> questions = questionService.selectQuestionListsByTestId(testId);
+		UserVO user = userService.getCurrentUser();
+		int userId = user.getId();
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("userId", userId);
+		params.put("testId", testId);
+
+		List<QuestionListDTO> questions = questionService.selectSloveQuestionListsByTestId(params);
 
 		if (questionId == null) {
 			questionId = questions.get(0).getId(); // 받은 문제 id가 없으면 첫번째 문제 보기
 		}
 
-		UserVO user = userService.getCurrentUser();
-		int userId = user.getId();
-
-		Map<String, Object> params = new HashMap<>();
 		params.put("questionId", questionId);
-		params.put("userId", userId);
-		params.put("testId", testId);
+
 		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
 
 		Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -308,6 +326,11 @@ public class QuestionController {
 			model.addAttribute("nextQuestionId", nextQuestionDetail.getId());
 		}
 
+		TestVO test = courseService.selectTestById(testId);
+		CourseVO course = courseService.selectCourseById(test.getCourse_id());
+
+		model.addAttribute("course", course);
+
 		return "solveQuestion";
 	}
 
@@ -354,7 +377,7 @@ public class QuestionController {
 			questionService.updateUserAnswer(answer);
 		}
 
-		List<QuestionListDTO> questions = questionService.selectQuestionListsByTestId(testId);
+		List<QuestionListDTO> questions = questionService.selectSloveQuestionListsByTestId(params);
 		model.addAttribute("questions", questions);
 		model.addAttribute("testId", testId);
 
@@ -387,6 +410,11 @@ public class QuestionController {
 			QuestionDetailDTO nextQuestionDetail = questionService.selectNextQuestionById(currentQuestionId);
 			model.addAttribute("nextQuestionId", nextQuestionDetail.getId());
 		}
+
+		TestVO test = courseService.selectTestById(testId);
+		CourseVO course = courseService.selectCourseById(test.getCourse_id());
+
+		model.addAttribute("course", course);
 
 		return "solveQuestion";
 	}
@@ -467,6 +495,10 @@ public class QuestionController {
 			}
 
 		}
+
+		CourseVO course = courseService.selectCourseById(test.getCourse_id());
+
+		model.addAttribute("course", course);
 
 		return "startTestPage";
 	}

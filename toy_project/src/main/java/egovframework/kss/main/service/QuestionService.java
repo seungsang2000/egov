@@ -20,6 +20,8 @@ public interface QuestionService {
 
 	List<QuestionListDTO> selectQuestionListsByTestId(int testId);
 
+	List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params);
+
 	public QuestionDetailDTO selectQuestionById(int questionId);
 
 	public int getTotalScoreByTestId(int testId);

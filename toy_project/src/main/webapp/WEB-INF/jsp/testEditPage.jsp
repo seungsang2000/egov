@@ -12,7 +12,7 @@
 				</div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
-						<li class="breadcrumb-item"><a href="/">메인 화면</a></li>
+						<li class="breadcrumb-item"><a href="/course.do?id=${course.id}">${course.title }</a></li>
 						<li class="breadcrumb-item active">문제 생성</li>
 					</ol>
 				</div>

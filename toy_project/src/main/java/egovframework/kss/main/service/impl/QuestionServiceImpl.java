@@ -152,4 +152,10 @@ public class QuestionServiceImpl implements QuestionService {
 		questionDAO.testGrading(testId);
 	}
 
+	@Override
+	public List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params) {
+
+		return questionDAO.selectSloveQuestionListsByTestId(params);
+	}
+
 }

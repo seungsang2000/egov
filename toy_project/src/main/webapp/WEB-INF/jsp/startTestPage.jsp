@@ -16,8 +16,8 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">나의 강좌</a></li>
-                        <li class="breadcrumb-item active">시험 풀이</li>
+                        <li class="breadcrumb-item"><a href="/course.do?id=${course.id }">${course.title}</a></li>
+                        <li class="breadcrumb-item active">시험 시작 페이지</li>
                     </ol>
                 </div>
             </div>
