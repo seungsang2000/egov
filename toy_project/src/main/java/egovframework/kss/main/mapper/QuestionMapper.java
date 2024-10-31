@@ -19,6 +19,8 @@ public interface QuestionMapper {
 
 	List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params);
 
+	List<QuestionListDTO> selectReviewQuestionListsByTestId(Map<String, Object> params);
+
 	// 질문 ID로 상세 정보 가져오기
 	QuestionDetailDTO selectQuestionById(int questionId);
 

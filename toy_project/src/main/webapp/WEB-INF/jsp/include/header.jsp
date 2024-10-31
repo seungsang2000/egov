@@ -105,7 +105,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="dropdown-divider"></div>
         <div id="notification-items"></div> <!-- 알림 항목을 추가할 곳 -->
         <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item dropdown-footer">알림 모두 삭제</a>
+        <a href="javascript:void(0);" class="dropdown-item dropdown-footer" onclick="deleteAllNotifications()">알림 모두 삭제</a>
     </div>
 </li>
       <li class="nav-item">
@@ -400,11 +400,33 @@ function sendMessage() {
     const message = { message: "테스트 메시지입니다!" };
     stompClient.send("/app/sendMessage", {}, JSON.stringify(message));
 }
+
     function confirmLogout() {
         
         $('#logoutModal').modal('show');
     }
     
+    function deleteAllNotifications() {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+        fetch('/allNotifications', {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // 알림 삭제 후 UI 업데이트
+                document.getElementById('notification-items').innerHTML = ''; // UI에서 알림 제거
+                document.getElementById('notification-count').innerText = '0'; // 알림 카운트 초기화
+                console.log('모든 알림이 삭제되었습니다.');
+            } else {
+                console.error('알림 삭제 실패');
+            }
+        })
+        .catch(error => console.error('Error deleting notifications:', error));
+    }
 
 </script>
 

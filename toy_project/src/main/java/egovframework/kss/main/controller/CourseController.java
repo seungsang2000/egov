@@ -347,4 +347,12 @@ public class CourseController {
 		return ResponseEntity.ok(notifications);
 	}
 
+	@DeleteMapping(value = "/allNotifications")
+	public ResponseEntity<Void> deleteAllNotifications() {
+		UserVO user = userService.getCurrentUser();
+
+		notificationService.deleteAllNotifications(user.getId());
+		return ResponseEntity.ok().build();
+	}
+
 }

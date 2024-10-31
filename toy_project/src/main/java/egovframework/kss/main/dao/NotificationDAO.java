@@ -32,4 +32,9 @@ public class NotificationDAO {
 		return notificationMapper.selectNotificationByUserId(id);
 	}
 
+	public void deleteAllNotifications(int userId) {
+		NotificationMapper notificationMapper = sqlSession.getMapper(NotificationMapper.class);
+		notificationMapper.deleteAllNotifications(userId);
+	}
+
 }

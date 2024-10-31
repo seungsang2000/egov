@@ -11,4 +11,6 @@ public interface NotificationMapper {
 	void deleteNotification(Map<String, Object> params);
 
 	List<NotificationVO> selectNotificationByUserId(int userId);
+
+	void deleteAllNotifications(int userId);
 }

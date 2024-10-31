@@ -33,4 +33,10 @@ public class NotificationServiceImpl implements NotificationService {
 		return notificationDAO.selectNotificationByUserId(id);
 	}
 
+	@Override
+	public void deleteAllNotifications(int userId) {
+		notificationDAO.deleteAllNotifications(userId);
+
+	}
+
 }

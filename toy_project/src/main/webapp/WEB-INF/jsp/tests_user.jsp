@@ -121,17 +121,22 @@
                                 <td class="project-actions text-right">
                                     <c:set var="currentTime" value="${currentTime}" />
                                     <c:choose>
-                                        <c:when test="${currentTime.time >= test.start_time.time && currentTime.time <= test.end_time.time && test.user_status != '완료'}">
-                                            <a class="btn btn-primary btn-sm" href="/question/startTestPage.do?testId=${test.id}">
-                                                <i class="fas fa-eye"></i> 문제 풀기
-                                            </a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <button class="btn btn-secondary btn-sm" disabled>
-                                                <i class="fas fa-eye-slash"></i> 문제 풀기
-                                            </button>
-                                        </c:otherwise>
-                                    </c:choose>
+        <c:when test="${currentTime.time >= test.start_time.time && currentTime.time <= test.end_time.time && test.user_status != '완료'}">
+            <a class="btn btn-primary btn-sm" href="/question/startTestPage.do?testId=${test.id}">
+                <i class="fas fa-eye"></i> 문제 풀기
+            </a>
+        </c:when>
+        <c:when test="${test.user_status == '완료' && test.is_scored}">
+            <a class="btn btn-info btn-sm" href="/question/testReview.do?testId=${test.id}">
+                <i class="fas fa-book"></i> 오답 노트
+            </a>
+        </c:when>
+        <c:otherwise>
+            <button class="btn btn-secondary btn-sm" disabled>
+                <i class="fas fa-eye-slash"></i> 문제 풀기
+            </button>
+        </c:otherwise>
+    </c:choose>
                                 </td>
                             </tr>
                         </c:if>

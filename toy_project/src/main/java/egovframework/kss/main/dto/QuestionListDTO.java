@@ -11,6 +11,5 @@ public class QuestionListDTO {
 	private int id;
 	private int question_order;
 	private Boolean is_answered;
-	private String abc;
 
 }

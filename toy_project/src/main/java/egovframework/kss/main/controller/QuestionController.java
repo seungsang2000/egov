@@ -513,4 +513,54 @@ public class QuestionController {
 		}
 	}
 
+	@RequestMapping(value = "/testReview.do")
+	public String testReview(@RequestParam("testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
+		model.addAttribute("testId", testId);
+
+		UserVO user = userService.getCurrentUser();
+		int userId = user.getId();
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("userId", userId);
+		params.put("testId", testId);
+
+		List<QuestionListDTO> questions = questionService.selectReviewQuestionListsByTestId(params);
+		model.addAttribute("questions", questions);
+
+		Integer id = 0;
+		if (questionId == null) {
+			id = questions.get(0).getId();
+		} else {
+			id = questionId;
+		}
+		params.put("questionId", id);
+
+		QuestionDetailDTO questionDetail = questionService.selectQuestionById(id);
+
+		String userAnswer = questionService.selectUserAnswer(params);
+
+		QuestionDetailWithUserAnswerDTO detailWithAnswer = new QuestionDetailWithUserAnswerDTO(); // 변환
+		detailWithAnswer.setId(questionDetail.getId());
+		detailWithAnswer.setQuestion_text(questionDetail.getQuestion_text());
+		detailWithAnswer.setQuestion_type(questionDetail.getQuestion_type());
+		detailWithAnswer.setOptions(questionDetail.getOptions());
+		detailWithAnswer.setUserAnswer(userAnswer);
+		detailWithAnswer.setScore(questionDetail.getScore());
+
+		model.addAttribute("currentQuestion", detailWithAnswer);
+
+		model.addAttribute("selectedQuestionId", id);
+		model.addAttribute("questionDetail", questionDetail);
+		model.addAttribute("editable", false);
+
+		model.addAttribute("correct_answer", questionDetail.getCorrect_answer());
+
+		TestVO test = courseService.selectTestById(testId);
+		CourseVO course = courseService.selectCourseById(test.getCourse_id());
+
+		model.addAttribute("course", course);
+
+		return "testReview";
+	}
+
 }

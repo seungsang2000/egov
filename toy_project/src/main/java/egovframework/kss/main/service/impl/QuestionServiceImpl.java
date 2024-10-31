@@ -49,6 +49,17 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
+	public List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params) {
+
+		return questionDAO.selectSloveQuestionListsByTestId(params);
+	}
+
+	@Override
+	public List<QuestionListDTO> selectReviewQuestionListsByTestId(Map<String, Object> params) {
+		return questionDAO.selectReviewQuestionListsByTestId(params);
+	}
+
+	@Override
 	public QuestionDetailDTO selectQuestionById(int questionId) {
 		QuestionDetailDTO question = questionDAO.selectQuestionById(questionId);
 
@@ -150,12 +161,6 @@ public class QuestionServiceImpl implements QuestionService {
 	@Transactional
 	public void testGrading(int testId) {
 		questionDAO.testGrading(testId);
-	}
-
-	@Override
-	public List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params) {
-
-		return questionDAO.selectSloveQuestionListsByTestId(params);
 	}
 
 }

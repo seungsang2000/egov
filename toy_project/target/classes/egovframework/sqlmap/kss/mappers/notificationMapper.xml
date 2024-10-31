@@ -17,6 +17,10 @@
 	
 	
 	</select>
+	
+	<delete id="deleteAllNotifications" parameterType="int">
+		delete from notifications where user_id = #{userId}
+	</delete>
 
 
 

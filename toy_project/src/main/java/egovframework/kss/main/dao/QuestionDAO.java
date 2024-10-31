@@ -50,6 +50,16 @@ public class QuestionDAO {
 		return questionMapper.selectQuestionListsByTestId(testId);
 	}
 
+	public List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.selectSloveQuestionListsByTestId(params);
+	}
+
+	public List<QuestionListDTO> selectReviewQuestionListsByTestId(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.selectReviewQuestionListsByTestId(params);
+	}
+
 	public QuestionDetailDTO selectQuestionById(int questionId) {
 		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
 		return questionMapper.selectQuestionById(questionId);
@@ -155,11 +165,6 @@ public class QuestionDAO {
 		questionMapper.testGrading(testId); // 시험에 참여한 유저들 점수 계산
 		questionMapper.assignZeroScoreToNonParticipants(testId); // 시험에 참여안한 유저들 0점 처리
 		questionMapper.updateIsScoredComplete(testId); // 시험을 채점 완료로 바꿈
-	}
-
-	public List<QuestionListDTO> selectSloveQuestionListsByTestId(Map<String, Object> params) {
-		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
-		return questionMapper.selectSloveQuestionListsByTestId(params);
 	}
 
 }
