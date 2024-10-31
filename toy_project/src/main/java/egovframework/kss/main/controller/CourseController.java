@@ -32,8 +32,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.service.CourseService;
@@ -301,9 +299,10 @@ public class CourseController {
 			TestVO test = courseService.selectTestById(testId);
 			CourseVO course = courseService.selectCourseById(test.getCourse_id());
 			String messageText = course.getTitle() + " 강좌에서 새로운 시험이 공개되었습니다: " + test.getName();
+			notificationService.sendMessageByTestId(testId, messageText);
 
-			List<Integer> receiverIds = courseService.getUsersByCourseId(test.getCourse_id());
-
+			/*List<Integer> receiverIds = courseService.getUsersByCourseId(test.getCourse_id());
+			
 			//db에 메세지 저장
 			for (int receiverId : receiverIds) {
 				NotificationVO notification = new NotificationVO();
@@ -312,12 +311,12 @@ public class CourseController {
 				notification.setUser_id(receiverId); // 수신자 ID 설정
 				notificationService.insertNotification(notification);
 			}
-
+			
 			// STOMP를 통해 해당 강좌에 구독 중인 사용자에게 메시지 전송
 			Map<String, Object> message = new HashMap<>();
 			message.put("message", messageText);
 			message.put("course_id", test.getCourse_id());
-			messagingTemplate.convertAndSend("/topic/course/" + test.getCourse_id() + "/notifications", new ObjectMapper().writeValueAsString(message));
+			messagingTemplate.convertAndSend("/topic/course/" + test.getCourse_id() + "/notifications", new ObjectMapper().writeValueAsString(message));*/
 
 			courseService.completeTest(testId);
 			return ResponseEntity.ok("시험 완료 처리 성공");

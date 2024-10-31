@@ -31,6 +31,7 @@ import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.model.Option;
 import egovframework.kss.main.model.Question;
 import egovframework.kss.main.service.CourseService;
+import egovframework.kss.main.service.NotificationService;
 import egovframework.kss.main.service.QuestionService;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.CourseVO;
@@ -52,6 +53,9 @@ public class QuestionController {
 
 	@Resource(name = "CourseService")
 	private CourseService courseService;
+
+	@Resource(name = "NotificationService")
+	private NotificationService notificationService;
 
 	@PostMapping("/questionCreate.do")
 	public String questionCreate(Model model, HttpServletRequest request) { // request.getParameter 방식도 시도해본다
@@ -506,6 +510,11 @@ public class QuestionController {
 	@PostMapping("testGrading.do")
 	public ResponseEntity<Void> testGrading(@RequestParam("id") int testId) { //ResponseEntity도 함 써보자
 		try {
+			TestVO test = courseService.selectTestById(testId);
+			CourseVO course = courseService.selectCourseById(test.getCourse_id());
+			String messageText = course.getTitle() + " 강좌에서 " + test.getName() + " 시험의 채점이 완료되었습니다";
+			notificationService.sendMessageByTestId(testId, messageText);
+
 			questionService.testGrading(testId);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {

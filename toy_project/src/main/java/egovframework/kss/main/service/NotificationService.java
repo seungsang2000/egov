@@ -13,4 +13,6 @@ public interface NotificationService {
 	List<NotificationVO> selectNotificationByUserId(int id);
 
 	void deleteAllNotifications(int userId);
+
+	void sendMessageByTestId(int testId, String messageText);
 }
