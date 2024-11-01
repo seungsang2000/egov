@@ -116,21 +116,24 @@
 						</div>
 					</div>
 				</div>
-				<div class="card card-info">
-					<div class="card-header">
-						<h3 class="card-title">AI 도움</h3>
-						<div class="card-tools">
-							<button type="button" class="btn btn-tool"
-								data-card-widget="collapse" title="Collapse">
-								<i class="fas fa-minus"></i>
-							</button>
-						</div>
-					</div>
-					<div class="card-body">
-						<p class="score-text">AI의 답변</p>
-					</div>
-
-				</div>
+<div class="card card-info ai-help-card">
+    <div class="card-header">
+        <h3 class="card-title">AI 오답노트</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+<div class="card-body">
+    <div id="ai-response-container" class="d-flex flex-column align-items-center justify-content-center" style="height: 100%;">
+        <div class="spinner-border" role="status" id="loading-spinner" style="display: none;">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <p id="ai-response" class="ai-response" style="display: none;">AI의 답변 표시</p>
+    </div>
+</div>
+</div>
 			</div>
 		</div>
 	</section>
@@ -138,16 +141,48 @@
 
 
 <style>
-.score-text {
-	font-size: 30px;
-	font-weight: bold;
-	color: #007bff;
+.ai-help-card {
+    background-color: #f8f9fa; /* 카드 배경색 */
+    border-radius: 0.5rem; /* 모서리 둥글기 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* 그림자 효과 */
 }
 
-.custom-btn {
-	padding: 15px 30px;
-	font-size: 18px;
+.ai-response {
+    font-size: 16px; /* 적당한 글자 크기 */
+    color: #343a40; /* 텍스트 색상 */
+    margin: 0; /* 기본 마진 제거 */
+    font-weight: bold; /* 글씨를 굵게 설정 */
 }
 </style>
+
+<script>
+const originalOnload = window.onload;
+
+window.onload = function() {
+    if (originalOnload) originalOnload();
+    const aiResponseElement = document.getElementById("ai-response");
+    const loadingSpinner = document.getElementById("loading-spinner");
+
+    loadingSpinner.style.display = "block"; // 스피너 표시
+    aiResponseElement.style.display = "none"; // AI 답변 숨기기
+
+    fetch(`/getFeedback.do?questionId=${currentQuestion.id}`)
+        .then(response => response.text())
+        .then(data => {
+            loadingSpinner.style.display = "none"; // 스피너 숨기기
+            aiResponseElement.innerText = data; // AI의 답변 표시
+            aiResponseElement.style.display = "block"; // AI 답변 보이기
+        })
+        .catch(error => {
+            console.error("Error fetching feedback:", error);
+            loadingSpinner.style.display = "none"; // 스피너 숨기기
+            aiResponseElement.innerText = "AI의 답변을 가져오는 데 오류가 발생했습니다."; // 오류 메시지 표시
+            aiResponseElement.style.display = "block"; // 오류 메시지 보이기
+        });
+};
+
+
+
+</script>
 
 <%@ include file="/WEB-INF/jsp/include/footer.jsp"%>

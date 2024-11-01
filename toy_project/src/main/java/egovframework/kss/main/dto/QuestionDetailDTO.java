@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class QuestionDetailDTO {
 	private int id;
+	private int test_id;
 	private String question_text;
 	private String question_type;
 	private String correct_answer;

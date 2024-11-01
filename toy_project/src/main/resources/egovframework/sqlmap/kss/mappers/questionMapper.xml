@@ -57,7 +57,7 @@ VALUES (#{question_id}, #{option_number}, #{option_text});
 
 	
 	<select id="selectQuestionById" parameterType="int" resultType="egovframework.kss.main.dto.QuestionDetailDTO">
-    SELECT q.id, q.question_text, q.question_type, q.correct_answer, q.score
+    SELECT q.id, q.question_text, q.question_type, q.correct_answer, q.score, test_id
     FROM public.questions q
     WHERE q.id = #{id}
 	</select>
@@ -91,7 +91,7 @@ VALUES (#{question_id}, #{option_number}, #{option_text});
 </delete>
 
 <select id="selectNextQuestionById" parameterType="int" resultType="egovframework.kss.main.dto.QuestionDetailDTO">
-    SELECT q.id, q.question_text, q.question_type, q.correct_answer, q.score
+    SELECT q.id, q.question_text, q.question_type, q.correct_answer, q.score, q.test_id
     FROM public.questions q
     WHERE q.test_id = (SELECT test_id FROM public.questions WHERE id = #{id}) 
       AND q.question_order > (SELECT question_order FROM public.questions WHERE id = #{id})
