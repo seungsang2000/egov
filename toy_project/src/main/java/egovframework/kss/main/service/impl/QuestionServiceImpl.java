@@ -142,6 +142,11 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
+	public boolean checkParticipatedStudentExists(int testId) {
+		return questionDAO.checkParticipatedStudentExists(testId);
+	}
+
+	@Override
 	public void insertExamParticipation(Map<String, Object> params) {
 		questionDAO.insertExamParticipation(params);
 	}
@@ -155,6 +160,11 @@ public class QuestionServiceImpl implements QuestionService {
 	public void updateExamParticipation(ExamParticipationVO examParticipation) {
 		questionDAO.updateExamParticipation(examParticipation);
 
+	}
+
+	@Override
+	public void updateExamPausePosition(Map<String, Object> params) {
+		questionDAO.updateExamPausePosition(params);
 	}
 
 	@Override

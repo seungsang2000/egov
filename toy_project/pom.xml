@@ -228,7 +228,11 @@
 			<version>${spring.maven.artifact.version}</version> <!-- 4.3.25.RELEASE 사용 -->
 		</dependency>
 
-
+		<dependency>
+			<groupId>net.bramp.ffmpeg</groupId>
+			<artifactId>ffmpeg</artifactId>
+			<version>0.6.2</version>
+		</dependency>
 
 
 

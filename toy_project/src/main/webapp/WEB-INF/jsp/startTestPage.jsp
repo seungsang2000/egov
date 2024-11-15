@@ -89,9 +89,9 @@
 
 
 <script>
-    // 시험 시작 버튼 클릭 시 모달 표시
+    
     document.getElementById('startTest').addEventListener('click', function() {
-        // Bootstrap의 모달을 표시
+        
         $('#confirmModal').modal('show');
     });
 

@@ -47,11 +47,15 @@ public interface QuestionMapper {
 
 	boolean checkExamParticipationExists(Map<String, Object> params);
 
+	boolean checkParticipatedStudentExists(int testId);
+
 	void insertExamParticipation(Map<String, Object> params);
 
 	ExamParticipationVO selectExamParticipation(Map<String, Object> params);
 
 	void updateExamParticipation(ExamParticipationVO examParticipation);
+
+	void updateExamPausePosition(Map<String, Object> params);
 
 	void testGrading(int testId);
 

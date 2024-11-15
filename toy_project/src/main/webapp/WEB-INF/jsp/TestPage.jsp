@@ -80,7 +80,7 @@
 
 <script>
 document.getElementById('startTest').addEventListener('click', function() {
-    // 모달을 띄움
+    
     $('#confirmModal').modal('show');
 });
 

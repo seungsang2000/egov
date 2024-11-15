@@ -144,6 +144,11 @@ public class QuestionDAO {
 		return questionMapper.checkExamParticipationExists(params);
 	}
 
+	public boolean checkParticipatedStudentExists(int testId) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		return questionMapper.checkParticipatedStudentExists(testId);
+	}
+
 	public void insertExamParticipation(Map<String, Object> params) {
 		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
 		questionMapper.insertExamParticipation(params);
@@ -157,6 +162,12 @@ public class QuestionDAO {
 	public void updateExamParticipation(ExamParticipationVO examParticipation) {
 		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
 		questionMapper.updateExamParticipation(examParticipation);
+
+	}
+
+	public void updateExamPausePosition(Map<String, Object> params) {
+		QuestionMapper questionMapper = sqlSession.getMapper(QuestionMapper.class);
+		questionMapper.updateExamPausePosition(params);
 
 	}
 

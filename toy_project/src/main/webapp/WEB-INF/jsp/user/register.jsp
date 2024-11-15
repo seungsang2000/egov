@@ -96,13 +96,6 @@
         </div>
       </form>
 
-      <div class="social-auth-links text-center">
-        <a href="#" class="btn btn-block btn-danger">
-          <i class="fab fa-google mr-2"></i>
-          Google 계정으로 가입
-        </a>
-      </div>
-
       <a href="/user/login.do" class="text-center">이미 회원가입되어 있음</a>
     </div>
   </div><!-- /.card -->
@@ -117,15 +110,25 @@
 
 <script>
 
-function isValidUserId(userId) {
+/* function isValidUserId(userId) {
     const regex = /^[a-zA-Z0-9]+$/; // 영어 대소문자와 숫자만 허용
+    return regex.test(userId);
+} */
+
+function isValidUserId(userId) {
+    const regex = /^[a-zA-Z0-9]{4,}$/; // 영어 대소문자, 숫자만 포함하고, 최소 4글자 이상
     return regex.test(userId);
 }
 
+function isValidPassword(password) {
+    const passwordRegex = /^[a-zA-Z0-9]{4,}$/; // 영문자와 숫자로만 이루어져 있고, 최소 4글자
+    return passwordRegex.test(password);
+}
 
 $(document).ready(function() {
     let isUserIdValid = false;
     let isEmailValid = false; // 이메일 유효성 검사를 위한 변수
+    let isPasswordValid = false;
     var csrfToken = $("input[name='_csrf']").val();
     var csrfHeader = "X-CSRF-TOKEN"; // 기본 CSRF 헤더 이름
 
@@ -135,7 +138,7 @@ $(document).ready(function() {
         if (userId) {
             // 유효성 검사
             if (!isValidUserId(userId)) {
-                $('#userIdResult').text('유저 아이디는 영어와 숫자만 포함할 수 있습니다.').removeClass('text-success').addClass('text-danger').show();
+                $('#userIdResult').text('유저 아이디는 최소 4글자 이상의 영어와 숫자로 이루어져야합니다. ').removeClass('text-success').addClass('text-danger').show();
                 isUserIdValid = false;
                 return; // 유효하지 않으면 AJAX 요청을 중단
             }
@@ -145,7 +148,7 @@ $(document).ready(function() {
                 data: { userId: userId },
                 success: function(response) {
                     if (response.exists) {
-                        $('#userIdResult').text('사용할 수 없는 유저 아이디입니다.').removeClass('text-success').addClass('text-danger').show(); // 붉은색
+                        $('#userIdResult').text('중복되는 유저 아이디입니다.').removeClass('text-success').addClass('text-danger').show(); // 붉은색
                         isUserIdValid = false; // 중복 아이디
                     } else {
                         $('#userIdResult').text('사용 가능한 유저 아이디입니다.').removeClass('text-danger').addClass('text-success').show(); // 녹색
@@ -183,7 +186,7 @@ $(document).ready(function() {
                 
                 success: function(response) {
                     if (response.exists) {
-                        $('#userEmailResult').text('사용할 수 없는 이메일입니다.').removeClass('text-success').addClass('text-danger').show(); // 붉은색
+                        $('#userEmailResult').text('중복되는 이메일입니다.').removeClass('text-success').addClass('text-danger').show(); // 붉은색
                         isEmailValid = false; // 중복 이메일
                     } else {
                         $('#userEmailResult').text('사용 가능한 이메일입니다.').removeClass('text-danger').addClass('text-success').show(); // 녹색
@@ -200,6 +203,18 @@ $(document).ready(function() {
             isEmailValid = false;
         }
     });
+    
+    $('input[name="password"]').on('blur', function() {
+        var password = $(this).val();
+        if (!isValidPassword(password)) {
+            $('#passwordResult').text('비밀번호는 최소 4글자 이상이어야 합니다.').removeClass('text-success').addClass('text-danger').show();
+            isPasswordValid = false;
+        } else {
+            $('#passwordResult').text('').hide();
+            isPasswordValid = true;
+        }
+    });
+
 
     // 폼 제출 처리
     $('form').on('submit', function(event) {
@@ -210,11 +225,14 @@ $(document).ready(function() {
         var confirmPassword = $('input[name="confirmPassword"]').val();
         var agreeTerms = $('#agreeTerms').is(':checked');
 
+        
+        
         // 비밀번호 확인 검사
-        if (password !== confirmPassword) {
-            alert('비밀번호가 일치하지 않습니다.');
+        if (!isValidPassword(password) || password !== confirmPassword) {
+            alert('비밀번호는 4글자 이상이어야 하며, 비밀번호가 일치해야 합니다.');
             return false;
         }
+
 
         // 개인정보 수집 동의 여부 확인
         if (!agreeTerms) {
@@ -224,7 +242,7 @@ $(document).ready(function() {
 
         // 유저 아이디 중복 여부 확인
         if (!isUserIdValid) {
-            alert('유저 아이디가 유효하지 않습니다. 중복 확인을 해주세요.');
+            alert('유저 아이디가 유효하지 않습니다.');
             return false;
         }
 

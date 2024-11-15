@@ -50,11 +50,15 @@ public interface QuestionService {
 
 	public boolean checkExamParticipationExists(Map<String, Object> params);
 
+	boolean checkParticipatedStudentExists(int testId);
+
 	public void insertExamParticipation(Map<String, Object> params);
 
 	public ExamParticipationVO selectExamParticipation(Map<String, Object> params);
 
 	public void updateExamParticipation(ExamParticipationVO examParticipation);
+
+	void updateExamPausePosition(Map<String, Object> params);
 
 	public void testGrading(int testId);
 }

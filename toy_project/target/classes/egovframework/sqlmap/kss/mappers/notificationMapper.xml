@@ -11,6 +11,10 @@
 		delete from notifications where course_id = #{courseId} and user_id = #{userId} and message = #{message}
 	</delete>
 	
+	<delete id="deleteDirectMessage" parameterType="int">
+		delete from direct_message where message_id = #{id}
+	</delete>
+	
 	<select id="selectNotificationByUserId" parameterType="int" resultType="egovframework.kss.main.vo.NotificationVO">
 		select * from notifications where user_id = #{userId}
 		ORDER BY created_at ASC; 
@@ -18,9 +22,24 @@
 	
 	</select>
 	
+	<select id="selectDirectMessageByUserId" parameterType="int" resultType="egovframework.kss.main.model.ChatMessage">
+		select u.image_path as sender_image, u.name as sender, m.message as content, m.created_at as created_at, m.id as message_id, m.course_id as course_id
+		from direct_message d
+		inner join messages m on d.message_id = id and d.recipient_id = #{id} 
+		inner join users u on u.id = m.user_id
+	</select>
+	
 	<delete id="deleteAllNotifications" parameterType="int">
 		delete from notifications where user_id = #{userId}
 	</delete>
+	
+	<delete id="deleteAllDirectMessage" parameterType="int">
+		delete from direct_message where recipient_id = #{userId}
+	</delete>
+	
+	<insert id="insertDirectMessage" parameterType="egovframework.kss.main.model.ChatMessage">
+		insert into direct_message(message_id, recipient_id) values(#{message_id}, #{recipient_id})
+	</insert>
 
 
 

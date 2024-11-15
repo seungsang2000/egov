@@ -80,7 +80,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <a href="#" class="btn btn-secondary">취소</a>
+                    <a href="/course.do?id=${course.id}" class="btn btn-secondary">취소</a>
                     <input type="hidden" name="course_id" value="${course.id}"/>
                     <input type="submit" value="시험 생성" class="btn btn-success float-right" onclick="return validateDates()">
                 </div>

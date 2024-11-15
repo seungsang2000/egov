@@ -13,14 +13,16 @@ public class CustomUserDetails implements UserDetails {
 	private String role;
 	private String name;
 	private String image_path;
+	private int id;
 
 	// Constructor
-	public CustomUserDetails(String username, String password, String role, String name, String image_path) {
+	public CustomUserDetails(String username, String password, String role, String name, String image_path, int id) {
 		this.username = username;
 		this.password = password;
 		this.role = role;
 		this.name = name;
 		this.setImage_path(image_path);
+		this.setId(id);
 	}
 
 	@Override
@@ -72,5 +74,13 @@ public class CustomUserDetails implements UserDetails {
 
 	public void setImage_path(String image_path) {
 		this.image_path = image_path;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

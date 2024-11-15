@@ -35,6 +35,8 @@
 		</property>
 		<property name="messageConverters">
 			<list>
+			<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+					 <bean class="org.springframework.http.converter.ResourceHttpMessageConverter" />
 				<bean
 					class="org.springframework.http.converter.StringHttpMessageConverter">
 					<property name="supportedMediaTypes">
@@ -45,6 +47,7 @@
 				</bean>
 				<bean
 					class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+					
 			</list>
 		</property>
 	</bean>

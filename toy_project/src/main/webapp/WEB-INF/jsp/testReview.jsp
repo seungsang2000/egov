@@ -142,16 +142,16 @@
 
 <style>
 .ai-help-card {
-    background-color: #f8f9fa; /* 카드 배경색 */
-    border-radius: 0.5rem; /* 모서리 둥글기 */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* 그림자 효과 */
+    background-color: #f8f9fa; 
+    border-radius: 0.5rem; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); 
 }
 
 .ai-response {
-    font-size: 16px; /* 적당한 글자 크기 */
-    color: #343a40; /* 텍스트 색상 */
-    margin: 0; /* 기본 마진 제거 */
-    font-weight: bold; /* 글씨를 굵게 설정 */
+    font-size: 16px; 
+    color: #343a40;
+    margin: 0; 
+    font-weight: bold;
 }
 </style>
 

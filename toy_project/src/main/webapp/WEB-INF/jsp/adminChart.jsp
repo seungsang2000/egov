@@ -175,14 +175,6 @@ $(function () {
         labels: courseTitles,
         datasets: [
             {
-                label: '내 점수',
-                borderColor: 'rgba(60,141,188,0.8)',
-                pointRadius: false,
-                pointColor: '#3b8bba',
-                pointStrokeColor: 'rgba(60,141,188,1)',
-                data: userTotalScores
-            },
-            {
                 label: '평균 점수',
                 borderColor: 'rgba(255,99,132,0.8)',
                 pointRadius: false,
@@ -245,11 +237,6 @@ $(function () {
     var barChartData = {
         labels: courseTitles,
         datasets: [
-            {
-                label: '내 점수',
-                backgroundColor: 'rgba(60,141,188,0.9)',
-                data: userTotalScores
-            },
             {
                 label: '평균 점수',
                 backgroundColor: 'rgba(255,99,132,0.9)',

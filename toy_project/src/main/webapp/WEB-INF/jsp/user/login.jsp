@@ -61,12 +61,7 @@
           <!-- /.col -->
         </div>
       </form>
-
-      <div class="social-auth-links text-center mt-2 mb-3">
-        <a href="#" class="btn btn-block btn-danger">
-          <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
-        </a>
-      </div>
+      
       <!-- /.social-auth-links -->
 
       <p class="mb-1">
@@ -97,9 +92,21 @@ $(document).ready(function() {
         var password = $('input[name="password"]').val();
         var rememberMe = $('#remember').is(':checked');
 
+        const idPasswordRegex = /^[a-zA-Z0-9]{4,}$/;
+        
         // 유효성 검사
         if (!userId || !password) {
             alert('아이디와 비밀번호를 입력해 주세요.');
+            return;
+        }
+        
+        if (!userId || !idPasswordRegex.test(userId)) {
+            alert('아이디는 영문자와 숫자로만 이루어져야 하며, 최소 4글자 이상이어야 합니다.');
+            return;
+        }
+
+        if (!password || !idPasswordRegex.test(password)) {
+            alert('비밀번호는 영문자와 숫자로만 이루어져야 하며, 최소 4글자 이상이어야 합니다.');
             return;
         }
 

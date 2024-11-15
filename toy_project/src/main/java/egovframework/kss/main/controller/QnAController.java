@@ -93,23 +93,21 @@ public class QnAController {
 			params.put("searchKeyword", searchKeyword);
 			model.addAttribute("searchKeyword", searchKeyword);
 		} else {
-			params.remove("searchKeyword"); // 빈 문자열일 경우 params에서 제거
+			params.remove("searchKeyword");
 		}
 
-		// division_id가 빈 문자열이 아닌 경우에만 params에 추가
 		if (divisionId != null && !divisionId.isEmpty()) {
-			params.put("division_id", Integer.parseInt(divisionId)); // Integer로 변환
+			params.put("division_id", Integer.parseInt(divisionId));
 			model.addAttribute("divisionId", divisionId);
 		} else {
-			params.remove("division_id"); // division_id가 없을 경우 params에서 제거
+			params.remove("division_id");
 		}
 
-		// checked_id가 빈 문자열이 아닌 경우에만 params에 추가
 		if (checkedId != null && !checkedId.isEmpty()) {
-			params.put("checked_id", Integer.parseInt(checkedId)); // Integer로 변환
+			params.put("checked_id", Integer.parseInt(checkedId));
 			model.addAttribute("checkedId", checkedId);
 		} else {
-			params.remove("checked_id"); // checked_id가 없을 경우 params에서 제거
+			params.remove("checked_id");
 		}
 
 		Map<String, Object> resultMap = qnAService.selectPageList(params);
@@ -124,7 +122,7 @@ public class QnAController {
 			totalCount = 0; // 기본값 설정
 		}
 
-		model.addAttribute("count", totalCount); // 모델에 추가
+		model.addAttribute("count", totalCount);
 
 		List<?> checked = qnAService.selectCheckedList();
 		model.addAttribute("checked", checked);
@@ -132,8 +130,7 @@ public class QnAController {
 		List<?> division = qnAService.selectDivisionList();
 		model.addAttribute("division", division);
 
-		// 포워딩할 경로 지정
-		return "bbs/qnaList"; // ModelAndView 대신 String 반환
+		return "bbs/qnaList";
 	}
 
 	@RequestMapping(value = "registerQnAPage.do")

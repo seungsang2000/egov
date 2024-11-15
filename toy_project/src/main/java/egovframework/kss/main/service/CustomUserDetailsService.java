@@ -25,6 +25,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 		}
 
 		// UserDetails 객체 생성 및 반환
-		return new CustomUserDetails(userVO.getUser_id(), userVO.getPassword(), userVO.getRole(), userVO.getName(), userVO.getImage_path());
+		return new CustomUserDetails(userVO.getUser_id(), userVO.getPassword(), userVO.getRole(), userVO.getName(), userVO.getImage_path(), userVO.getId());
 	}
 }
