@@ -20,4 +20,5 @@ public class CourseVO {
 	private boolean enrolled = false;
 	private int studentCount;
 	private String image_path;
+	private int max_students;
 }

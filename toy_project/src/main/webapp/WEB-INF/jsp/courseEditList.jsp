@@ -47,49 +47,67 @@
                             <th style="width: 20%">강좌</th>
                             <th style="width: 15%">이미지</th>
                             <th style="width: 15%">수강 인원</th>
-                            <th>Project Progress</th>
+                            <th>신청현황</th>
                             <th style="width: 8%" class="text-center">상태</th>
                             <th style="width: 20%"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="course" items="${courseList}"  varStatus="status">
-    <tr>
-        <td>${status.index + 1}</td>
-        <td>
-            <a>${course.title}</a>
-            <br/>
-            <small>Created <fmt:formatDate value="${course.created_at}" pattern="yyyy-MM-dd" /></small>
-        </td>
-        <td>
-            <ul class="list-inline">
-                <li class="list-inline-item">
-                <img src="/${course.image_path}" 
-                             alt="이미지 없음" 
-                             class="table-avatar" 
-                             onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
-                </li>
-            </ul>
-        </td>
-        <td><i class="fas fa-user-friends" style="margin-right: 5px; color: #007bff;"></i>
-    <span style="color: #333;">${course.studentCount}명</span></td>
-        <td class="project_progress">
-            <div class="progress progress-sm">
-                <div class="progress-bar bg-green" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
-                </div>
-            </div>
-            <small>50% Complete</small>
-        </td>
-        <td class="project-state">
-            <span class="badge ${course.status == '비공개' ? 'badge-danger' : 'badge-success'}">${course.status}</span>
-        </td>
-        <td class="project-actions text-right">
-            <a class="btn btn-info btn-sm" href="/couresEdit.do?courseId=${course.id}">
-                 <i class="fas fa-pencil-alt"></i> Edit
-            </a>
-        </td>
-    </tr>
-</c:forEach>
+<c:choose>
+    <c:when test="${empty courseList}">
+        <tr>
+            <td colspan="8" class="text-center">검색 결과가 없습니다.</td>
+        </tr>
+    </c:when>
+    <c:otherwise>
+        <c:forEach var="course" items="${courseList}" varStatus="status">
+            <tr>
+                <td>${status.index + 1}</td>
+                <td>
+                    <a>${course.title}</a>
+                    <br/>
+                    <small>Created <fmt:formatDate value="${course.created_at}" pattern="yyyy-MM-dd" /></small>
+                </td>
+                <td>
+                    <ul class="list-inline">
+                        <li class="list-inline-item">
+                            <img src="/${course.image_path}" 
+                                 alt="이미지 없음" 
+                                 class="table-avatar" 
+                                 onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';">
+                        </li>
+                    </ul>
+                </td>
+                <td>
+                    <i class="fas fa-user-friends" style="margin-right: 5px; color: #007bff;"></i>
+                    <span style="color: #333;">${course.studentCount} / ${course.max_students}명</span>
+                </td>
+                <td class="project_progress">
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-green" role="progressbar" 
+                             aria-valuenow="${course.studentCount / course.max_students * 100}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100" 
+                             style="width: ${course.studentCount / course.max_students * 100}%">
+                        </div>
+                    </div>
+                    <small>${Math.round((course.studentCount / course.max_students) * 100)}% 신청</small>
+                </td>
+                <td class="project-state">
+                    <span class="badge ${course.status == '비공개' ? 'badge-danger' : 'badge-success'}">${course.status}</span>
+                </td>
+                <td class="project-actions text-right">
+                    <a class="btn btn-info btn-sm" href="/courseEdit.do?courseId=${course.id}">
+                        <i class="fas fa-pencil-alt"></i> 수정
+                    </a>
+                    <a class="btn btn-danger btn-sm" href="#" onclick="confirmDelete(${course.id})">
+                        <i class="fas fa-trash"></i> 삭제
+                    </a>
+                </td>
+            </tr>
+        </c:forEach>
+    </c:otherwise>
+</c:choose>
                     </tbody>
                 </table>
             </div>
@@ -102,38 +120,27 @@
   </div>
   <!-- /.content-wrapper -->
 
-  <script>
-$(document).ready(function() {
-    $('.enroll-button').on('click', function() {
-        console.log("...........");
-        var courseId = $(this).data('course-id');
-        var csrfToken = $('meta[name="_csrf"]').attr('content');
-        
+<script>
+function confirmDelete(courseId) {
+    if (confirm('삭제하시겠습니까?')) {
         $.ajax({
-            url: '/courseEnroll.do',
-            type: 'POST',
-            data: {
-                courseId: courseId
-            },
+            url: '/courseDelete.do?id=' + courseId, // 요청 URL
+            type: 'DELETE', // 요청 메서드
             beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // CSRF 토큰 추가
+                xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
             },
-            success: function(response) {
-                if (response.success) {
-                    alert(response.message);
-                    location.reload();
-                } else {
-                    alert('강좌 등록에 실패했습니다: ' + response.message);
-                }
+            success: function(result) {
+                alert('삭제되었습니다.');
+                window.location.reload(); // 페이지 새로고침
             },
-            error: function() {
-                alert('서버 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+            error: function(xhr, status, error) {
+                alert('삭제에 실패했습니다: ' + xhr.responseText);
             }
         });
-    });
-});
-</script>
+    }
+}
 
+</script>
 
 
   <%@ include file="/WEB-INF/jsp/include/footer.jsp" %>

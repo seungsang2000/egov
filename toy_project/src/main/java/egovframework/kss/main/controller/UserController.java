@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -34,7 +35,9 @@ import org.springframework.web.multipart.MultipartFile;
 import egovframework.kss.main.dto.PasswordKeyDTO;
 import egovframework.kss.main.dto.UserRegisterDTO;
 import egovframework.kss.main.exception.CustomException;
+import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.service.UserService;
+import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.UserVO;
 
 @Controller
@@ -44,6 +47,9 @@ public class UserController {
 
 	@Resource(name = "UserService")
 	UserService userService;
+
+	@Resource(name = "CourseService")
+	private CourseService courseService;
 
 	@Autowired
 	@Qualifier("authenticationManager") // 명시적으로 빈 이름을 지정
@@ -260,12 +266,14 @@ public class UserController {
 		String sessionKey = (String) session.getAttribute("authKey");
 		String sessionEmail = (String) session.getAttribute("email");
 		String errorMessage = null;
+		Map<String, Object> params = new HashMap<>();
+		params.put("email", sessionEmail);
+		params.put("key", sessionKey);
+
 		if (sessionKey == null || sessionEmail == null) {
 			errorMessage = "접근이 제한된 페이지 입니다.";
 		} else {
-			Map<String, Object> params = new HashMap<>();
-			params.put("email", sessionEmail);
-			params.put("key", sessionKey);
+
 			PasswordKeyDTO passwordKeyDTO = userService.getPasswordKeyByKeyAndEmail(params);
 			if (passwordKeyDTO != null) {
 				// 인증 키가 존재하는 경우
@@ -283,6 +291,7 @@ public class UserController {
 		} else {
 			response.put("success", true);
 			response.put("message", "비밀번호가 변경되었습니다");
+			userService.deletePasswordKeyByKeyAndEmail(params);
 		}
 
 		return response;
@@ -293,6 +302,9 @@ public class UserController {
 
 		UserVO user = userService.getCurrentUser();
 		model.addAttribute("user", user);
+		List<CourseVO> courseList = courseService.selectMyCourseList(user.getId());
+		// 모델에 강좌 목록 추가
+		model.addAttribute("list", courseList);
 		model.addAttribute("pageName", "myPage");
 
 		return "user/profile";

@@ -21,16 +21,41 @@
     <intercept-url pattern="/user/checkEmail.do" access="permitAll" />
     <intercept-url pattern="/user/forgotPassword.do" access="permitAll" />
     <intercept-url pattern="/user/emailCheck.do" access="permitAll" />
+    <intercept-url pattern="/video/**" access="permitAll" />
     <intercept-url pattern="/user/verifyAuthKey.do" access="permitAll" />
     <intercept-url pattern="/user/resetPassword.do" access="permitAll" />
     <intercept-url pattern="/courseCreate.do" access="hasAuthority('admin')" />
     <intercept-url pattern="/testCreatePage.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/courseEditList.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/courseEdit.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/courseUpdate.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/testDelete.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/courseDelete.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/changeTestTime.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/testComplete.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/testVideo.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/viewTestVideo.do" access="hasAuthority('admin')" />
+   
     <intercept-url pattern="/question/questionCreate.do" access="hasAuthority('admin')" />
     <intercept-url pattern="/question/testCreate.do" access="hasAuthority('admin')" />
     <intercept-url pattern="/question/testDelete.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/questionCreate.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/testEdit.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/questionDelete.do" access="hasAuthority('admin')" />
+    
     <intercept-url pattern="/question/testView.do" access="hasAuthority('admin')" />
     <intercept-url pattern="/question/questionUpdate.do" access="hasAuthority('admin')" />
     <intercept-url pattern="/question/testComplete.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/testReEdit.do" access="hasAuthority('admin')" />
+    <intercept-url pattern="/question/testGrading.do" access="hasAuthority('admin')" />
+
+    
+    <intercept-url pattern="/courseEnroll.do" access="hasAuthority('user')" />
+    <intercept-url pattern="/courseEnrollEdit.do" access="hasAuthority('user')" />
+    <intercept-url pattern="/courseEnroll.do" access="hasAuthority('user')" />
+    <intercept-url pattern="/question/solveTest.do" access="hasAuthority('user')" />
+    <intercept-url pattern="/question/userFinishTest.do" access="hasAuthority('user')" />
+    <intercept-url pattern="/question/startTestPage.do" access="hasAuthority('user')" />
     
     <intercept-url pattern="/stomp/**" access="permitAll" />
     <intercept-url pattern="/ws/**" access="permitAll" />

@@ -53,6 +53,18 @@ public class UserDAO {
 		return userMapper.getPasswordKeyByKeyAndEmail(params);
 	}
 
+	public void deletePasswordKeyByEmail(String email) {
+		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+		userMapper.deletePasswordKeyByEmail(email);
+
+	}
+
+	public void deletePasswordKeyByKeyAndEmail(Map<String, Object> params) {
+		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+		userMapper.deletePasswordKeyByKeyAndEmail(params);
+
+	}
+
 	public UserVO selectUserByEmail(String email) {
 		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 		return userMapper.selectUserByEmail(email);
@@ -77,6 +89,11 @@ public class UserDAO {
 	public UserVO selectUserByUserId(String username) {
 		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 		return userMapper.selectUserByUserId(username);
+	}
+
+	public UserVO selectUserById(int id) {
+		UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+		return userMapper.selectUserById(id);
 	}
 
 }

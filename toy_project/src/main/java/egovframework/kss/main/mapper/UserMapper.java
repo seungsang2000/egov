@@ -25,6 +25,10 @@ public interface UserMapper {
 
 	PasswordKeyDTO getPasswordKeyByKeyAndEmail(Map<String, Object> params);
 
+	void deletePasswordKeyByEmail(String email);
+
+	void deletePasswordKeyByKeyAndEmail(Map<String, Object> params);
+
 	void updatePassword(UserVO user);
 
 	boolean checkExistUserEmailForUpdate(Map<String, Object> params);
@@ -32,5 +36,7 @@ public interface UserMapper {
 	void updateUser(UserVO user);
 
 	UserVO selectUserByUserId(String username);
+
+	UserVO selectUserById(int id);
 
 }

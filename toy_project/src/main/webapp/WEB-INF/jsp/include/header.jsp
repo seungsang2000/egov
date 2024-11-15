@@ -41,6 +41,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="/resources/dist/css/adminlte.min.css">
   
   <!-- REQUIRED SCRIPTS -->
+  
+  <!-- video.js -->
+  <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet" />
+<script src="https://vjs.zencdn.net/7.15.4/video.min.js"></script>
 
 <!-- jQuery -->
 <script src="/resources/plugins/jquery/jquery.min.js"></script>
@@ -66,39 +70,54 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <li class="nav-item d-none d-sm-inline-block">
         <a href="/" class="nav-link">Home</a>
       </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Contact</a>
-      </li>
     </ul>
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
+    <c:if test="${pageName == 'courseEnroll' || pageName == 'courseEdit'}">
       <!-- Navbar Search -->
       <li class="nav-item">
         <a class="nav-link" data-widget="navbar-search" href="#" role="button">
           <i class="fas fa-search"></i>
         </a>
+        
         <div class="navbar-search-block">
-          <form class="form-inline">
-            <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-              <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                  <i class="fas fa-search"></i>
-                </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-          </form>
+          <form class="form-inline" method="get" onsubmit="return submitSearchForm(this);">
+    <div class="input-group input-group-sm">
+        <input class="form-control form-control-navbar" type="search" name="search" placeholder="Search" aria-label="Search">
+        <div class="input-group-append">
+            <button class="btn btn-navbar" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</form>
         </div>
       </li>
-
+      </c:if>
+	      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-comments"></i>
+          <span class="badge badge-danger navbar-badge" id="DMnotification-count" style="display: none">0</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="DMnotification-dropdown">
+        <span class="dropdown-header">채팅 알림</span>
+        <div class="dropdown-divider"></div>
+        <div id="DMnotification-items"></div> <!-- 알림 항목을 추가할 곳 -->
+        <div class="dropdown-divider"></div>
+          
+         
+         
+          <a href="javascript:void(0);" class="dropdown-item dropdown-footer" onclick="deleteAllDM()">알림 모두 삭제</a>
+        </div>
+      </li>
       <li class="nav-item dropdown">
     <a class="nav-link" data-toggle="dropdown" href="#">
         <i class="far fa-bell"></i>
-        <span class="badge badge-warning navbar-badge" id="notification-count">0</span>
+        <span class="badge badge-warning navbar-badge" id="notification-count" style="display: none">0</span>
     </a>
     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notification-dropdown">
         <span class="dropdown-header">알림</span>
@@ -153,16 +172,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </div>
 
       <!-- SidebarSearch Form -->
-      <div class="form-inline">
-        <div class="input-group" data-widget="sidebar-search">
-          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-sidebar">
-              <i class="fas fa-search fa-fw"></i>
-            </button>
-          </div>
-        </div>
-      </div>
+
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
@@ -194,7 +204,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </sec:authorize>
             </ul>
           </li>
-          <sec:authorize access="hasAuthority('admin')">
+          
           <li class="nav-item menu-open">
           <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-edit"></i>
@@ -203,6 +213,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
+            <sec:authorize access="hasAuthority('admin')">
             <ul class="nav nav-treeview">
             <li class="nav-item">
                 <a href="/courseCreate.do" class="nav-link <c:if test="${pageName == 'courseCreate'}">active</c:if>">
@@ -217,8 +228,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
             </ul>
+            </sec:authorize>
+            <sec:authorize access="hasAuthority('user')">
+            <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="/courseEnrollEdit.do" class="nav-link <c:if test="${pageName == 'courseEnrollEdit'}">active</c:if>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>등록 강좌 관리</p>
+                </a>
+              </li>
+            </ul>
+            </sec:authorize>
           </li>
-          </sec:authorize>
+          
           <li class="nav-item menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -245,6 +267,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </sec:authorize>
               <form id="logoutForm" action="/user/logout.do" method="post" style="display: none;">
     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+<input type="hidden" id="user_id" value="<sec:authentication property="principal.id" />">
 </form>
 <sec:authorize access="isAuthenticated()">
 <li class="nav-item">
@@ -274,15 +297,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </sec:authorize>
             </ul>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Simple Link
-                <span class="right badge badge-danger">New</span>
-              </p>
-            </a>
-          </li>
+
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -319,10 +334,10 @@ function connect() {
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {
-        console.log('Connected: ' + frame);
+        
 
         const courseIds = JSON.parse('${sessionScope.courseIds}'); 
-        console.log(courseIds); 
+        
 
         
         courseIds.forEach(courseId => {
@@ -337,11 +352,75 @@ function connect() {
 
        
         stompClient.subscribe('/topic/messages', function (message) {
-            
             const data = JSON.parse(message.body);
             showNotification(data);
         });
     });
+}
+
+function connectDM() {
+    const socket = new SockJS('/stomp'); 
+    stompClient3 = Stomp.over(socket);
+
+    stompClient3.connect({}, function (frame) {
+        
+
+        const userId = document.getElementById('user_id').value;
+        
+            stompClient3.subscribe('/topic/course/'+userId+'/DM', function (message) {
+                    
+                const data = JSON.parse(message.body);
+                
+                
+                
+                showDM(data)
+                
+             });
+    });
+}
+
+
+function showDM(data){
+    const DMs = document.getElementById('DMnotification-items');
+    const newDM = document.createElement('a');
+    newDM.classList.add('dropdown-item');
+    newDM.innerHTML = '<div class="media"><img src="/'+data.sender_image+'" alt="User Avatar" class="img-size-50 mr-3 img-circle"><div class="media-body"><h3 class="dropdown-item-title">'
+        +data.sender+'<span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span></h3><p class="text-sm">'+data.content+'</p><p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>' 
+        +new Date(data.created_at).toLocaleString()+'</p></div></div>'
+        
+        newDM.onclick = function() {
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content
+            
+            fetch('/DM.do?id='+data.message_id, {
+                method: 'DELETE',
+                headers: {
+                    [csrfHeader]: csrfToken 
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/chat.do?id=' + data.course_id+'&messageId='+data.message_id;
+                } else {
+                    console.error('알림 삭제 실패');
+                }
+            })
+            .catch(error => console.error('Error deleting notification:', error));
+        };
+   
+        
+        
+        
+    DMs.insertBefore(newDM, DMs.firstChild);     
+        
+    const DMCount = document.getElementById('DMnotification-count');
+    DMCount.innerText = parseInt(DMCount.innerText) + 1;
+    
+    if (parseInt(DMCount.innerText) === 0) {
+        DMCount.style.display = 'none';
+    } else {
+        DMCount.style.display = 'block';  // 필요하면 다시 보이게 할 수 있음
+    }
 }
 
 function showNotification(data) {
@@ -377,6 +456,12 @@ function showNotification(data) {
     
     const notificationCount = document.getElementById('notification-count');
     notificationCount.innerText = parseInt(notificationCount.innerText) + 1;
+    
+    if (parseInt(notificationCount.innerText) === 0) {
+        notificationCount.style.display = 'none';
+    } else {
+        notificationCount.style.display = 'block';  // 필요하면 다시 보이게 할 수 있음
+    }
 }
 
 function loadNotifications() {
@@ -390,10 +475,23 @@ function loadNotifications() {
         .catch(error => console.error('Error loading notifications:', error));
 }
 
+function loadDMs() {
+    fetch('/DMs.do')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(DM => {
+                showDM(DM);
+            });
+        })
+        .catch(error => console.error('Error loading DMs:', error));
+}
+
 
 window.onload = function() {
     loadNotifications();
+    loadDMs()
     connect();
+    connectDM();
 };
 
 function sendMessage() {
@@ -420,12 +518,53 @@ function sendMessage() {
                 // 알림 삭제 후 UI 업데이트
                 document.getElementById('notification-items').innerHTML = ''; // UI에서 알림 제거
                 document.getElementById('notification-count').innerText = '0'; // 알림 카운트 초기화
-                console.log('모든 알림이 삭제되었습니다.');
+                document.getElementById('notification-count').style.display = 'none';
+                
             } else {
                 console.error('알림 삭제 실패');
             }
         })
         .catch(error => console.error('Error deleting notifications:', error));
+    }
+    
+    function deleteAllDM(){
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+        fetch('/allDMs', {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // 알림 삭제 후 UI 업데이트
+                document.getElementById('DMnotification-items').innerHTML = ''; // UI에서 알림 제거
+                document.getElementById('DMnotification-count').innerText = '0'; // 알림 카운트 초기화
+                document.getElementById('DMnotification-count').style.display = 'none';
+                
+            } else {
+                console.error('알림 삭제 실패');
+            }
+        })
+        .catch(error => console.error('Error deleting DMnotifications:', error));
+    }
+    
+    function submitSearchForm(form) {
+        // 현재 URL 가져오기
+        const currentUrl = window.location.href.split('?')[0]; // 쿼리 파라미터 제거
+
+        // 검색어 가져오기
+        const searchQuery = form.search.value;
+
+        // 새로운 URL 생성
+        const newUrl = currentUrl + "?search=" + encodeURIComponent(searchQuery);
+
+        
+        window.location.href = newUrl;
+
+       
+        return false;
     }
 
 </script>

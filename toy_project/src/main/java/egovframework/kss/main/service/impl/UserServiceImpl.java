@@ -90,6 +90,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public void deletePasswordKeyByEmail(String email) {
+		userDAO.deletePasswordKeyByEmail(email);
+	}
+
+	@Override
+	public void deletePasswordKeyByKeyAndEmail(Map<String, Object> params) {
+		userDAO.deletePasswordKeyByKeyAndEmail(params);
+
+	}
+
+	@Override
 	public UserVO selectUserByEmail(String email) {
 		return userDAO.selectUserByEmail(email);
 	}
@@ -123,6 +134,8 @@ public class UserServiceImpl implements UserService {
 
 			sender.send(message);
 
+			deletePasswordKeyByEmail(tomail);
+
 			PasswordKeyDTO passwordKeyDTO = new PasswordKeyDTO();
 			passwordKeyDTO.setCreated_at(Timestamp.from(Instant.now()));
 			passwordKeyDTO.setEmail(tomail);
@@ -131,6 +144,7 @@ public class UserServiceImpl implements UserService {
 			insertPasswordKey(passwordKeyDTO);
 
 			response.put("success", true);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.put("success", false);
@@ -193,13 +207,18 @@ public class UserServiceImpl implements UserService {
 		Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
 
 		// 새로운 UserDetails 생성 (CustomUserDetails 또는 현재 사용 중인 인증 객체의 UserDetails)
-		CustomUserDetails updatedUserDetails = new CustomUserDetails(updatedUser.getUser_id(), updatedUser.getPassword(), updatedUser.getRole(), updatedUser.getName(), updatedUser.getImage_path());
+		CustomUserDetails updatedUserDetails = new CustomUserDetails(updatedUser.getUser_id(), updatedUser.getPassword(), updatedUser.getRole(), updatedUser.getName(), updatedUser.getImage_path(), updatedUser.getId());
 
 		// 새로운 Authentication 객체 생성
 		Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUserDetails, currentAuth.getCredentials(), updatedUserDetails.getAuthorities());
 
 		// SecurityContext에 새로운 인증 정보 설정
 		SecurityContextHolder.getContext().setAuthentication(newAuth);
+	}
+
+	@Override
+	public UserVO selectUserById(int id) {
+		return userDAO.selectUserById(id);
 	}
 
 }

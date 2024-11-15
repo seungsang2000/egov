@@ -3,17 +3,21 @@ package egovframework.kss.main.mapper;
 import java.util.List;
 import java.util.Map;
 
+import egovframework.kss.main.dto.ChatDTO;
+import egovframework.kss.main.dto.CourseDetailDTO;
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.dto.CourseScoreDTO;
 import egovframework.kss.main.dto.CourseUserCountDTO;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.EnrollmentVO;
 import egovframework.kss.main.vo.TestVO;
+import egovframework.kss.main.vo.UserVO;
+import egovframework.kss.main.vo.messageVO;
 
 public interface CourseMapper {
 	List<CourseVO> selectCourseList();
 
-	List<CourseVO> selectEditCourseList(Integer currentUserId);
+	List<CourseVO> selectEditCourseList(Map<String, Object> params);
 
 	List<CourseVO> selectMyCourseList(Integer currentUserId);
 
@@ -21,9 +25,11 @@ public interface CourseMapper {
 
 	void enrollUserInCourse(EnrollmentVO enrollmentVO);
 
-	List<CourseEnrollListDTO> selectCourseEnrollList(Integer currentUserId);
+	List<CourseEnrollListDTO> selectCourseEnrollList(Map<String, Object> params);
 
 	CourseVO selectCourseById(Integer id);
+
+	CourseDetailDTO selectCourseDetailById(Integer id);
 
 	void registerTest(TestVO test);
 
@@ -33,7 +39,13 @@ public interface CourseMapper {
 
 	void deleteTest(Integer testId);
 
+	void deleteCourse(Integer courseId);
+
+	void updateTestTime(TestVO test);
+
 	void completeTest(int testId);
+
+	void incompleteTest(int testId);
 
 	TestVO selectTestById(int testId);
 
@@ -45,6 +57,22 @@ public interface CourseMapper {
 
 	void updateCourse(CourseVO courseVO);
 
-	List<Integer> getUsersByCourseId(int courseId);
+	List<Integer> getUsersIdByCourseId(int courseId);
+
+	void insertMessage(messageVO messageVO);
+
+	List<ChatDTO> selectMessageByCourseIdAndUserId(Map<String, Object> params);
+
+	List<UserVO> selectUsersByCourseId(int courseId);
+
+	int getEnrolledCoursesCountById(int userId);
+
+	List<CourseVO> selectCourseEnrollEditList(int userId);
+
+	void CancelEnrollment(Map<String, Object> params);
+
+	int enrollmentCountByCourseId(int courseId);
+
+	boolean isExamRegisteredForCourse(int courseId);
 
 }

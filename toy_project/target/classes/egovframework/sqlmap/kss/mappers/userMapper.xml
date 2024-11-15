@@ -44,6 +44,15 @@ ORDER BY created_at DESC
 LIMIT 1;
 </select>
 
+	<delete id="deletePasswordKeyByEmail" parameterType="String">
+	delete from password_key where email = #{email}
+	</delete>
+
+
+	<delete id="deletePasswordKeyByKeyAndEmail" parameterType="map">
+	delete from password_key where email = #{email} AND key = #{key}
+	</delete>
+
 	<update id="updatePassword" parameterType="egovframework.kss.main.vo.UserVO">
 	update users set password = #{password} where id=#{id}
 	</update>
@@ -54,6 +63,11 @@ LIMIT 1;
 	
 	<select id="selectUserByUserId" parameterType="String" resultType="egovframework.kss.main.vo.UserVO">
 		select * from users where user_id=#{username}
+	
+	</select>
+	
+	<select id="selectUserById" parameterType="int" resultType="egovframework.kss.main.vo.UserVO">
+		select * from users where id=#{id}
 	
 	</select>
 

@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
     
 <%@ include file="/WEB-INF/jsp/include/header.jsp" %>
@@ -65,7 +65,7 @@
                   </li>
                 </ul>
 
-                <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>
+                
               </div>
               <!-- /.card-body -->
             </div>
@@ -77,37 +77,25 @@
                 <h3 class="card-title">강좌</h3>
               </div>
               <!-- /.card-header -->
-              <div class="card-body">
-                <strong><i class="fas fa-book mr-1"></i> Education</strong>
+<div class="card-body">
+    <c:forEach var="course" items="${list}" varStatus="status">
+        <strong>
+            <a data-toggle="collapse" href="#collapse${status.index}" role="button" aria-expanded="false" aria-controls="collapse${status.index}">
+                ${course.title}
+            </a>
+        </strong>
 
-                <p class="text-muted">
-                  B.S. in Computer Science from the University of Tennessee at Knoxville
-                </p>
+        <div class="collapse" id="collapse${status.index}">
+            <p class="text-muted card-description">
+                ${course.description}
+            </p>
+        </div>
 
-                <hr>
-
-                <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
-
-                <p class="text-muted">Malibu, California</p>
-
-                <hr>
-
-                <strong><i class="fas fa-pencil-alt mr-1"></i> Skills</strong>
-
-                <p class="text-muted">
-                  <span class="tag tag-danger">UI Design</span>
-                  <span class="tag tag-success">Coding</span>
-                  <span class="tag tag-info">Javascript</span>
-                  <span class="tag tag-warning">PHP</span>
-                  <span class="tag tag-primary">Node.js</span>
-                </p>
-
-                <hr>
-
-                <strong><i class="far fa-file-alt mr-1"></i> Notes</strong>
-
-                <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fermentum enim neque.</p>
-              </div>
+        <c:if test="${!status.last}">
+            <hr>
+        </c:if>
+    </c:forEach>
+</div>
               <!-- /.card-body -->
             </div>
             <!-- /.card -->
@@ -139,8 +127,19 @@
                       <div class="form-group row">
                         <label for="inputImage" class="col-sm-2 col-form-label">유저 이미지</label>
                         <div class="col-sm-10">
-                          <input id="inputImage" type="file" name="uploadFile" class="form-control" accept="image/*">
-                        </div>
+                        <!-- 파일 선택 버튼 -->
+        
+                        
+                        <!-- 현재 이미지 미리보기 -->
+        <div><img id="currentImage" src="/${user.image_path}" alt="현재 이미지" class="img-thumbnail" onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/question_mark.png';" style="max-width: 100px; max-height: 100px; margin-bottom: 10px;">
+        </div>
+        <!-- 숨겨진 파일 입력 -->
+        <input id="inputImage" type="file" name="uploadFile" class="d-none" accept="image/*">
+        <div><button type="button" class="btn btn-primary" id="uploadButton">파일 선택</button></div>
+        
+        
+                        
+                        	</div>
                       </div>
                       <div class="form-group row">
                         <div class="offset-sm-2 col-sm-10">
@@ -177,6 +176,16 @@
 
 
 <script>
+function toggleDescription(element) {
+    if (element.classList.contains("text-truncate")) {
+      element.classList.remove("text-truncate");
+      element.innerText = element.getAttribute("data-full-text"); // 전체 텍스트 표시
+    } else {
+      element.classList.add("text-truncate");
+      element.innerText = element.getAttribute("data-short-text"); // 축소된 텍스트 표시
+    }
+  }
+
 function validateForm() {
     const email = $('#inputEmail').val();
     const privacyAgreement = $('#privacyAgreement').is(':checked');
@@ -217,8 +226,33 @@ function validateForm() {
         }
     });
 
-    return false; // 폼 제출 방지
+    return false;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const inputImage = document.getElementById('inputImage');
+    const uploadButton = document.getElementById('uploadButton');
+    const currentImage = document.getElementById('currentImage');
+
+    
+    inputImage.value = '';
+
+    
+    uploadButton.addEventListener('click', function() {
+        inputImage.click();
+    });
+
+   
+    inputImage.addEventListener('change', function(event) {
+        if (inputImage.files && inputImage.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImage.src = e.target.result;
+            }
+            reader.readAsDataURL(inputImage.files[0]);
+        }
+    });
+});
 </script>
 
 

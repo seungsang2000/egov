@@ -25,6 +25,10 @@ public interface UserService {
 
 	PasswordKeyDTO getPasswordKeyByKeyAndEmail(Map<String, Object> params);
 
+	void deletePasswordKeyByEmail(String email);
+
+	void deletePasswordKeyByKeyAndEmail(Map<String, Object> params);
+
 	UserVO selectUserByEmail(String email);
 
 	Map<String, Object> sendMail(String email);
@@ -42,4 +46,6 @@ public interface UserService {
 	UserVO getCurrentUser();
 
 	void updateAuthentication(UserVO updatedUser);
+
+	UserVO selectUserById(int id);
 }

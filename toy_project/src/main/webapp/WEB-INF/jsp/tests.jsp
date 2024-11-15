@@ -35,6 +35,17 @@
 	<!-- Main content -->
 	<section class="content">
 
+<ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link  active" href="#">시험 목록</a> <!-- 시험 목록 페이지 -->
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/chat.do?id=${course.id}">소통</a> <!-- 소통 페이지 -->
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/testVideo.do?id=${course.id}">시험영상</a> <!-- 소통 페이지 -->
+        </li>
+    </ul>
     <!-- Default box -->
     <div class="card">
         <div class="card-header">
@@ -59,9 +70,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach var="test" items="${list}">
+                    <c:forEach var="test" items="${list}" varStatus="status">
                         <tr>
-                            <td>#</td>
+                            <td>${status.index + 1}</td>
                             <td><a>${test.name}</a><br /><small>
                                 <fmt:formatDate value="${test.start_time}" pattern="yyyy-MM-dd HH:mm" /> ~ 
                                 <fmt:formatDate value="${test.end_time}" pattern="yyyy-MM-dd HH:mm" />
@@ -92,17 +103,29 @@
                                 </div>
                                 <small>${test.user_count} / ${totalStudent} (${Math.round((test.user_count / totalStudent) * 100)}% Complete)</small>
                             </td>
-                            <td class="project-state"><span class="badge badge-success">${test.status}</span></td>
+                            <td class="project-state">
+    <c:choose>
+        <c:when test="${test.status == '완료'}">
+            <span class="badge badge-success">${test.status}</span> <!-- 초록색 -->
+        </c:when>
+        <c:when test="${test.status == '작성중'}">
+            <span class="badge badge-danger">${test.status}</span> <!-- 빨간색 -->
+        </c:when>
+        <c:otherwise>
+            <span class="badge badge-secondary">${test.status}</span> <!-- 기본 색상 -->
+        </c:otherwise>
+    </c:choose>
+</td>
                             <td class="project-actions text-right">
                                 <c:choose>
                                     <c:when test="${test.status == '작성중'}">
-                                        <a class="btn btn-info btn-sm" href="/question/testEdit.do?testId=${test.id}">
-                                            <i class="fas fa-pencil-alt"></i> Edit
+                                        <a class="btn btn-info btn-sm btn-custom" href="/question/testEdit.do?testId=${test.id}">
+                                            <i class="fas fa-pencil-alt"></i> 수정
                                         </a>
                                     </c:when>
                                     <c:when test="${test.status == '완료'}">
-                                        <a class="btn btn-primary btn-sm" href="/question/testView.do?testId=${test.id}">
-                                            <i class="fas fa-eye"></i> View
+                                        <a class="btn btn-primary btn-sm btn-custom" href="/question/testView.do?testId=${test.id}">
+                                            <i class="fas fa-eye"></i> 검토
                                         </a>
                                     </c:when>
                                     <c:otherwise>
@@ -111,20 +134,25 @@
                                 </c:choose>
                                 <c:choose>
                                     <c:when test="${test.is_scored}">
-                                        <a class="btn btn-secondary btn-sm" href="#" disabled>
-                                            <i class="fas fa-check-square"></i> 채점
+                                        <a class="btn btn-secondary btn-sm btn-custom" href="#" disabled>
+                                            <i class="fas fa-check-square"></i> 완료
                                         </a>
                                     </c:when>
                                     <c:when test="${currentTime.time >= test.start_time.time && currentTime.time >= test.end_time.time && test.status == '완료'}">
-                                        <a class="btn btn-success btn-sm" href="#" onclick="confirmGrading(${test.id})">
+                                        <a class="btn btn-success btn-sm btn-custom" href="#" onclick="confirmGrading(${test.id})">
                                             <i class="fas fa-check-square"></i> 채점
                                         </a>
                                     </c:when>
-                                    <c:otherwise>
-                                        <a class="btn btn-danger btn-sm" href="#" onclick="confirmDelete(${test.id})">
-                                            <i class="fas fa-trash"></i> 삭제
-                                        </a>
-                                    </c:otherwise>
+    <c:when test="${test.status == '완료'}">
+        <a class="btn btn-warning btn-sm btn-custom" href="#" onclick="confirmReEdit(${test.id})">
+            <i class="fas fa-redo"></i> 편집
+        </a>
+    </c:when>
+    <c:otherwise>
+                <a class="btn btn-danger btn-sm btn-custom" href="#" onclick="confirmDelete(${test.id})">
+            <i class="fas fa-trash"></i> 삭제
+        </a>
+    </c:otherwise>
                                 </c:choose>
                             </td>
                         </tr>
@@ -179,6 +207,11 @@
     color: #28a745; /* 체크 아이콘 색상 */
     font-size: 1.5rem; /* 체크 아이콘 크기 조정 */
 }
+
+.btn-custom {
+    min-width: 65px; /* 최소 너비 설정 */
+    
+}
 </style>
 
 
@@ -197,6 +230,26 @@ function confirmDelete(testId) {
             },
             error: function(xhr, status, error) {
                 alert('삭제에 실패했습니다: ' + xhr.responseText);
+            }
+        });
+    }
+}
+
+function confirmReEdit(testId){
+    if (confirm('시험을 작성중으로 되돌리시겠습니까?\n시험에 응시한 학생이 있을 경우, 편집이 불가능합니다.')) {
+        $.ajax({
+            url: '/question/testReEdit.do', // 요청 URL
+            type: 'POST', // 요청 메서드
+            data: {id:testId},
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="_csrf"]').attr('content')); // CSRF 토큰 추가
+            },
+            success: function(result) {
+                alert('편집모드로 되돌아갑니다.');
+                window.location.reload(); // 페이지 새로고침
+            },
+            error: function(xhr, status, error) {
+                alert('편집모드로 되돌아가지 못하였습니다: ' + xhr.responseText);
             }
         });
     }

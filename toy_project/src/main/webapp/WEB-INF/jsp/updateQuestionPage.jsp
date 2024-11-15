@@ -22,11 +22,13 @@
 	</div>
 
 	<section class="content">
-		<form id="questionForm" onsubmit="return confirmUpdate();" method="post">
+		
+			<div class="row">
+			<div class="col-md-6">
+			<form id="questionForm" onsubmit="return confirmUpdate();" method="post">
 			<input type="hidden" name="test_id" value="${testId}" /> <input
 				type="hidden" name="questionId" value="${questionDetail.id}" />
-			<div class="row">
-				<div class="col-md-6">
+				
 					<div class="card card-primary">
 						<div class="card-header">
 							<h3 class="card-title">문제 수정</h3>
@@ -139,8 +141,11 @@
     <button type="submit" class="btn btn-primary">문제 수정</button>
 </div>
 						</div>
+						
 					</div>
+					</form>
 				</div>
+				
 
 				<div class="col-md-6">
 					<div class="card card-secondary">
@@ -176,13 +181,50 @@
 							</p>
 						</div>
 					</div>
+					<div class="card card-success collapsed-card">
+            <div class="card-header">
+                <h3 class="card-title">테스트 설정</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        <div class="card-body">
+<form id="testForm" method="post" onsubmit="changeTime(event); return false;">
+    <div class="form-group">
+        <label for="inputStartDateTime">시작일 및 시간</label>
+        <input type="datetime-local" id="StartDate" class="form-control" name="start_time" 
+               value="${test.start_time}" required>
+    </div>
+    <div class="form-group">
+        <label for="inputEndDateTime">종료일 및 시간</label>
+        <input type="datetime-local" id="EndDate" class="form-control" name="end_time" 
+               value="${test.end_time}" required>
+    </div>
+    <div class="form-group">
+        <label for="inputDuration">시험 시간 (분)</label>
+        <input type="number" id="inputDuration" class="form-control" name="time_limit" 
+               value="${test.time_limit}" required min="1" step="1">
+    </div>
+    <input type="hidden" name="test_id" value="${test.id}"> 
+    <div class="text-center mt-3">
+    <button type="submit" class="btn btn-success">설정 변경</button>
+    </div>
+</form>
+		</div>
+		
+    </div>
 				</div>
+				        
 			</div>
-		</form>
+		
 	</section>
 </div>
 
 <script>
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 function toggleFields() {
     var status = document.getElementById("inputStatus").value; // 현재 선택된 문제 형식
     var fields = {
@@ -337,16 +379,66 @@ function confirmUpdate() {
     return false;
 }
 
+const originOnload = window.onload
+
 window.onload = function() {
+    if(originOnload) originOnload();
     toggleFields();
 };
+
+function changeTime(event) {
+    event.preventDefault(); // 기본 form 제출 방지
+
+    const form = document.getElementById('testForm');
+    const formData = new FormData(form);
+    const testData = {};
+
+    formData.forEach((value, key) => {
+        testData[key] = value; // FormData에서 JSON 객체로 변환
+    });
+
+    
+    const startTime = new Date(testData.start_time);
+    const endTime = new Date(testData.end_time);
+    const timeLimitMinutes = parseInt(testData.time_limit, 10); // 시험 시간(분 단위)
+
+    const minimumEndTime = new Date(startTime.getTime() + timeLimitMinutes * 60000); // 시작 시간 + 시험 시간
+
+    if (endTime < minimumEndTime) {
+        alert("종료 시간은 시작 시간 이후 시험 시간보다 늦어야 합니다.");
+        return;
+    }
+    
+    
+
+    fetch('/changeTestTime.do', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken // CSRF 토큰 추가
+        },
+    body: JSON.stringify(testData), 
+    })
+    .then(response => {
+        if (response.ok) {
+            alert("설정이 변경되었습니다.");
+            window.location.reload(); // 페이지 리로드
+        } else {
+            alert("설정 변경이 실패했습니다.");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("서버와의 통신 중 오류가 발생했습니다.");
+    });
+}
 </script>
 
 <style>
 .score-text {
 	font-size: 30px; 
-	font-weight: bold; /* 굵게 설정 */
-	color: #007bff; /* 원하는 색상으로 설정 */
+	font-weight: bold; 
+	color: #007bff; 
 }
 </style>
 

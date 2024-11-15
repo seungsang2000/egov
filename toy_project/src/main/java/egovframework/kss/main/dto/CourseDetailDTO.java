@@ -9,15 +9,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CourseEnrollListDTO {
+public class CourseDetailDTO {
 	private int id;
+	private String instructor;
 	private String title;
 	private String description;
-	private String instructor;
-	private Timestamp created_at;
 	private String status;
-	private boolean enrolled;
+	private int instructor_id;
+	private Timestamp created_at;
+	private boolean enrolled = false;
 	private int studentCount;
-	private String instructor_image;
-	private String max_students;
+	private String course_image_path;
+	private String user_image_path;
+	private int max_students;
 }

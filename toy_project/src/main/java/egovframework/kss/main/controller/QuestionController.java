@@ -105,7 +105,7 @@ public class QuestionController {
 	
 			model.addAttribute("testId", testId);
 	
-			return "testEditPage";
+			return "createQuestionPage";
 		}*/
 
 	@RequestMapping(value = "/testEdit.do")
@@ -117,7 +117,7 @@ public class QuestionController {
 
 		TestVO test = courseService.selectTestById(testId);
 		CourseVO course = courseService.selectCourseById(test.getCourse_id());
-
+		model.addAttribute("test", test);
 		model.addAttribute("course", course);
 
 		if (questionId != null) {
@@ -134,7 +134,7 @@ public class QuestionController {
 			List<QuestionListDTO> questions = questionService.selectQuestionListsByTestId(testId);
 			model.addAttribute("questions", questions);
 
-			return "testEditPage";
+			return "createQuestionPage";
 		}
 
 	}
@@ -198,6 +198,7 @@ public class QuestionController {
 		CourseVO course = courseService.selectCourseById(test.getCourse_id());
 
 		model.addAttribute("course", course);
+		model.addAttribute("test", test);
 
 		return "updateQuestionPage";
 
@@ -274,6 +275,12 @@ public class QuestionController {
 		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
 
 		Timestamp now = new Timestamp(System.currentTimeMillis());
+
+		TestVO test = courseService.selectTestById(testId);
+		if (test.getEnd_time().before(now)) {
+			throw new CustomException("이미 완료된 시험입니다");
+		}
+
 		if (userParticipation != null) {
 			if (userParticipation.getEnd_time().before(now) || userParticipation.getStatus().equals("완료")) {
 				throw new CustomException("이미 완료된 시험입니다");
@@ -282,7 +289,6 @@ public class QuestionController {
 
 		if (!questionService.checkExamParticipationExists(params)) {
 			System.out.println("시험 응시 시작~~~~~~~~"); //유저 시험 참여
-			TestVO test = courseService.selectTestById(testId);
 
 			Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
@@ -290,7 +296,10 @@ public class QuestionController {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(startTime.getTime());
 			calendar.add(Calendar.MINUTE, test.getTime_limit());
-			Timestamp endTime = new Timestamp(calendar.getTimeInMillis());
+			Timestamp calculatedEndTime = new Timestamp(calendar.getTimeInMillis());
+			Timestamp existingEndTime = test.getEnd_time();
+
+			Timestamp endTime = calculatedEndTime.compareTo(existingEndTime) < 0 ? calculatedEndTime : existingEndTime;
 
 			String status = "시험중";
 			params.put("startTime", startTime);
@@ -306,6 +315,7 @@ public class QuestionController {
 		model.addAttribute("endTime", userParticipation.getEndTimeAsISO());
 
 		model.addAttribute("testId", testId);
+		model.addAttribute("userId", user.getId());
 		model.addAttribute("selectedQuestionId", questionId);
 
 		model.addAttribute("questions", questions);
@@ -330,7 +340,6 @@ public class QuestionController {
 			model.addAttribute("nextQuestionId", nextQuestionDetail.getId());
 		}
 
-		TestVO test = courseService.selectTestById(testId);
 		CourseVO course = courseService.selectCourseById(test.getCourse_id());
 
 		model.addAttribute("course", course);
@@ -351,8 +360,22 @@ public class QuestionController {
 		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
 
 		Timestamp now = new Timestamp(System.currentTimeMillis());
+
+		TestVO test = courseService.selectTestById(testId);
+
+		Timestamp endTime = test.getEnd_time();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(endTime.getTime());
+		calendar.add(Calendar.MINUTE, 1); // 1분 추가(제출시 네트워크 오류등 대비하기 위해, post제출은 제한시간+ 1분까지 허용)
+
+		if (calendar.getTimeInMillis() < now.getTime()) {
+			throw new CustomException("이미 완료된 시험입니다");
+		}
+
 		if (userParticipation != null) {
-			if (userParticipation.getEnd_time().before(now) || userParticipation.getStatus().equals("완료")) {
+			calendar.setTimeInMillis(userParticipation.getEnd_time().getTime());
+			calendar.add(Calendar.MINUTE, 1);
+			if (calendar.getTimeInMillis() < now.getTime() || userParticipation.getStatus().equals("완료")) {
 				throw new CustomException("이미 완료된 시험입니다");
 			}
 		}
@@ -384,7 +407,7 @@ public class QuestionController {
 		List<QuestionListDTO> questions = questionService.selectSloveQuestionListsByTestId(params);
 		model.addAttribute("questions", questions);
 		model.addAttribute("testId", testId);
-
+		model.addAttribute("userId", user.getId());
 		if (questionId != null) {
 			currentQuestionId = questionId;
 		} else {
@@ -415,7 +438,6 @@ public class QuestionController {
 			model.addAttribute("nextQuestionId", nextQuestionDetail.getId());
 		}
 
-		TestVO test = courseService.selectTestById(testId);
 		CourseVO course = courseService.selectCourseById(test.getCourse_id());
 
 		model.addAttribute("course", course);
@@ -507,13 +529,29 @@ public class QuestionController {
 		return "startTestPage";
 	}
 
+	@PostMapping("/testReEdit.do")
+	public ResponseEntity<String> testReEdit(@RequestParam("id") int testId) {
+		try {
+
+			if (questionService.checkParticipatedStudentExists(testId)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 시험에 응시한 학생이 있습니다.");
+			}
+
+			courseService.incompleteTest(testId);
+
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
 	@PostMapping("testGrading.do")
 	public ResponseEntity<Void> testGrading(@RequestParam("id") int testId) { //ResponseEntity도 함 써보자
 		try {
 			TestVO test = courseService.selectTestById(testId);
 			CourseVO course = courseService.selectCourseById(test.getCourse_id());
 			String messageText = course.getTitle() + " 강좌에서 " + test.getName() + " 시험의 채점이 완료되었습니다";
-			notificationService.sendMessageByTestId(testId, messageText);
+			notificationService.sendNotificationByTestId(testId, messageText);
 
 			questionService.testGrading(testId);
 			return ResponseEntity.ok().build();

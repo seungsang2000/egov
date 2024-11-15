@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import egovframework.kss.main.dao.CourseDAO;
+import egovframework.kss.main.dto.ChatDTO;
+import egovframework.kss.main.dto.CourseDetailDTO;
 import egovframework.kss.main.dto.CourseEnrollListDTO;
 import egovframework.kss.main.dto.CourseScoreDTO;
 import egovframework.kss.main.dto.CourseUserCountDTO;
@@ -18,6 +20,7 @@ import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.EnrollmentVO;
 import egovframework.kss.main.vo.TestVO;
 import egovframework.kss.main.vo.UserVO;
+import egovframework.kss.main.vo.messageVO;
 
 @Service("CourseService")
 public class CourseServiceImpl implements CourseService {
@@ -57,8 +60,8 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
-	public List<CourseEnrollListDTO> selectCourseEnrollList(Integer currentUserId) {
-		return courseDAO.selectCourseEnrollList(currentUserId);
+	public List<CourseEnrollListDTO> selectCourseEnrollList(Map<String, Object> params) {
+		return courseDAO.selectCourseEnrollList(params);
 	}
 
 	@Override
@@ -69,6 +72,11 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public CourseVO selectCourseById(Integer id) {
 		return courseDAO.selectCourseById(id);
+	}
+
+	@Override
+	public CourseDetailDTO selectCourseDetailById(Integer id) {
+		return courseDAO.selectCourseDetailById(id);
 	}
 
 	@Override
@@ -88,9 +96,19 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
+	public void updateTestTime(TestVO test) {
+		courseDAO.updateTestTime(test);
+	}
+
+	@Override
 	public void completeTest(int testId) {
 		courseDAO.completeTest(testId);
 
+	}
+
+	@Override
+	public void incompleteTest(int testId) {
+		courseDAO.incompleteTest(testId);
 	}
 
 	@Override
@@ -120,8 +138,8 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
-	public List<CourseVO> selectEditCourseList(Integer currentUserId) {
-		return courseDAO.selectEditCourseList(currentUserId);
+	public List<CourseVO> selectEditCourseList(Map<String, Object> params) {
+		return courseDAO.selectEditCourseList(params);
 	}
 
 	@Override
@@ -131,8 +149,58 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
-	public List<Integer> getUsersByCourseId(int courseId) {
-		return courseDAO.getUsersByCourseId(courseId);
+	public List<Integer> getUsersIdByCourseId(int courseId) {
+		return courseDAO.getUsersIdByCourseId(courseId);
+	}
+
+	@Override
+	public void insertMessage(messageVO messageVO) {
+		courseDAO.insertMessage(messageVO);
+
+	}
+
+	@Override
+	public List<ChatDTO> selectMessageByCourseIdAndUserId(Map<String, Object> params) {
+		return courseDAO.selectMessageByCourseIdAndUserId(params);
+	}
+
+	@Override
+	public List<UserVO> selectUsersByCourseId(int courseId) {
+		return courseDAO.selectUsersByCourseId(courseId);
+	}
+
+	@Override
+	public void deleteCourse(int courseId) {
+		courseDAO.deleteCourse(courseId);
+
+	}
+
+	@Override
+	public int getEnrolledCoursesCountById(int userId) {
+		return courseDAO.getEnrolledCoursesCountById(userId);
+	}
+
+	@Override
+	public List<CourseVO> selectCourseEnrollEditList(int userId) {
+		return courseDAO.selectCourseEnrollEditList(userId);
+
+	}
+
+	@Override
+	public void CancelEnrollment(Map<String, Object> params) {
+		courseDAO.CancelEnrollment(params);
+
+	}
+
+	@Override
+	public int enrollmentCountByCourseId(int courseId) {
+		return courseDAO.enrollmentCountByCourseId(courseId);
+	}
+
+	@Override
+	public boolean isExamRegisteredForCourse(int courseId) {
+
+		return courseDAO.isExamRegisteredForCourse(courseId);
 	}
 
 }

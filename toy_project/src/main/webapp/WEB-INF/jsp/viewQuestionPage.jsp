@@ -131,17 +131,50 @@
                 <p class="score-text">
                     <strong>${totalScore}</strong> 점
                 </p>
+                
             </div>
             
         </div>
-        <div class="text-center mt-3">
-						<button type="button" class="btn btn-primary custom-btn" onclick="completeTest()">시험 완료</button>
-						</div>
+        <div class="card card-success collapsed-card">
+            <div class="card-header">
+                <h3 class="card-title">테스트 설정</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        <div class="card-body">
+<form id="testForm" method="post" onsubmit="changeTime(event); return false;">
+    <div class="form-group">
+        <label for="inputStartDateTime">시작일 및 시간</label>
+        <input type="datetime-local" id="StartDate" class="form-control" name="start_time" 
+               value="${test.start_time}" required>
+    </div>
+    <div class="form-group">
+        <label for="inputEndDateTime">종료일 및 시간</label>
+        <input type="datetime-local" id="EndDate" class="form-control" name="end_time" 
+               value="${test.end_time}" required>
+    </div>
+    <div class="form-group">
+        <label for="inputDuration">시험 시간 (분)</label>
+        <input type="number" id="inputDuration" class="form-control" name="time_limit" 
+               value="${test.time_limit}" required min="1" step="1">
+    </div>
+    <input type="hidden" name="test_id" value="${test.id}"> 
+    <div class="text-center mt-3">
+    <button type="submit" class="btn btn-success">설정 변경</button>
+    </div>
+</form>
+		</div>
+		
+    </div>
+    <div class="text-center mt-3">
+    <button type="button" class="btn btn-primary custom-btn" onclick="completeTest()">시험 완료</button>
     </div>
 </div>
 </section>
 </div>
-
 
 <style>
     .score-text {
@@ -189,8 +222,6 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
     function completeTest() {
         
         if (confirm("시험 생성을 완료하시겠습니까? 등록된 유저들에게 시험이 공개되게 되며, 문제 수정이 불가능해집니다.")) {
-           
-            const testId = 'yourTestId';
 
             
             fetch('/testComplete.do?testId=${testId}', { 
@@ -203,9 +234,11 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
             .then(response => {
                 if (response.ok) {
                     alert("시험이 완료되었습니다.");
-                    window.location.href = '/question/testView.do?testId=${testId}';
+                    window.location.href = '/course.do?id=${course.id}';
                 } else {
-                    alert("시험 완료 요청에 실패했습니다.");
+                    return response.json().then(errorMessage  => {
+                        alert("시험 완료 요청에 실패했습니다: " + errorMessage.message ); 
+                    });
                 }
             })
             .catch(error => {
@@ -214,8 +247,56 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
             });
         } else {
             
-            console.log("시험 완료가 취소되었습니다.");
+            
         }
+    }
+    
+    
+    function changeTime(event) {
+        event.preventDefault(); // 기본 form 제출 방지
+
+        const form = document.getElementById('testForm');
+        const formData = new FormData(form);
+        const testData = {};
+
+        formData.forEach((value, key) => {
+            testData[key] = value; // FormData에서 JSON 객체로 변환
+        });
+
+        
+        const startTime = new Date(testData.start_time);
+        const endTime = new Date(testData.end_time);
+        const timeLimitMinutes = parseInt(testData.time_limit, 10); // 시험 시간(분 단위)
+
+        const minimumEndTime = new Date(startTime.getTime() + timeLimitMinutes * 60000); // 시작 시간 + 시험 시간
+
+        if (endTime < minimumEndTime) {
+            alert("종료 시간은 시작 시간 이후 시험 시간보다 늦어야 합니다.");
+            return;
+        }
+        
+        
+
+        fetch('/changeTestTime.do', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken // CSRF 토큰 추가
+            },
+        body: JSON.stringify(testData), 
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("설정이 변경되었습니다.");
+                window.location.reload(); // 페이지 리로드
+            } else {
+                alert("설정 변경이 실패했습니다.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("서버와의 통신 중 오류가 발생했습니다.");
+        });
     }
 </script>
 

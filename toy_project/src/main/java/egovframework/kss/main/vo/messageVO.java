@@ -3,18 +3,17 @@ package egovframework.kss.main.vo;
 import java.sql.Timestamp;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UserVO {
-
+@NoArgsConstructor
+public class messageVO {
 	private int id;
-	private String user_id;
-	private String role; // 권한
-	private String email;
-	private String name;
-	private String password;
-	private String image_path;
+	private int user_id;
+	private int course_id;
+	private String message;
 	private Timestamp created_at;
+	private Integer recipient_id;
 }

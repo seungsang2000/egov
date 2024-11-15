@@ -24,7 +24,7 @@
 		c.id;
 	</select>
 	
-	<select id="selectEditCourseList" parameterType="java.lang.Integer"
+	<select id="selectEditCourseList" parameterType="map"
 		resultType="egovframework.kss.main.vo.CourseVO">
 		SELECT
 		c.id,
@@ -34,15 +34,19 @@
 		c.image_path as image_path,
 		c.created_at AS created_at,
 		c.status,
-		COUNT(e.user_id) AS studentCount
+		c.max_students,
+		COUNT(CASE WHEN e.status ='user' then e.user_id end) AS studentCount
 		FROM
 		course c
 		INNER JOIN
-		users u ON u.id = c.instructor_id and c.instructor_id = #{id}
+		users u ON u.id = c.instructor_id and c.instructor_id = #{userId}
 		LEFT JOIN
 		enrollments e ON e.course_id = c.id
+		<if test="search != null and search != ''">
+        WHERE c.title LIKE CONCAT('%', #{search}, '%')
+    	</if>
 		GROUP BY
-		c.id, u.name, c.title, c.description, c.created_at, c.status, u.image_path
+		c.id, u.name, c.title, c.description, c.created_at, c.status, u.image_path, c.max_students
 		ORDER BY
 		c.id;
 	</select>
@@ -63,17 +67,29 @@
 
 	<select id="selectCourseById" parameterType="java.lang.Integer"
 		resultType="egovframework.kss.main.vo.CourseVO">
-		select c.id, c.title, c.description, u.name as instructor,
-		c.created_at as created_at, c.status, u.id as instructor_id, c.image_path
+		select c.id, c.title, c.description, u.name as instructor, c.image_path as image_path,
+		c.created_at as created_at, c.status, u.id as instructor_id, c.image_path, c.max_students as max_students
 		from course c
 		inner join users u on u.id=c.instructor_id
 		where c.id=#{id}
 	</select>
+	
+	<select id="selectCourseDetailById" parameterType="java.lang.Integer"
+		resultType="egovframework.kss.main.dto.CourseDetailDTO">
+		select c.id, c.title, c.description, u.name as instructor, u.image_path as user_image_path,
+		c.created_at as created_at, c.status, u.id as instructor_id, c.image_path as course_image_path, c.max_students as max_students, 
+		COUNT(CASE WHEN e.status ='user' then e.user_id end) AS studentCount
+		from course c
+		inner join users u on u.id=c.instructor_id
+		left JOIN enrollments e ON e.course_id = c.id
+		where c.id=#{id}
+		GROUP BY c.id, c.title, c.description, u.name, c.image_path, u.image_path, c.created_at, c.status, u.id, c.max_students
+	</select>
 
 
 
-	<select id="selectCourseEnrollList"
-        parameterType="java.lang.Integer"
+<select id="selectCourseEnrollList"
+        parameterType="map"
         resultType="egovframework.kss.main.dto.CourseEnrollListDTO">
     SELECT
         c.id,
@@ -82,13 +98,14 @@
         u.name AS instructor,
         u.image_path as instructor_image,
         c.created_at AS created_at,
-        c.status,
+        c.status, 
+        c.max_students as max_students,
         CASE 
             WHEN #{currentUserId} IS NULL THEN false 
             WHEN COUNT(e.user_id) > 0 THEN true 
             ELSE false 
         END AS enrolled,
-        COUNT(e2.user_id) AS studentCount
+        COUNT(CASE WHEN e2.status = 'user' THEN e2.user_id END) AS studentCount
     FROM
         course c
     INNER JOIN 
@@ -97,11 +114,42 @@
         enrollments e ON e.course_id = c.id AND e.user_id = #{currentUserId}
     LEFT JOIN 
         enrollments e2 ON e2.course_id = c.id
+     <if test="search != null and search != ''">
+        WHERE c.title LIKE CONCAT('%', #{search}, '%')
+        OR u.name LIKE CONCAT('%', #{search}, '%')
+    </if>
     GROUP BY 
-        c.id, u.name, u.image_path, c.title, c.description, c.created_at, c.status
+        c.id, u.name, u.image_path, c.title, c.description, c.created_at, c.status, c.max_students
     ORDER BY 
         c.id;
 </select>
+
+
+    <select id="selectCourseEnrollEditList" parameterType="int" resultType="egovframework.kss.main.vo.CourseVO">
+    SELECT
+		c.id,
+		c.title,
+		c.description,
+		u.name AS instructor,
+		c.image_path as image_path,
+		c.created_at AS created_at,
+		c.status,
+		c.max_students,
+		COUNT(e2.user_id) AS studentCount
+		FROM
+		course c
+		INNER JOIN
+		users u ON u.id = c.instructor_id
+		INNER JOIN
+		enrollments e ON e.course_id = c.id and e.user_id = #{userId}
+		LEFT JOIN 
+        enrollments e2 ON e2.course_id = c.id
+        where e2.status = 'user'
+		GROUP BY
+		c.id, u.name, c.title, c.description, c.created_at, c.status, u.image_path, c.max_students
+		ORDER BY
+		c.id;
+    </select>
 
 
 	<insert id="registerCourse"
@@ -110,10 +158,10 @@
         keyProperty="id"
 		>
 		insert into course(instructor_id, title, description,
-		status, created_at, image_path)
+		status, created_at, image_path, max_students)
 		values (#{instructor_id},#{title}, #{description},
 		#{status},
-		#{created_at}, #{image_path})
+		#{created_at}, #{image_path}, #{max_students})
 
 	</insert>
 
@@ -152,7 +200,12 @@
         t.shutdown, 
         t.description, 
         t.status, 
-        e.status AS user_status,
+        case
+        when e.status is NULL  then NULL
+        when e.status = '완료' then '완료'
+        when e.status = '시험중' and e.end_time &lt; NOW() then '완료'
+        else '시험중'
+        end as user_status,
         t.score,
         t.is_scored,
         (SELECT COUNT(e2.user_id) FROM exam_participation e2 WHERE e2.test_id = t.id and e2.end_time is not null) AS user_count,
@@ -168,14 +221,31 @@
 		delete from test where id=#{testId}
 	</delete>
 	
+	<delete id="deleteCourse" parameterType="java.lang.Integer">
+		delete from course where id=#{courseId}
+	</delete>
+	
+	<update id="updateTestTime" parameterType="egovframework.kss.main.vo.TestVO">
+		update test  
+		set start_time = #{start_time}, end_time=#{end_time}, time_limit = #{time_limit}
+		where id=#{id}
+	
+	</update>
+	
 	<update id="completeTest" parameterType="int">
 		update test 
 		set status = '완료', score = (SELECT SUM(score) FROM questions WHERE test_id = #{testId}) 
 		where id=#{testId}
 	</update>
 	
+	<update id="incompleteTest" parameterType="int">
+		update test 
+		set status = '작성중', score = (SELECT SUM(score) FROM questions WHERE test_id = #{testId}) 
+		where id=#{testId}
+	</update>
+	
 	<update id="updateCourse" parameterType="egovframework.kss.main.vo.CourseVO">
-		update course set title=#{title}, description=#{description}, status = #{status}, image_path = #{image_path} where id=#{id}
+		update course set title=#{title}, description=#{description}, status = #{status}, image_path = #{image_path}, max_students = #{max_students} where id=#{id}
 	</update>
 	
 	<select id="selectTotalStudentsByCourseId" parameterType="int" resultType="int">
@@ -226,12 +296,75 @@ GROUP BY
     c.id, c.title;
     </select>
     
-    <select id="getUsersByCourseId" parameterType="int" resultType="java.lang.Integer">
+    <select id="getUsersIdByCourseId" parameterType="int" resultType="java.lang.Integer">
     select user_id
     from enrollments
     where course_id = #{courseId}
     
     </select>
+    
+    <select id="selectUsersByCourseId" parameterType="int" resultType="egovframework.kss.main.vo.UserVO">
+    	select u.id as id, u.name as name, u.role as role, u.image_path as image_path, e.enrolled_at as created_at
+    	from (select * from enrollments where course_id = #{courseId}) e
+    	inner join users u on  u.id=e.user_id
+    	order by role
+    	
+    </select>
+    
+    <insert id="insertMessage" parameterType="egovframework.kss.main.vo.messageVO" useGeneratedKeys="true" keyProperty="id">
+    insert into messages(user_id, course_id, message, created_at, recipient_id) values (#{user_id}, #{course_id}, #{message}, #{created_at}, #{recipient_id})
+    </insert>
+    
+    <select id="selectMessageByCourseIdAndUserId" parameterType="map" resultType="egovframework.kss.main.dto.ChatDTO">
+    select 
+    	m.id as id, 
+    	m.course_id as course_id, 
+    	m.message as message, 
+    	m.created_at as created_at, 
+    	CASE 
+    		when u.id = #{userId} then true
+    		ELSE false
+    	end as is_me, 
+    	u.name as user_name, 
+    	u.image_path as user_image,
+    	u2.name as recipient_name
+    from (select * from messages where course_id = #{courseId}) m
+    inner join users u on m.user_id = u.id
+    left join users u2 on m.recipient_id = u2.id
+    order by created_at asc
+    </select>
+    
+    <select id="getEnrolledCoursesCountById" parameterType ="int" resultType="int">
+    select count(*)
+    from enrollments e
+    where user_id=#{userId}
+    
+    </select>
+    
+
+    
+    <delete id="CancelEnrollment" parameterType="map">
+    	delete from enrollments where  course_id = #{courseId} and user_id = #{userId} and status = 'user'
+    </delete>
+    
+    <select id="enrollmentCountByCourseId" parameterType="int" resultType="int">
+    select count(*)
+    from enrollments where course_id = #{course_id} and status = 'user'
+    
+    </select>
+    
+    <select id="isExamRegisteredForCourse" parameterType="int" resultType="boolean">
+    <![CDATA[
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.test
+    WHERE course_id = #{courseId}
+      AND end_time < CURRENT_TIMESTAMP
+  )
+  ]]>
+  </select>
+    
+    
     
     
 	

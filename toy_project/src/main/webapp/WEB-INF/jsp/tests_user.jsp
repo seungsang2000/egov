@@ -34,6 +34,14 @@
 
     <!-- Main content -->
     <section class="content">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link  active" href="#">시험 목록</a> <!-- 시험 목록 페이지 -->
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/chat.do?id=${course.id}">소통</a> <!-- 소통 페이지 -->
+        </li>
+    </ul>
     <!-- Default box -->
     <div class="card">
         <div class="card-header">
@@ -52,10 +60,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach var="test" items="${list}">
+                    <c:forEach var="test" items="${list}" varStatus="status">
                         <c:if test="${test.status == '완료'}">
                             <tr>
-                                <td>#</td>
+                                <td>${status.index + 1}</td>
                                 <td>
                                     <a>${test.name}</a><br />
                                     <small>
@@ -153,33 +161,33 @@
 <!-- /.content-wrapper -->
 
 <style>
-.user-section .user-count-container { /* 부모 클래스와 함께 사용 */
+.user-section .user-count-container { 
     display: flex;
-    align-items: center; /* 아이템 수직 중앙 정렬 */
-    font-size: 1.2rem; /* 기본 폰트 크기 */
-    padding: 5px; /* 패딩 추가 */
+    align-items: center; 
+    font-size: 1.2rem;
+    padding: 5px; 
 }
 
-.user-section .badge { /* 부모 클래스와 함께 사용 */
-    font-size: 1rem; /* 배지 크기 조정 */
-    margin-right: 5px; /* 배지 간격 조정 */
+.user-section .badge {
+    font-size: 1rem; 
+    margin-right: 5px; 
 }
 
-.user-section .separator { /* 부모 클래스와 함께 사용 */
-    margin: 0 5px; /* 구분자 간격 조정 */
-    font-weight: bold; /* 구분자 강조 */
+.user-section .separator { 
+    margin: 0 5px; 
+    font-weight: bold; 
 }
 
-.user-section .user-icon { /* 부모 클래스와 함께 사용 */
-    margin-left: 10px; /* 사용자 아이콘 여백 */
-    color: #007bff; /* 아이콘 색상 */
-    font-size: 1.5rem; /* 아이콘 크기 조정 */
+.user-section .user-icon { 
+    margin-left: 10px; 
+    color: #007bff; 
+    font-size: 1.5rem;
 }
 
-.user-section .check-icon { /* 부모 클래스와 함께 사용 */
-    margin-left: 5px; /* 체크 아이콘 여백 */
-    color: #28a745; /* 체크 아이콘 색상 */
-    font-size: 1.5rem; /* 체크 아이콘 크기 조정 */
+.user-section .check-icon { 
+    margin-left: 5px; 
+    color: #28a745;
+    font-size: 1.5rem;
 }
 </style>
 

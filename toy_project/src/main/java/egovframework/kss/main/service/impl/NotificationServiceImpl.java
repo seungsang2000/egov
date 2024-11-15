@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import egovframework.kss.main.dao.NotificationDAO;
+import egovframework.kss.main.model.ChatMessage;
 import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.service.NotificationService;
 import egovframework.kss.main.vo.CourseVO;
@@ -45,8 +46,18 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
+	public void deleteDirectMessage(int id) {
+		notificationDAO.deleteDirectMessage(id);
+	}
+
+	@Override
 	public List<NotificationVO> selectNotificationByUserId(int id) {
 		return notificationDAO.selectNotificationByUserId(id);
+	}
+
+	@Override
+	public List<ChatMessage> selectDirectMessageByUserId(int id) {
+		return notificationDAO.selectDirectMessageByUserId(id);
 	}
 
 	@Override
@@ -56,11 +67,16 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	public void sendMessageByTestId(int testId, String messageText) {
+	public void deleteAllDirectMessage(int userId) {
+		notificationDAO.deleteAllDirectMessage(userId);
+	}
+
+	@Override
+	public void sendNotificationByTestId(int testId, String messageText) {
 		TestVO test = courseService.selectTestById(testId);
 		CourseVO course = courseService.selectCourseById(test.getCourse_id());
 
-		List<Integer> receiverIds = courseService.getUsersByCourseId(test.getCourse_id());
+		List<Integer> receiverIds = courseService.getUsersIdByCourseId(test.getCourse_id());
 
 		//db에 메세지 저장
 		for (int receiverId : receiverIds) {
@@ -80,6 +96,33 @@ public class NotificationServiceImpl implements NotificationService {
 		} catch (MessagingException | JsonProcessingException e) {
 
 		}
+
+	}
+
+	@Override
+	public void sendChatting(int courseId, ChatMessage chatMessage) {
+		try {
+			messagingTemplate.convertAndSend("/topic/course/" + courseId + "/chat", new ObjectMapper().writeValueAsString(chatMessage));
+		} catch (MessagingException | JsonProcessingException e) {
+
+		}
+
+	}
+
+	@Override
+	public void sendDirectMessage(ChatMessage chatMessage) {
+		try {
+			messagingTemplate.convertAndSend("/topic/course/" + chatMessage.getRecipient_id() + "/DM", new ObjectMapper().writeValueAsString(chatMessage));
+			insertDirectMessage(chatMessage);
+		} catch (MessagingException | JsonProcessingException e) {
+
+		}
+
+	}
+
+	@Override
+	public void insertDirectMessage(ChatMessage chatMessage) {
+		notificationDAO.insertDirectMessage(chatMessage);
 
 	}
 
