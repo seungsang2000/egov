@@ -557,15 +557,18 @@ public class CourseController {
 				Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
 
 				Pattern pattern = Pattern.compile("_(\\d+)_(\\d+)");
-				try {
-					for (File file : files) {
-						//videoFiles.add(file.getName());
+				for (File file : files) {
+					try {
+						// 파일 이름 가져오기
 						String filename = file.getName();
 						Matcher matcher = pattern.matcher(filename);
 
+						// 패턴 일치 여부 확인
 						if (matcher.find()) {
 							int userId = Integer.parseInt(matcher.group(1));
 							int testId = Integer.parseInt(matcher.group(2));
+
+							// 데이터 처리
 							Map<String, Object> item1 = new HashMap<>();
 							UserVO test_user = userService.selectUserById(userId);
 							TestVO test = courseService.selectTestById(testId);
@@ -576,10 +579,12 @@ public class CourseController {
 							item1.put("last_modified", file.lastModified());
 							videoFiles.add(item1);
 						}
+					} catch (Exception e) {
+						// 처리 불가능한 파일에 대한 로그 기록 또는 사용자 알림
+						System.err.println("파일 처리 중 문제가 발생했습니다: " + file.getName() + " - " + e.getMessage());
 					}
-				} catch (Exception e) {
-					throw new CustomException("에러가 발생하는 파일이 존재합니다.");
 				}
+
 			}
 		}
 

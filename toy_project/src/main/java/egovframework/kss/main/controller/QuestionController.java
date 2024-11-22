@@ -2,7 +2,6 @@ package egovframework.kss.main.controller;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +24,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import egovframework.kss.main.dto.AnswerDTO;
 import egovframework.kss.main.dto.QuestionDetailDTO;
-import egovframework.kss.main.dto.QuestionDetailWithUserAnswerDTO;
 import egovframework.kss.main.dto.QuestionListDTO;
+import egovframework.kss.main.dto.SolveQuestionDTO;
+import egovframework.kss.main.dto.SolveTestDTO;
+import egovframework.kss.main.dto.TestReviewDTO;
 import egovframework.kss.main.exception.CustomException;
 import egovframework.kss.main.model.Option;
 import egovframework.kss.main.model.Question;
 import egovframework.kss.main.service.CourseService;
 import egovframework.kss.main.service.NotificationService;
 import egovframework.kss.main.service.QuestionService;
+import egovframework.kss.main.service.TestService;
 import egovframework.kss.main.service.UserService;
 import egovframework.kss.main.vo.CourseVO;
 import egovframework.kss.main.vo.ExamParticipationVO;
@@ -56,6 +58,9 @@ public class QuestionController {
 
 	@Resource(name = "NotificationService")
 	private NotificationService notificationService;
+
+	@Resource(name = "TestService")
+	private TestService testService;
 
 	@PostMapping("/questionCreate.do")
 	public String questionCreate(Model model, HttpServletRequest request) { // request.getParameter 방식도 시도해본다
@@ -257,192 +262,49 @@ public class QuestionController {
 	@Transactional
 	public String solveTest(@RequestParam(value = "testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
 
-		UserVO user = userService.getCurrentUser();
-		int userId = user.getId();
+		try {
+			SolveTestDTO solveTestDTO = testService.solveTest(testId, questionId);
 
-		Map<String, Object> params = new HashMap<>();
-		params.put("userId", userId);
-		params.put("testId", testId);
+			model.addAttribute("endTime", solveTestDTO.getEndTime());
+			model.addAttribute("testId", solveTestDTO.getTestId());
+			model.addAttribute("userId", solveTestDTO.getUserId());
+			model.addAttribute("selectedQuestionId", solveTestDTO.getSelectedQuestionId());
+			model.addAttribute("questions", solveTestDTO.getQuestions());
+			model.addAttribute("currentQuestion", solveTestDTO.getCurrentQuestion());
+			model.addAttribute("editable", solveTestDTO.isEditable());
+			model.addAttribute("nextQuestionId", solveTestDTO.getNextQuestionId());
+			model.addAttribute("course", solveTestDTO.getCourse());
 
-		List<QuestionListDTO> questions = questionService.selectSloveQuestionListsByTestId(params);
-
-		if (questionId == null) {
-			questionId = questions.get(0).getId(); // 받은 문제 id가 없으면 첫번째 문제 보기
+			return "solveQuestion";
+		} catch (CustomException e) {
+			model.addAttribute("errorMessage", e.getMessage());
+			return "errorPage";
 		}
-
-		params.put("questionId", questionId);
-
-		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
-
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-
-		TestVO test = courseService.selectTestById(testId);
-		if (test.getEnd_time().before(now)) {
-			throw new CustomException("이미 완료된 시험입니다");
-		}
-
-		if (userParticipation != null) {
-			if (userParticipation.getEnd_time().before(now) || userParticipation.getStatus().equals("완료")) {
-				throw new CustomException("이미 완료된 시험입니다");
-			}
-		}
-
-		if (!questionService.checkExamParticipationExists(params)) {
-			System.out.println("시험 응시 시작~~~~~~~~"); //유저 시험 참여
-
-			Timestamp startTime = new Timestamp(System.currentTimeMillis());
-
-			// 시간 더하기
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(startTime.getTime());
-			calendar.add(Calendar.MINUTE, test.getTime_limit());
-			Timestamp calculatedEndTime = new Timestamp(calendar.getTimeInMillis());
-			Timestamp existingEndTime = test.getEnd_time();
-
-			Timestamp endTime = calculatedEndTime.compareTo(existingEndTime) < 0 ? calculatedEndTime : existingEndTime;
-
-			String status = "시험중";
-			params.put("startTime", startTime);
-			params.put("endTime", endTime);
-			params.put("status", status);
-
-			questionService.insertExamParticipation(params);
-			userParticipation = questionService.selectExamParticipation(params);
-		} else {
-			System.out.println("시험 중복 응시~~~~~~~~");
-		}
-
-		model.addAttribute("endTime", userParticipation.getEndTimeAsISO());
-
-		model.addAttribute("testId", testId);
-		model.addAttribute("userId", user.getId());
-		model.addAttribute("selectedQuestionId", questionId);
-
-		model.addAttribute("questions", questions);
-
-		QuestionDetailDTO questionDetail = questionService.selectQuestionById(questionId);
-
-		String userAnswer = questionService.selectUserAnswer(params);
-
-		QuestionDetailWithUserAnswerDTO detailWithAnswer = new QuestionDetailWithUserAnswerDTO(); // 변환
-		detailWithAnswer.setId(questionDetail.getId());
-		detailWithAnswer.setQuestion_text(questionDetail.getQuestion_text());
-		detailWithAnswer.setQuestion_type(questionDetail.getQuestion_type());
-		detailWithAnswer.setOptions(questionDetail.getOptions());
-		detailWithAnswer.setUserAnswer(userAnswer);
-		detailWithAnswer.setScore(questionDetail.getScore());
-
-		model.addAttribute("currentQuestion", detailWithAnswer);
-		model.addAttribute("editable", false);
-
-		if (questionId != questions.get(questions.size() - 1).getId()) {
-			QuestionDetailDTO nextQuestionDetail = questionService.selectNextQuestionById(questionId);
-			model.addAttribute("nextQuestionId", nextQuestionDetail.getId());
-		}
-
-		CourseVO course = courseService.selectCourseById(test.getCourse_id());
-
-		model.addAttribute("course", course);
-
-		return "solveQuestion";
 	}
 
 	@PostMapping("/solveTest.do")
+	@Transactional
 	public String solveQuestion(HttpServletRequest request, Model model, @RequestParam(value = "questionId", required = false) Integer questionId, @RequestParam(value = "nextQuestionId", required = false) Integer nextQuestionId) {
-		String questionType = request.getParameter("questionType");
-		int testId = Integer.parseInt(request.getParameter("testId"));
-		int currentQuestionId = Integer.parseInt(request.getParameter("currentQuestionId"));
-		UserVO user = userService.getCurrentUser();
-		int userId = user.getId();
-		Map<String, Object> params = new HashMap<>();
-		params.put("userId", userId);
-		params.put("testId", testId);
-		ExamParticipationVO userParticipation = questionService.selectExamParticipation(params);
 
-		Timestamp now = new Timestamp(System.currentTimeMillis());
+		try {
+			SolveQuestionDTO solveQuestionDTO = testService.solveQuestion(request, questionId, nextQuestionId);
 
-		TestVO test = courseService.selectTestById(testId);
+			// 모델에 값 설정
+			model.addAttribute("questions", solveQuestionDTO.getQuestions());
+			model.addAttribute("testId", solveQuestionDTO.getTestId());
+			model.addAttribute("userId", solveQuestionDTO.getUserId());
+			model.addAttribute("endTime", solveQuestionDTO.getEndTime());
+			model.addAttribute("currentQuestion", solveQuestionDTO.getCurrentQuestion());
+			model.addAttribute("selectedQuestionId", solveQuestionDTO.getSelectedQuestionId());
+			model.addAttribute("editable", solveQuestionDTO.isEditable());
+			model.addAttribute("nextQuestionId", solveQuestionDTO.getNextQuestionId());
+			model.addAttribute("course", solveQuestionDTO.getCourse());
 
-		Timestamp endTime = test.getEnd_time();
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(endTime.getTime());
-		calendar.add(Calendar.MINUTE, 1); // 1분 추가(제출시 네트워크 오류등 대비하기 위해, post제출은 제한시간+ 1분까지 허용)
-
-		if (calendar.getTimeInMillis() < now.getTime()) {
-			throw new CustomException("이미 완료된 시험입니다");
+			return "solveQuestion";
+		} catch (CustomException e) {
+			model.addAttribute("errorMessage", e.getMessage());
+			return "errorPage";
 		}
-
-		if (userParticipation != null) {
-			calendar.setTimeInMillis(userParticipation.getEnd_time().getTime());
-			calendar.add(Calendar.MINUTE, 1);
-			if (calendar.getTimeInMillis() < now.getTime() || userParticipation.getStatus().equals("완료")) {
-				throw new CustomException("이미 완료된 시험입니다");
-			}
-		}
-
-		AnswerDTO answer = new AnswerDTO();
-		answer.setQuestion_id(currentQuestionId);
-		answer.setTest_id(testId);
-		answer.setUser_id(user.getId());
-
-		if (questionType.equals("주관식")) {
-			String user_answer = request.getParameter("subjectiveAnswer");
-			answer.setAnswer(user_answer);
-		} else if (questionType.equals("서술형")) {
-
-		} else if (questionType.equals("객관식")) {
-
-			String user_answer = request.getParameter("answer");
-			answer.setAnswer(user_answer);
-		}
-
-		if (!questionService.checkUserAnswerExists(answer)) {
-			System.out.println("답변 저장");
-			questionService.insertUserAnswer(answer);
-		} else {
-			System.out.println("답변 업데이트");
-			questionService.updateUserAnswer(answer);
-		}
-
-		List<QuestionListDTO> questions = questionService.selectSloveQuestionListsByTestId(params);
-		model.addAttribute("questions", questions);
-		model.addAttribute("testId", testId);
-		model.addAttribute("userId", user.getId());
-		if (questionId != null) {
-			currentQuestionId = questionId;
-		} else {
-			currentQuestionId = nextQuestionId;
-		}
-
-		QuestionDetailDTO questionDetail = questionService.selectQuestionById(currentQuestionId);
-
-		params.put("questionId", currentQuestionId);
-
-		model.addAttribute("endTime", userParticipation.getEndTimeAsISO());
-
-		String userAnswer = questionService.selectUserAnswer(params);
-
-		QuestionDetailWithUserAnswerDTO detailWithAnswer = new QuestionDetailWithUserAnswerDTO();
-		detailWithAnswer.setId(questionDetail.getId());
-		detailWithAnswer.setQuestion_text(questionDetail.getQuestion_text());
-		detailWithAnswer.setQuestion_type(questionDetail.getQuestion_type());
-		detailWithAnswer.setOptions(questionDetail.getOptions());
-		detailWithAnswer.setUserAnswer(userAnswer);
-		detailWithAnswer.setScore(questionDetail.getScore());
-		model.addAttribute("currentQuestion", detailWithAnswer);
-		model.addAttribute("selectedQuestionId", questionDetail.getId());
-		model.addAttribute("editable", false);
-
-		if (currentQuestionId != questions.get(questions.size() - 1).getId()) {
-			QuestionDetailDTO nextQuestionDetail = questionService.selectNextQuestionById(currentQuestionId);
-			model.addAttribute("nextQuestionId", nextQuestionDetail.getId());
-		}
-
-		CourseVO course = courseService.selectCourseById(test.getCourse_id());
-
-		model.addAttribute("course", course);
-
-		return "solveQuestion";
 	}
 
 	@PostMapping("/userFinishTest.do")
@@ -562,50 +424,17 @@ public class QuestionController {
 
 	@RequestMapping(value = "/testReview.do")
 	public String testReview(@RequestParam("testId") int testId, @RequestParam(value = "questionId", required = false) Integer questionId, Model model) {
-		model.addAttribute("testId", testId);
 
-		UserVO user = userService.getCurrentUser();
-		int userId = user.getId();
+		TestReviewDTO reviewDTO = testService.getTestReview(testId, questionId);
 
-		Map<String, Object> params = new HashMap<>();
-		params.put("userId", userId);
-		params.put("testId", testId);
-
-		List<QuestionListDTO> questions = questionService.selectReviewQuestionListsByTestId(params);
-		model.addAttribute("questions", questions);
-
-		Integer id = 0;
-		if (questionId == null) {
-			id = questions.get(0).getId();
-		} else {
-			id = questionId;
-		}
-		params.put("questionId", id);
-
-		QuestionDetailDTO questionDetail = questionService.selectQuestionById(id);
-
-		String userAnswer = questionService.selectUserAnswer(params);
-
-		QuestionDetailWithUserAnswerDTO detailWithAnswer = new QuestionDetailWithUserAnswerDTO(); // 변환
-		detailWithAnswer.setId(questionDetail.getId());
-		detailWithAnswer.setQuestion_text(questionDetail.getQuestion_text());
-		detailWithAnswer.setQuestion_type(questionDetail.getQuestion_type());
-		detailWithAnswer.setOptions(questionDetail.getOptions());
-		detailWithAnswer.setUserAnswer(userAnswer);
-		detailWithAnswer.setScore(questionDetail.getScore());
-
-		model.addAttribute("currentQuestion", detailWithAnswer);
-
-		model.addAttribute("selectedQuestionId", id);
-		model.addAttribute("questionDetail", questionDetail);
-		model.addAttribute("editable", false);
-
-		model.addAttribute("correct_answer", questionDetail.getCorrect_answer());
-
-		TestVO test = courseService.selectTestById(testId);
-		CourseVO course = courseService.selectCourseById(test.getCourse_id());
-
-		model.addAttribute("course", course);
+		model.addAttribute("testId", reviewDTO.getTestId());
+		model.addAttribute("questions", reviewDTO.getQuestions());
+		model.addAttribute("currentQuestion", reviewDTO.getCurrentQuestion());
+		model.addAttribute("selectedQuestionId", reviewDTO.getSelectedQuestionId());
+		model.addAttribute("questionDetail", reviewDTO.getQuestionDetail());
+		model.addAttribute("editable", reviewDTO.isEditable());
+		model.addAttribute("correct_answer", reviewDTO.getCorrectAnswer());
+		model.addAttribute("course", reviewDTO.getCourse());
 
 		return "testReview";
 	}
